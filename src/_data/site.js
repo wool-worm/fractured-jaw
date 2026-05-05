@@ -4,7 +4,7 @@ module.exports = {
   title: "Fractured Jaw",
   description:
     "A zine and blog. Writing, music, politics. Anonymous, intermittent, hand-built.",
-  url: "https://fractured-jaw.blog",
+  url: "https://fractured-jaw.com",
   language: "en",
   // Default author shown when a post's frontmatter doesn't override it.
   defaultAuthor: "wool-worm",
