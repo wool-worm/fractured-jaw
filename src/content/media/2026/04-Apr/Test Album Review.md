@@ -1,0 +1,23 @@
+---
+title: Test Album Review
+date_published: 2026-04-20T18:00:00Z
+date_updated: 2026-04-20T18:00:00Z
+author: wool-worm
+tags: [music, review]
+description_short: Scaffolding review used to confirm the media layout renders the rating field.
+description_long: Scaffolding review used to confirm that media posts produce /media/test-album-review/ and that the post-meta partial surfaces the rating frontmatter field.
+featured: false
+draft: false
+exclude: false
+preview_enabled: true
+graph_enabled: true
+image:
+reading_time: 2 min read
+rating: 4/5
+---
+
+A placeholder review. Confirms:
+
+- the media layout chains through to base.njk
+- post-meta surfaces the `rating` frontmatter when present
+- the URL `/media/test-album-review/` resolves correctly from `src/content/media/2026/04-Apr/Test Album Review.md`

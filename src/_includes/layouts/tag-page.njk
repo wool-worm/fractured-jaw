@@ -1,0 +1,31 @@
+---
+layout: layouts/base.njk
+---
+{# Per-tag page (/tags/<tag>/). Receives `tagEntry` (a single item from
+   collections.tagList) via pagination. Posts are pre-grouped by section
+   in the order blog → essays → fragments → media. #}
+
+<section class="tag-page tag-{{ tagEntry.tag }}">
+  <header class="page-header">
+    <h1 class="page-title">
+      Tag: <span class="tag-name">{{ tagEntry.displayName }}</span>
+    </h1>
+    <p class="tag-meta">
+      {{ tagEntry.count }} post{% if tagEntry.count != 1 %}s{% endif %}
+      &middot; <a href="/tags/">all tags</a>
+    </p>
+  </header>
+
+  {% for group in tagEntry.bySection %}
+    <section class="tag-section-group">
+      <h2 class="tag-section-heading">
+        <a href="/{{ group.section }}/">{{ group.section }}</a>
+      </h2>
+      <ul class="post-list">
+        {% for post in group.posts %}
+          {% include "partials/post-card.njk" %}
+        {% endfor %}
+      </ul>
+    </section>
+  {% endfor %}
+</section>

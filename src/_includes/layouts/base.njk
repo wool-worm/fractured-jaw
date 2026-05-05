@@ -1,0 +1,28 @@
+{# The HTML skeleton every page is wrapped in. Section layouts (post.njk,
+   page.njk, etc.) chain into this via `layout: layouts/base.njk` in their
+   own frontmatter. #}
+<!DOCTYPE html>
+<html lang="{{ site.language }}">
+<head>
+  {% include "partials/head.njk" %}
+</head>
+<body>
+  {% include "partials/header.njk" %}
+  <main>
+    {{ content | safe }}
+  </main>
+  {% include "partials/footer.njk" %}
+  {# Local-graph widget renders on every page EXCEPT /network_nodes/ — the
+     dedicated full-graph view would render the same graph twice. Whether
+     the *current* page appears as a node in the graph is governed
+     separately by the `graph_enabled` frontmatter flag (see
+     graph-data.11ty.js). The widget's layout (global, local, section,
+     tag) is driven by the `page_type` frontmatter, read by
+     graph-widget.js off data attributes on the partial. #}
+  {% if page.url != "/network_nodes/" %}
+    {% include "partials/graph-widget.njk" %}
+    <script src="/assets/js/graph-widget.js" defer></script>
+  {% endif %}
+  <script src="/assets/js/wikilink-preview.js" defer></script>
+</body>
+</html>

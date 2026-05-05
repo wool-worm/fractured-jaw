@@ -1,0 +1,9 @@
+# Obsidian internals — never publish to the site
+src/content/.obsidian/
+src/content/.trash/
+
+# Author-side workspace: templates, guides, snippets that aren't site content
+src/content/_local/
+
+# Build output (in case it ever lives inside src/)
+src/_site/

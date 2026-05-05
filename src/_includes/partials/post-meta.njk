@@ -1,0 +1,41 @@
+{# Post metadata block — published/updated dates, author, reading time,
+   media rating (when present), tag list. Used by every content layout. #}
+<dl class="post-meta">
+  {% if date_published %}
+    <dt>Published</dt>
+    <dd>
+      <time datetime="{{ date_published | isoDate }}">{{ date_published | humanDate }}</time>
+    </dd>
+  {% endif %}
+
+  {% if date_updated and (date_updated | isoDate) != (date_published | isoDate) %}
+    <dt>Updated</dt>
+    <dd>
+      <time datetime="{{ date_updated | isoDate }}">{{ date_updated | humanDate }}</time>
+    </dd>
+  {% endif %}
+
+  <dt>By</dt>
+  <dd>{{ author or site.defaultAuthor }}</dd>
+
+  {% if reading_time %}
+    <dt>Reading time</dt>
+    <dd>{{ reading_time }}</dd>
+  {% endif %}
+
+  {% if rating %}
+    <dt>Rating</dt>
+    <dd>{{ rating }}</dd>
+  {% endif %}
+
+  {% if tags and tags.length %}
+    <dt>Tags</dt>
+    <dd>
+      <ul class="tag-list">
+        {% for tag in tags %}
+          <li><a href="/tags/{{ tag | slug }}/">{{ tag }}</a></li>
+        {% endfor %}
+      </ul>
+    </dd>
+  {% endif %}
+</dl>

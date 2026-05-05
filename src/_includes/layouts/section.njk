@@ -1,0 +1,30 @@
+---
+layout: layouts/base.njk
+---
+{# Layout for section landing pages (/blog/, /essays/, /fragments/, /media/).
+   Caller's frontmatter sets `section_name` to the collection key. The page's
+   markdown body becomes the intro paragraph above the post list. #}
+
+{% set posts = collections[section_name] %}
+
+<section class="section-page section-{{ section_name }}">
+  <header class="section-header">
+    <h1 class="section-title">{{ title }}</h1>
+    {% if description_short %}
+      <p class="section-description">{{ description_short }}</p>
+    {% endif %}
+    {% if content %}
+      <div class="section-intro">{{ content | safe }}</div>
+    {% endif %}
+  </header>
+
+  {% if posts and posts.length %}
+    <ul class="post-list section-post-list">
+      {% for post in posts %}
+        {% include "partials/post-card.njk" %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="section-empty">No posts yet.</p>
+  {% endif %}
+</section>

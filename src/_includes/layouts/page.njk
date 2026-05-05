@@ -1,0 +1,13 @@
+---
+layout: layouts/base.njk
+---
+{# Layout for top-level static pages (src/content/pages/), e.g. /about/,
+   /contributors/. Plain — no post-meta, no tags, no description block. #}
+<article class="page">
+  <header class="page-header">
+    <h1 class="page-title">{{ title }}</h1>
+  </header>
+  <div class="page-content">
+    {{ content | safe }}
+  </div>
+</article>

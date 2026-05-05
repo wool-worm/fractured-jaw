@@ -1,0 +1,33 @@
+---
+layout: layouts/base.njk
+---
+{# Tag index page (/tags/). Lists every tag in collections.tagList with
+   a count and a link to the per-tag page. Tags are pre-sorted alphabetically
+   by .eleventy.js. #}
+
+<section class="tags-index">
+  <header class="page-header">
+    <h1 class="page-title">{{ title or "Tags" }}</h1>
+    {% if description_short %}
+      <p>{{ description_short }}</p>
+    {% endif %}
+    {% if content %}
+      <div class="page-intro">{{ content | safe }}</div>
+    {% endif %}
+  </header>
+
+  {% if collections.tagList.length %}
+    <ul class="tag-cloud">
+      {% for entry in collections.tagList %}
+        <li>
+          <a href="/tags/{{ entry.tag }}/" class="tag-cloud-item">
+            <span class="tag-cloud-name">{{ entry.displayName }}</span>
+            <span class="tag-cloud-count">({{ entry.count }})</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No tags yet.</p>
+  {% endif %}
+</section>

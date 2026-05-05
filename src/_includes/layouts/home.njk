@@ -1,0 +1,43 @@
+---
+layout: layouts/base.njk
+---
+{# Homepage layout: free-form intro markdown on top, then dynamic sections
+   pulled from collections (featured, recent, section nav cards). #}
+
+<section class="home-intro">
+  {{ content | safe }}
+</section>
+
+{% if collections.featured.length %}
+  <section class="home-featured">
+    <h2>Featured</h2>
+    <ul class="post-list post-list-featured">
+      {% for post in collections.featured | take(6) %}
+        {% include "partials/post-card.njk" %}
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+{% if collections.all_content.length %}
+  <section class="home-recent">
+    <h2>Recent</h2>
+    <ul class="post-list post-list-recent">
+      {% for post in collections.all_content | take(15) %}
+        {% include "partials/post-card.njk" %}
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+<section class="home-sections">
+  <h2>Sections</h2>
+  <ul class="section-nav">
+    <li><a href="/blog/">Blog</a> &mdash; long-form posts</li>
+    <li><a href="/essays/">Essays</a> &mdash; self-contained pieces</li>
+    <li><a href="/fragments/">Fragments</a> &mdash; errata and idea-level notes</li>
+    <li><a href="/media/">Media</a> &mdash; reviews of books, film, music</li>
+    <li><a href="/tags/">Tags</a> &mdash; browse by topic</li>
+    <li><a href="/about/">About</a></li>
+  </ul>
+</section>

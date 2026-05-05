@@ -1,0 +1,26 @@
+{
+  "name": "fractured-jaw",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fractured Jaw — a personal anonymous blog/zine. Static site built with Eleventy, authored in Obsidian, hosted on GitHub Pages.",
+  "type": "commonjs",
+  "main": ".eleventy.js",
+  "scripts": {
+    "start": "cross-env ELEVENTY_ENV=development eleventy --serve",
+    "build": "cross-env ELEVENTY_ENV=production eleventy",
+    "build:dev": "cross-env ELEVENTY_ENV=development eleventy",
+    "clean": "rimraf _site"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wool-worm/Fractured-Jaw.git"
+  },
+  "homepage": "https://fractured-jaw.blog",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.2",
+    "cross-env": "^7.0.3",
+    "luxon": "^3.5.0",
+    "rimraf": "^6.0.1"
+  }
+}

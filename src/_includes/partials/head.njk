@@ -1,0 +1,22 @@
+{# Per-page <head> contents — included by base.njk. #}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% if title and title != site.title %}{{ title }} — {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+<meta name="description" content="{{ description_short or site.description }}">
+<meta name="author" content="{{ author or site.defaultAuthor }}">
+
+{# Open Graph (used by Discord, Slack, Mastodon, Facebook, etc. when links are shared) #}
+<meta property="og:title" content="{{ title or site.title }}">
+<meta property="og:description" content="{{ description_short or site.description }}">
+<meta property="og:type" content="{% if section and section != 'pages' %}article{% else %}website{% endif %}">
+<meta property="og:url" content="{{ site.url }}{{ page.url }}">
+<meta property="og:site_name" content="{{ site.title }}">
+{% if image %}<meta property="og:image" content="{{ image }}">{% endif %}
+
+{# Twitter card #}
+<meta name="twitter:card" content="{% if image %}summary_large_image{% else %}summary{% endif %}">
+<meta name="twitter:title" content="{{ title or site.title }}">
+<meta name="twitter:description" content="{{ description_short or site.description }}">
+{% if image %}<meta name="twitter:image" content="{{ image }}">{% endif %}
+
+<link rel="canonical" href="{{ site.url }}{{ page.url }}">

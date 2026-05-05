@@ -1,0 +1,125 @@
+// Eleventy JavaScript template — emits /graph-data.json at build time.
+//
+// Powers the force-directed graph at /network_nodes/ and the local-graph
+// widget that appears on every other page. Two edge sets are produced so
+// the client can flip between modes without rebuilding:
+//
+//   linkEdges — directed: source post wikilinks to target post
+//   tagEdges  — bidirectional in spirit; source post → tag node
+//
+// Like preview-index.11ty.js this lives outside src/content/ so the
+// directory data file doesn't try to compute a permalink for it.
+
+const fs = require("fs");
+const slugify = require("./utils/slugify");
+const { vaultPathToUrl } = require("./utils/permalink");
+
+// Capture [[...]] but skip ![[...]] (image embed syntax — reserved for
+// a later Obsidian-attachment phase). Lookbehind is supported in every
+// browser/Node version we care about.
+const WIKILINK_RE = /(?<!!)\[\[([^\]\n]+?)\]\]/g;
+
+// Strip a leading YAML frontmatter block so we only scan the body for
+// wikilinks. Tolerates LF or CRLF line endings.
+function stripFrontmatter(raw) {
+  const m = raw.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n([\s\S]*)$/);
+  return m ? m[1] : raw;
+}
+
+class GraphData {
+  data() {
+    return {
+      permalink: "/graph-data.json",
+      eleventyExcludeFromCollections: true,
+    };
+  }
+
+  render({ collections }) {
+    const items = (collections && collections.previewable) || [];
+
+    // Page nodes — one per published post or top-level page that has a URL.
+    // Skip pages with `graph_enabled: false` in frontmatter (top-level pages
+    // like home, about, section landings — they're navigation surfaces, not
+    // worth a node in the graph).
+    const pageNodes = [];
+    const knownUrls = new Set();
+    for (const item of items) {
+      if (!item.url) continue; // drafts/excluded files have permalink:false
+      if (item.data.graph_enabled === false) continue;
+      pageNodes.push({
+        id: item.url,
+        type: "page",
+        title: item.data.title || "(untitled)",
+        section: item.data.section || null,
+        url: item.url,
+      });
+      knownUrls.add(item.url);
+    }
+
+    // Wikilink edges — scan each item's raw markdown for [[path|alias]]
+    // and resolve the path through the same transform the markdown-it
+    // plugin uses. Edges to unknown targets (typos, dead links, or pages
+    // excluded via graph_enabled:false) are dropped silently here; the
+    // wikilink plugin still warns at build for genuine dead links.
+    const linkEdges = [];
+    for (const item of items) {
+      if (!item.url) continue;
+      // Skip outgoing edges from excluded pages — orphan source IDs
+      // would point at nodes that don't exist.
+      if (item.data.graph_enabled === false) continue;
+
+      const raw = fs.readFileSync(item.inputPath, "utf8");
+      const body = stripFrontmatter(raw);
+
+      WIKILINK_RE.lastIndex = 0; // regex is module-scoped; reset between items
+      let m;
+      while ((m = WIKILINK_RE.exec(body)) !== null) {
+        const [vaultPath] = m[1].split("|");
+        const targetUrl = vaultPathToUrl(vaultPath.trim());
+        if (!targetUrl || targetUrl === item.url) continue;
+        if (!knownUrls.has(targetUrl)) continue;
+        linkEdges.push({ source: item.url, target: targetUrl });
+      }
+    }
+
+    // Tag nodes + post→tag edges. Tags are a separate node type so the
+    // tag-mode view has clear hubs (one node per tag, each post fans
+    // out to its tags) instead of the dense post-to-post mesh you'd
+    // get from "posts share a tag" edges. Pages excluded from the graph
+    // (graph_enabled:false) don't contribute tag edges either.
+    const tagNodes = new Map();
+    const tagEdges = [];
+    for (const item of items) {
+      if (!item.url) continue;
+      if (item.data.graph_enabled === false) continue;
+      const raw = item.data.tags;
+      const tags = Array.isArray(raw) ? raw : raw ? [raw] : [];
+      for (const rawTag of tags) {
+        const slug = slugify(String(rawTag));
+        if (!slug) continue;
+        const tagId = `tag:${slug}`;
+        if (!tagNodes.has(tagId)) {
+          tagNodes.set(tagId, {
+            id: tagId,
+            type: "tag",
+            title: String(rawTag),
+            url: `/tags/${slug}/`,
+          });
+        }
+        tagEdges.push({ source: item.url, target: tagId });
+      }
+    }
+
+    return JSON.stringify(
+      {
+        nodes: [...pageNodes, ...tagNodes.values()],
+        linkEdges,
+        tagEdges,
+      },
+      null,
+      2
+    );
+  }
+}
+
+module.exports = GraphData;

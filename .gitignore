@@ -1,0 +1,50 @@
+# Build output
+_site/
+
+# Dependencies
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor scratch
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code local-only state
+.claude/settings.local.json
+.claude/worktrees/
+
+# Eleventy cache
+.cache/
+
+# Obsidian vault config — kept local, synced across devices via Obsidian Sync,
+# not via this repo. Plugin source code, themes, hotkeys, and per-vault state
+# files (bookmarks, graph view, daily-notes, recent files, etc.) all carry
+# either privacy risk (vault paths, geolocation, work tags) or pure noise.
+# The published site doesn't depend on anything under .obsidian/, so the
+# whole directory stays out of git.
+src/content/.obsidian/
+
+# Obsidian trash
+src/content/.trash/
+
+# Author-side scratch (templates, guides, drafts not yet placed in a section).
+# Excluded from build via .eleventyignore; also excluded from git so it can
+# hold work-in-progress freely without leaking.
+src/content/_local/
