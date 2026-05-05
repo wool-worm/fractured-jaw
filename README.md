@@ -1,6 +1,6 @@
 # Fractured Jaw
 
-A zine and blog at [fractured-jaw.blog](https://fractured-jaw.blog). Writing, music, politics. Anonymous, intermittent, hand-built.
+A zine and blog at [fractured-jaw.com](https://fractured-jaw.com). Writing, music, politics. Anonymous, intermittent, hand-built.
 
 Static site authored in Obsidian, built with [Eleventy](https://www.11ty.dev/), hosted on GitHub Pages.
 
