@@ -1,4 +1,4 @@
-// Eleventy config for fractured-jaw.blog.
+// Eleventy config for fractured-jaw.com.
 //
 // Most "magic" lives in three places:
 //   - src/content/content.11tydata.js: computes per-page permalinks and
