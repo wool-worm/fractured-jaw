@@ -1,0 +1,176 @@
+/* ── Reset ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Body / scanline ────────────────────────────────────────────────────── */
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--bone);
+  background-color: var(--void);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.18) 2px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+  min-height: 100vh;
+}
+
+/* ── Headings ───────────────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: normal;
+  line-height: 1.2;
+  color: var(--brass);
+  letter-spacing: 0.04em;
+}
+
+h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); }
+h2 { font-size: clamp(1.2rem, 3vw, 1.75rem); }
+h3 { font-size: 1.2rem; color: var(--brass-deep); }
+h4, h5, h6 { font-size: 1rem; color: var(--bone-dim); }
+
+/* ── Links ──────────────────────────────────────────────────────────────── */
+a {
+  color: var(--brass);
+  text-decoration: none;
+  border-bottom: 1px solid var(--brass-faint);
+  transition: color 0.12s, border-color 0.12s;
+}
+
+a:hover, a:focus-visible {
+  color: var(--sodium);
+  border-bottom-color: var(--sodium-soft);
+  outline: none;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--sodium);
+  outline-offset: 2px;
+}
+
+/* ── Paragraphs ─────────────────────────────────────────────────────────── */
+p {
+  margin-bottom: var(--sp-md);
+  max-width: var(--col-max);
+}
+
+/* ── Post content prose ─────────────────────────────────────────────────── */
+.post-content p,
+.post-content li,
+.post-content blockquote,
+.post-content table {
+  max-width: var(--col-max);
+}
+
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+  margin-top: var(--sp-lg);
+  margin-bottom: var(--sp-sm);
+}
+
+.post-content ul,
+.post-content ol {
+  margin-left: var(--sp-lg);
+  margin-bottom: var(--sp-md);
+}
+
+.post-content li {
+  margin-bottom: var(--sp-xs);
+}
+
+/* ── Blockquote ─────────────────────────────────────────────────────────── */
+blockquote {
+  border-left: 3px solid var(--blood);
+  padding: var(--sp-sm) var(--sp-md);
+  margin: var(--sp-md) 0;
+  color: var(--bone-dim);
+  font-style: italic;
+  background: var(--void-soft);
+}
+
+blockquote p:last-child { margin-bottom: 0; }
+
+/* ── Code ───────────────────────────────────────────────────────────────── */
+code {
+  font-family: var(--font-body);
+  font-size: 0.875em;
+  color: var(--sodium);
+  background: var(--void-soft);
+  padding: 0.1em 0.3em;
+  border: 1px solid var(--bone-faint);
+}
+
+pre {
+  background: var(--void-soft);
+  border: 1px solid var(--bone-faint);
+  border-left: 3px solid var(--brass-deep);
+  padding: var(--sp-md);
+  overflow-x: auto;
+  margin-bottom: var(--sp-md);
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--bone);
+}
+
+/* ── Horizontal rule ────────────────────────────────────────────────────── */
+hr {
+  border: none;
+  border-top: 1px solid var(--bone-faint);
+  margin: var(--sp-lg) 0;
+}
+
+/* ── Selection ──────────────────────────────────────────────────────────── */
+::selection {
+  background: var(--brass-deep);
+  color: var(--void);
+}
+
+/* ── Images ─────────────────────────────────────────────────────────────── */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Tables ─────────────────────────────────────────────────────────────── */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: var(--sp-md);
+  font-size: 0.875rem;
+}
+
+th, td {
+  border: 1px solid var(--bone-faint);
+  padding: var(--sp-xs) var(--sp-sm);
+  text-align: left;
+}
+
+th {
+  background: var(--void-soft);
+  color: var(--brass);
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+}
+
+/* ── Lists (global) ─────────────────────────────────────────────────────── */
+ul, ol {
+  list-style: none;
+}

@@ -1,0 +1,50 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Font declarations. Font files live in src/assets/css/fonts/.
+   Files copied from Brutalist Framework 2.7 assets (self-hosted).
+   Each font has multiple weight/style variants declared separately so the
+   browser picks the right file rather than synthesizing bold/italic.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* VCR Mono — body copy */
+@font-face {
+  font-family: 'VCR Mono';
+  src: url('fonts/vcr-mono/VCR_OSD_MONO.woff2') format('woff2'),
+       url('fonts/vcr-mono/VCR_OSD_MONO.woff') format('woff'),
+       url('fonts/vcr-mono/VCR_OSD_MONO.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Tea For God — section/h2 headers */
+@font-face {
+  font-family: 'Tea For God';
+  src: url('fonts/teaforgod/TeaForGod.woff2') format('woff2'),
+       url('fonts/teaforgod/TeaForGod.woff') format('woff'),
+       url('fonts/teaforgod/TeaForGod.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Sudbury Basin — post/page titles */
+@font-face {
+  font-family: 'Sudbury Basin';
+  src: url('fonts/sudbury/SudburyBasin.woff2') format('woff2'),
+       url('fonts/sudbury/SudburyBasin.woff') format('woff'),
+       url('fonts/sudbury/SudburyBasin.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Brutalism — masthead/logotype only */
+@font-face {
+  font-family: 'Brutalism';
+  src: url('fonts/brutalism/Brutalism.woff2') format('woff2'),
+       url('fonts/brutalism/Brutalism.woff') format('woff'),
+       url('fonts/brutalism/Brutalism.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

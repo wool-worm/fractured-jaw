@@ -1,0 +1,175 @@
+/* ── Site shell ─────────────────────────────────────────────────────────── */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--col-wide);
+  margin: 0 auto;
+  padding: var(--sp-lg) var(--sp-md);
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.site-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-lg);
+  padding: var(--sp-md) var(--sp-md);
+  border-bottom: 2px solid var(--brass-deep);
+  background: var(--void);
+  position: relative;
+  z-index: 20;
+}
+
+.site-header::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--blood);
+  opacity: 0.6;
+}
+
+/* ── Masthead ───────────────────────────────────────────────────────────── */
+.site-title {
+  font-family: var(--font-mast);
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  color: var(--bone);
+  border-bottom: none;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-shadow: var(--bitshadow);
+}
+
+.site-title:hover {
+  color: var(--brass);
+  border-bottom: none;
+}
+
+/* ── Navigation ─────────────────────────────────────────────────────────── */
+.site-nav {
+  flex: 1;
+}
+
+.site-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  list-style: none;
+}
+
+.site-nav a {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  text-transform: lowercase;
+  letter-spacing: 0.08em;
+  color: var(--bone-dim);
+  border-bottom: none;
+  border-right: 1px solid var(--bone-faint);
+  padding: 0.15rem 0.75rem;
+  transition: color 0.1s, background 0.1s;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible {
+  color: var(--sodium);
+  background: var(--void-soft);
+  border-bottom: none;
+}
+
+.site-nav a[aria-current="page"] {
+  color: var(--brass);
+  background: var(--void-soft);
+}
+
+.site-nav li:last-child a {
+  border-right: none;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+.site-footer {
+  margin-top: auto;
+  padding: var(--sp-md);
+  border-top: 1px solid var(--bone-faint);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--bone-faint);
+  text-align: center;
+  background: var(--void-soft);
+  position: relative;
+}
+
+/* CSS-only sawtooth above the footer */
+.site-footer::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background-image:
+    linear-gradient(135deg, var(--void-soft) 33.33%, transparent 33.33%),
+    linear-gradient(225deg, var(--void-soft) 33.33%, transparent 33.33%);
+  background-size: 16px 8px;
+  background-position: 0 0, 8px 0;
+  background-repeat: repeat-x;
+}
+
+.site-footer p { margin-bottom: 0; max-width: none; }
+
+/* ── Page headers (shared by section, tag, page layouts) ────────────────── */
+.page-header,
+.section-header,
+.post-header {
+  margin-bottom: var(--sp-lg);
+  padding-bottom: var(--sp-md);
+  border-bottom: var(--border-std);
+}
+
+.page-title,
+.section-title,
+.post-title {
+  font-family: var(--font-title);
+  font-size: clamp(1.5rem, 4vw, 2.6rem);
+  color: var(--bone);
+  line-height: 1.15;
+  letter-spacing: 0.03em;
+  text-shadow: var(--bitshadow);
+  margin-bottom: var(--sp-sm);
+}
+
+.post-description,
+.section-description,
+.page-intro {
+  color: var(--bone-dim);
+  font-size: 0.95rem;
+  max-width: 60ch;
+  margin-bottom: 0;
+}
+
+/* ── Responsive header collapse ─────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .site-header {
+    flex-direction: column;
+    gap: var(--sp-sm);
+    align-items: flex-start;
+  }
+
+  .site-nav ul {
+    flex-wrap: wrap;
+  }
+
+  .site-nav a {
+    padding: 0.2rem 0.5rem;
+  }
+}

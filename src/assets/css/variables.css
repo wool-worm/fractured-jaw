@@ -1,0 +1,60 @@
+:root {
+  /* ── Void palette ──────────────────────────── */
+  --void:        #0a0a0a;
+  --void-soft:   #141414;
+  --void-mid:    #1e1c1a;
+  --void-rim:    #2a2622;
+
+  /* ── Bone (body text) ──────────────────────── */
+  --bone:        #d8d4cc;
+  --bone-dim:    #8a857c;
+  --bone-faint:  #4a463f;
+
+  /* ── Brass (primary accent) ────────────────── */
+  --brass:       #c9a961;
+  --brass-deep:  #8a7340;
+  --brass-faint: #3d3322;
+
+  /* ── Sodium-vapor (secondary accent) ──────── */
+  --sodium:      #ffaa33;
+  --sodium-soft: #c98226;
+
+  /* ── Blood red (fracture/danger) ──────────── */
+  --blood:       #8b0000;
+  --blood-bright:#c62828;
+
+  /* ── Typography ────────────────────────────── */
+  --font-body:    'VCR Mono', 'Courier New', ui-monospace, monospace;
+  --font-display: 'Tea For God', 'VCR Mono', 'Courier New', monospace;
+  --font-title:   'Sudbury Basin', 'Tea For God', 'Courier New', monospace;
+  --font-mast:    'Brutalism', 'Sudbury Basin', 'Courier New', monospace;
+
+  /* ── Spacing ───────────────────────────────── */
+  --sp-xs: 0.25rem;
+  --sp-sm: 0.5rem;
+  --sp-md: 1rem;
+  --sp-lg: 2rem;
+  --sp-xl: 4rem;
+
+  /* ── Layout ────────────────────────────────── */
+  --col-max: 78ch;
+  --col-wide: 100ch;
+
+  /* ── Borders ───────────────────────────────── */
+  --border-std:  1px solid var(--bone-faint);
+  --border-hot:  1px solid var(--brass);
+  --border-hard: 2px solid var(--brass-deep);
+
+  /* ── Bitshadow (applied inline on titles) ──── */
+  --bitshadow:
+    0.18rem 0.09rem 0 var(--blood),
+    -0.09rem -0.18rem 0 var(--brass-deep);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
