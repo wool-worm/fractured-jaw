@@ -6,18 +6,9 @@
    Assumes palette tokens from variables.css.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── 1. Body: ichor column grid + phosphor grain ────────────────────────── */
+/* ── 1. Body: void grain ────────────────────────────────────────────────── */
 body {
   background-image:
-    /* ichor column bleed at irregular intervals */
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 120px,
-      rgba(92, 26, 114, 0.04) 120px,
-      rgba(92, 26, 114, 0.04) 121px
-    ),
-    /* horizontal noise grain */
     repeating-linear-gradient(
       0deg,
       transparent,
@@ -25,10 +16,10 @@ body {
       rgba(0, 0, 0, 0.14) 2px,
       rgba(0, 0, 0, 0.14) 4px
     );
-  background-size: 121px 100%, 100% 4px;
+  background-size: 100% 4px;
 }
 
-/* Ichor vignette — corrupted signal bleeding from edges */
+/* Void vignette — deep black edges, no colour tint */
 body::before {
   content: '';
   position: fixed;
@@ -37,9 +28,8 @@ body::before {
   z-index: 9000;
   background: radial-gradient(
     ellipse at center,
-    transparent 50%,
-    rgba(92, 26, 114, 0.18) 80%,
-    rgba(0, 0, 0, 0.65) 100%
+    transparent 55%,
+    rgba(0, 0, 0, 0.55) 100%
   );
 }
 
@@ -64,7 +54,7 @@ body::after {
   overflow: hidden;
   height: 1.4rem;
   background: var(--void);
-  border-bottom: 1px solid var(--ichor);
+  border-bottom: 1px solid var(--blood);
 }
 
 /* Scrolling station ID text */
@@ -104,21 +94,21 @@ body::after {
     -72deg,
     transparent,
     transparent 18px,
-    rgba(92, 26, 114, 0.07) 18px,
-    rgba(92, 26, 114, 0.07) 36px
+    rgba(139, 0, 0, 0.06) 18px,
+    rgba(139, 0, 0, 0.06) 36px
   );
   background-size: 51px 51px;
   animation: zone-drift 9s linear infinite;
-  border-bottom: 3px solid var(--ichor);
+  border-bottom: 3px solid var(--blood);
   padding-top: var(--sp-md);
   padding-bottom: var(--sp-md);
   padding-right: calc(220px + 2rem); /* reserve space for fixed graph widget */
   gap: var(--sp-xl);
 }
 
-/* Override sawtooth strip colour to ichor */
+/* Override sawtooth strip colour to blood */
 .site-header::after {
-  background-color: var(--ichor);
+  background-color: var(--blood);
 }
 
 /* Station ID injected after nav */
@@ -140,9 +130,7 @@ body::after {
   filter: url(#turbulence-mild);
 }
 
-.site-title {
-  filter: url(#turbulence);
-}
+/* No turbulence filter on masthead — displacement makes it too fuzzy */
 
 /* Reading pages: no animation or distortion on post/page titles */
 .page-title,
@@ -169,14 +157,14 @@ body::after {
   overflow: hidden;
 }
 
-/* Base layer: cold institutional grey, ichor+verdigris bitshadow */
+/* Base layer: cold institutional grey, tighter bitshadow */
 .site-title > span:first-child {
   position: relative;
   color: var(--cement-light);
   text-shadow:
-    0.35rem 0.18rem 0 var(--ichor),
-    -0.18rem -0.35rem 0 var(--brass-deep),
-    0.7rem 0.35rem 0 rgba(92, 26, 114, 0.3);
+    0.15rem 0.08rem 0 var(--ichor),
+    -0.08rem -0.15rem 0 var(--brass-deep),
+    0.3rem 0.15rem 0 rgba(92, 26, 114, 0.2);
 }
 
 /* Top third — sickly purple */
@@ -189,7 +177,7 @@ body::after {
 
 /* Middle third — cold teal */
 .site-title > span:nth-child(3) {
-  color: var(--brass);
+  color: var(--blood);
   clip-path: polygon(0 33%, 100% 33%, 100% 66%, 0 66%);
   text-shadow: -0.2rem 0.15rem 0 var(--ichor);
   animation: cult-drift-b 3.8s steps(1) infinite, cult-slice-b 13s steps(1) infinite;
@@ -327,7 +315,7 @@ body::after {
 
 /* ── 12. Blockquote: intercepted transmission ───────────────────────────── */
 blockquote {
-  border-left: 6px solid var(--ichor);
+  border-left: 6px solid var(--blood);
   border-right: 2px solid var(--brass-deep);
   background: rgba(92, 26, 114, 0.05);
   position: relative;
@@ -514,31 +502,31 @@ hr {
   65%  { transform: none; }
 }
 
-/* Masthead layer drift — slow, unsteady */
+/* Masthead layer drift — kept tight so spans don't separate visibly */
 @keyframes cult-drift-a {
   0%   { transform: translateX(0); }
-  20%  { transform: translateX(-4px); }
-  45%  { transform: translateX(2px); }
+  20%  { transform: translateX(-1px); }
+  45%  { transform: translateX(1px); }
   70%  { transform: translateX(0); }
-  90%  { transform: translateX(-3px); }
+  90%  { transform: translateX(-1px); }
   100% { transform: translateX(0); }
 }
 
 @keyframes cult-drift-b {
   0%   { transform: translateX(0); }
-  15%  { transform: translateX(5px); }
-  40%  { transform: translateX(-3px); }
+  15%  { transform: translateX(2px); }
+  40%  { transform: translateX(-1px); }
   65%  { transform: translateX(0); }
-  85%  { transform: translateX(4px); }
+  85%  { transform: translateX(1px); }
   100% { transform: translateX(0); }
 }
 
 @keyframes cult-drift-c {
   0%   { transform: translateX(0); }
-  25%  { transform: translateX(3px); }
-  50%  { transform: translateX(-6px); }
+  25%  { transform: translateX(1px); }
+  50%  { transform: translateX(-2px); }
   75%  { transform: translateX(0); }
-  90%  { transform: translateX(5px); }
+  90%  { transform: translateX(1px); }
   100% { transform: translateX(0); }
 }
 
