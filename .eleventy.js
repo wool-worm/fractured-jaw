@@ -158,9 +158,12 @@ module.exports = function (eleventyConfig) {
 
   // ---------- Passthrough copy ----------
 
-  // Static assets get copied verbatim to _site/. Folders that don't exist
-  // yet (e.g. images/) won't error — Eleventy silently skips them.
-  eleventyConfig.addPassthroughCopy("src/assets");
+  // Static assets copied verbatim to _site/. Listed explicitly so that
+  // src/assets/brutalist-framework/ (local reference only) never lands in
+  // the build output. Add new subdirs here as needed.
+  eleventyConfig.addPassthroughCopy({ "src/assets/css": "assets/css" });
+  eleventyConfig.addPassthroughCopy({ "src/assets/js":  "assets/js"  });
+  eleventyConfig.addPassthroughCopy({ "src/assets/images": "assets/images" });
   eleventyConfig.addPassthroughCopy("CNAME");
 
   // ---------- Watch targets ----------

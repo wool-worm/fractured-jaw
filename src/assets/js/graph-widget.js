@@ -340,7 +340,7 @@
     var visibleIds = new Set(visible.map(function (n) { return n.id; }));
     var edges = activeEdges();
 
-    ctx.strokeStyle = "#999";
+    ctx.strokeStyle = "#3d3322";
     ctx.lineWidth = 1;
     for (var i = 0; i < edges.length; i++) {
       var e = edges[i];
@@ -361,13 +361,13 @@
       ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
       ctx.fillStyle = colorFor(n);
       ctx.fill();
-      ctx.strokeStyle = "#000";
+      ctx.strokeStyle = "#0a0a0a";
       ctx.lineWidth = 1.5;
       ctx.stroke();
     }
 
     if (hoverNode) {
-      ctx.fillStyle = "#000";
+      ctx.fillStyle = "#c9a961";
       ctx.font = "10px monospace";
       ctx.fillText(hoverNode.title || "", hoverNode.x + 9, hoverNode.y + 3);
     }

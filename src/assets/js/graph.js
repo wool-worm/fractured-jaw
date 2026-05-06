@@ -174,7 +174,7 @@
     var edges = activeEdges();
 
     // Edges first, so nodes draw on top.
-    ctx.strokeStyle = "#999";
+    ctx.strokeStyle = "#3d3322";
     ctx.lineWidth = 1;
     for (var i = 0; i < edges.length; i++) {
       var e = edges[i];
@@ -196,14 +196,14 @@
       ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
       ctx.fillStyle = colorFor(n);
       ctx.fill();
-      ctx.strokeStyle = "#000";
+      ctx.strokeStyle = "#0a0a0a";
       ctx.lineWidth = 1.5;
       ctx.stroke();
     }
 
     // Labels — show all when the graph is small, otherwise just the
     // hovered node so we don't carpet the canvas with text.
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = "#c9a961";
     ctx.font = "11px monospace";
     var showAll = visible.length < 30;
     for (var l = 0; l < visible.length; l++) {
