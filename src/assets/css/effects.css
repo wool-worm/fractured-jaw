@@ -1,0 +1,176 @@
+/* ── Bitshadow ───────────────────────────────────────────────────────────── */
+/* Chromatic aberration effect. Applied to masthead/title via variables.css
+   --bitshadow token. Also available as a utility class. */
+.bitshadow {
+  letter-spacing: 0.08em;
+  text-shadow: var(--bitshadow);
+}
+
+/* ── Deconstructed text ──────────────────────────────────────────────────── */
+/* Usage: wrap target text in 4 child divs all containing the same content.
+   The container stacks them with position: relative / absolute so each
+   slice masks and shifts independently.
+
+   Example markup:
+   <div class="deconstructed-text" aria-label="Fractured Jaw">
+     <div aria-hidden="true">Fractured Jaw</div>
+     <div aria-hidden="true">Fractured Jaw</div>
+     <div aria-hidden="true">Fractured Jaw</div>
+     <div aria-hidden="true">Fractured Jaw</div>
+   </div>
+*/
+.deconstructed-text {
+  position: relative;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+.deconstructed-text > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* First child is the accessible "real" layer — visible, in position */
+.deconstructed-text > div:first-child {
+  position: relative;
+  color: var(--bone);
+}
+
+.deconstructed-text > div:nth-child(2) {
+  color: var(--brass);
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  animation: deco-drift-a 4.7s steps(1) infinite;
+}
+
+.deconstructed-text > div:nth-child(3) {
+  color: var(--blood-bright);
+  clip-path: polygon(0 35%, 100% 35%, 100% 68%, 0 68%);
+  animation: deco-drift-b 3.2s steps(1) infinite;
+}
+
+.deconstructed-text > div:nth-child(4) {
+  color: var(--sodium);
+  clip-path: polygon(0 68%, 100% 68%, 100% 100%, 0 100%);
+  animation: deco-drift-c 6.1s steps(1) infinite;
+}
+
+@keyframes deco-drift-a {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(-2px); }
+  30%  { transform: translateX(1px); }
+  55%  { transform: translateX(0); }
+  80%  { transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes deco-drift-b {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(2px); }
+  45%  { transform: translateX(-1px); }
+  70%  { transform: translateX(0); }
+  90%  { transform: translateX(1px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes deco-drift-c {
+  0%   { transform: translateX(0); }
+  10%  { transform: translateX(1px); }
+  35%  { transform: translateX(-2px); }
+  60%  { transform: translateX(0); }
+  85%  { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+/* ── Divisive ────────────────────────────────────────────────────────────── */
+/* Two-column split block, brutalist column break.
+   Usage: <div class="divisive"><div>Left</div><div>Right</div></div> */
+.divisive {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--bone-faint);
+  margin: var(--sp-lg) 0;
+}
+
+.divisive > * {
+  padding: var(--sp-md);
+}
+
+.divisive > *:first-child {
+  background: var(--blood);
+  color: var(--bone);
+  border-right: 3px solid var(--sodium);
+}
+
+.divisive > *:last-child {
+  background: var(--void-soft);
+  color: var(--bone-dim);
+}
+
+@media (max-width: 500px) {
+  .divisive {
+    grid-template-columns: 1fr;
+  }
+  .divisive > *:first-child {
+    border-right: none;
+    border-bottom: 3px solid var(--sodium);
+  }
+}
+
+/* ── Baffle / ambient glitch text ────────────────────────────────────────── */
+/* .baffle-forever elements are picked up by baffle.js and scrambled
+   continuously. Use sparingly for decorative unreadable ambient text.
+   Mark decorative uses with aria-hidden="true". */
+.baffle-forever {
+  font-family: var(--font-body);
+  color: var(--bone-faint);
+  letter-spacing: 0.1em;
+  cursor: default;
+  user-select: none;
+}
+
+/* Glitch flicker — layered on top of baffle scramble */
+.baffle-forever::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    transparent 0%,
+    rgba(201, 169, 97, 0.03) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  animation: glitch-flicker 8s linear infinite;
+}
+
+@keyframes glitch-flicker {
+  0%, 95%, 100% { opacity: 0; }
+  96%            { opacity: 1; }
+  97%            { opacity: 0; }
+  98%            { opacity: 1; }
+  99%            { opacity: 0; }
+}
+
+/* ── CRT / scanline pulse ────────────────────────────────────────────────── */
+/* Optional: apply to any element for extra CRT feel */
+.scanline {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanline::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+}

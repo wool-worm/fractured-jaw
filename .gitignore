@@ -48,3 +48,8 @@ src/content/.trash/
 # Excluded from build via .eleventyignore; also excluded from git so it can
 # hold work-in-progress freely without leaking.
 src/content/_local/
+
+# Brutalist Framework source — kept local for reference and DIY styling.
+# Font files are extracted into src/assets/css/fonts/ and committed separately.
+src/assets/Brutalist_Framework_2.7.zip
+src/assets/brutalist-framework/

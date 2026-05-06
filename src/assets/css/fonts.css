@@ -1,0 +1,66 @@
+/* ── Font declarations — all files self-hosted from Brutalist Framework 2.7 ── */
+
+/* VCR Mono — body copy (woff/woff2 only, no ttf in BF package) */
+@font-face {
+  font-family: 'VCR Mono';
+  src: url('fonts/vcr-mono/vcr_mono.001-webfont.woff2') format('woff2'),
+       url('fonts/vcr-mono/vcr_mono.001-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Tea For God — section/h2 headers */
+@font-face {
+  font-family: 'Tea For God';
+  src: url('fonts/teaforgod/TeaForGodRegular.woff2') format('woff2'),
+       url('fonts/teaforgod/TeaForGodRegular.woff') format('woff'),
+       url('fonts/teaforgod/TeaForGodRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Sudbury Basin — post/page titles */
+@font-face {
+  font-family: 'Sudbury Basin';
+  src: url('fonts/sudbury/SudburyBasin-Regular.woff2') format('woff2'),
+       url('fonts/sudbury/SudburyBasin-Regular.woff') format('woff'),
+       url('fonts/sudbury/SudburyBasin-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Sudbury Basin 3D — optional variant, same family stack */
+@font-face {
+  font-family: 'Sudbury Basin 3D';
+  src: url('fonts/sudbury/SudburyBasin3D-Regular.woff2') format('woff2'),
+       url('fonts/sudbury/SudburyBasin3D-Regular.woff') format('woff'),
+       url('fonts/sudbury/SudburyBasin3D-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Brutalism — masthead/logotype only */
+@font-face {
+  font-family: 'Brutalism';
+  src: url('fonts/brutalism/BrutalismRegular.woff2') format('woff2'),
+       url('fonts/brutalism/BrutalismRegular.woff') format('woff'),
+       url('fonts/brutalism/BrutalismRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Crude — decorative alternate, same rough register as Brutalism */
+@font-face {
+  font-family: 'Crude';
+  src: url('fonts/brutalism/CrudeRegular.woff2') format('woff2'),
+       url('fonts/brutalism/CrudeRegular.woff') format('woff'),
+       url('fonts/brutalism/CrudeRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

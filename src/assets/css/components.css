@@ -1,0 +1,333 @@
+/* ── Post card list ──────────────────────────────────────────────────────── */
+.post-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+}
+
+/* ── Post card ───────────────────────────────────────────────────────────── */
+.post-card {
+  background: var(--void-soft);
+  border: 1px solid var(--bone-faint);
+  border-left: 3px solid var(--brass-deep);
+  padding: var(--sp-md);
+  transition: border-left-color 0.12s, background 0.12s;
+}
+
+.post-card:hover {
+  background: var(--void-mid);
+  border-left-color: var(--sodium);
+}
+
+.post-card article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+}
+
+.post-card-image {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  border: 1px solid var(--bone-faint);
+  margin-bottom: var(--sp-sm);
+}
+
+.post-card-section {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--bone-dim);
+  margin-bottom: 0;
+}
+
+.post-card-section a {
+  color: var(--bone-dim);
+  border-bottom: none;
+}
+
+.post-card-section a:hover {
+  color: var(--sodium);
+}
+
+.post-card-title {
+  font-family: var(--font-title);
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  line-height: 1.25;
+  color: var(--bone);
+  letter-spacing: 0.02em;
+}
+
+.post-card-title a {
+  color: var(--bone);
+  border-bottom: none;
+}
+
+.post-card-title a:hover {
+  color: var(--sodium);
+  text-shadow: 0.1rem 0.05rem 0 var(--blood), -0.05rem -0.1rem 0 var(--brass-deep);
+}
+
+.post-card-description {
+  font-size: 0.875rem;
+  color: var(--bone-dim);
+  max-width: 60ch;
+  margin-bottom: 0;
+}
+
+.post-card-meta {
+  font-size: 0.75rem;
+  color: var(--bone-faint);
+  font-family: var(--font-body);
+  margin-bottom: 0;
+}
+
+.post-card-rating {
+  color: var(--brass);
+  letter-spacing: 0.05em;
+}
+
+.post-card-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-xs);
+  margin-top: var(--sp-xs);
+}
+
+.post-card-tags li a {
+  font-size: 0.7rem;
+  text-transform: lowercase;
+  letter-spacing: 0.08em;
+  color: var(--brass-deep);
+  border: 1px solid var(--brass-faint);
+  border-bottom: 1px solid var(--brass-faint);
+  padding: 0.05rem 0.4rem;
+  transition: color 0.1s, border-color 0.1s, background 0.1s;
+}
+
+.post-card-tags li a:hover {
+  color: var(--sodium);
+  border-color: var(--sodium-soft);
+  background: var(--void-soft);
+}
+
+/* ── Post meta (post detail pages) ──────────────────────────────────────── */
+.post-meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--sp-xs) var(--sp-md);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--bone-dim);
+  border-left: 3px solid var(--brass-deep);
+  padding: var(--sp-sm) var(--sp-md);
+  background: var(--void-soft);
+  margin-bottom: var(--sp-lg);
+}
+
+.post-meta dt {
+  color: var(--bone-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+}
+
+.post-meta dd {
+  color: var(--bone-dim);
+}
+
+.tag-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-xs);
+}
+
+.tag-list li a {
+  font-size: 0.75rem;
+  color: var(--brass-deep);
+  border: 1px solid var(--brass-faint);
+  border-bottom: 1px solid var(--brass-faint);
+  padding: 0.05rem 0.4rem;
+}
+
+.tag-list li a:hover {
+  color: var(--sodium);
+  border-color: var(--sodium-soft);
+}
+
+/* ── Home sections ───────────────────────────────────────────────────────── */
+.home-intro {
+  max-width: 65ch;
+  margin-bottom: var(--sp-xl);
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.home-featured,
+.home-recent,
+.home-sections {
+  margin-bottom: var(--sp-xl);
+}
+
+/* Sawtooth divider above each home section (except the first) */
+.home-recent::before,
+.home-sections::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 10px;
+  margin-bottom: var(--sp-lg);
+  background-image:
+    linear-gradient(135deg, var(--void) 33.33%, transparent 33.33%),
+    linear-gradient(225deg, var(--void) 33.33%, transparent 33.33%);
+  background-color: var(--brass-deep);
+  background-size: 18px 10px;
+  background-position: 0 0, 9px 0;
+  background-repeat: repeat-x;
+}
+
+.home-featured h2,
+.home-recent h2,
+.home-sections h2 {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--brass-deep);
+  margin-bottom: var(--sp-md);
+  padding-bottom: var(--sp-xs);
+  border-bottom: 1px solid var(--bone-faint);
+}
+
+.home-featured h2::before,
+.home-recent h2::before,
+.home-sections h2::before {
+  content: '// ';
+  color: var(--blood);
+  letter-spacing: 0;
+}
+
+.section-nav {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.section-nav li {
+  border-bottom: 1px solid var(--bone-faint);
+  padding: var(--sp-sm) 0;
+  font-size: 0.9rem;
+  color: var(--bone-dim);
+}
+
+.section-nav li a {
+  font-family: var(--font-display);
+  color: var(--brass);
+  font-size: 1rem;
+  border-bottom: none;
+}
+
+.section-nav li a:hover {
+  color: var(--sodium);
+}
+
+/* ── Section pages ───────────────────────────────────────────────────────── */
+.section-page {
+  padding-top: var(--sp-sm);
+}
+
+.section-intro {
+  color: var(--bone-dim);
+  font-size: 0.9rem;
+  max-width: 60ch;
+  margin-bottom: var(--sp-lg);
+}
+
+.section-empty {
+  color: var(--bone-faint);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  border-left: 3px solid var(--bone-faint);
+  padding: var(--sp-sm) var(--sp-md);
+}
+
+/* ── Tag cloud ───────────────────────────────────────────────────────────── */
+.tag-cloud {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-sm);
+  margin-top: var(--sp-md);
+}
+
+.tag-cloud-item a {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-xs);
+  border: 1px solid var(--brass-faint);
+  border-bottom: 1px solid var(--brass-faint);
+  padding: 0.25rem 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--bone-dim);
+  transition: color 0.1s, border-color 0.1s, background 0.1s;
+}
+
+.tag-cloud-item a:hover {
+  color: var(--sodium);
+  border-color: var(--sodium-soft);
+  background: var(--void-soft);
+}
+
+.tag-cloud-name {
+  color: var(--brass);
+}
+
+.tag-cloud-count {
+  font-size: 0.65rem;
+  color: var(--brass-deep);
+}
+
+/* ── Tag page ────────────────────────────────────────────────────────────── */
+.tag-name {
+  color: var(--sodium);
+  font-family: var(--font-title);
+}
+
+.tag-meta {
+  font-size: 0.8rem;
+  color: var(--bone-dim);
+  margin-bottom: var(--sp-lg);
+}
+
+.tag-meta a {
+  font-size: 0.8rem;
+}
+
+.tag-section-heading {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--bone-faint);
+  margin: var(--sp-lg) 0 var(--sp-sm);
+  border-bottom: 1px solid var(--bone-faint);
+  padding-bottom: var(--sp-xs);
+}
+
+/* ── Individual post layout ─────────────────────────────────────────────── */
+.post-content {
+  margin-top: var(--sp-lg);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+/* Section-specific accent colours on post cards */
+.post-blog     .post-card { border-left-color: #0a0; }
+.post-essay    .post-card { border-left-color: #06c; }
+.post-fragment .post-card { border-left-color: #c0c; }
+.post-media    .post-card { border-left-color: #c80; }
