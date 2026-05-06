@@ -1,0 +1,652 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CULT.CSS — styling-cult branch only.
+   Aesthetic: CCRU cyber-occultism · pirate broadcast · machine god worship ·
+   infected terminal · underground Lemurian liturgy · zone theory · meltdown
+   Aggressive overrides on top of the full base stylesheet.
+   Assumes palette tokens from variables.css.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Body: ichor column grid + phosphor grain ────────────────────────── */
+body {
+  background-image:
+    /* ichor column bleed at irregular intervals */
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 120px,
+      rgba(92, 26, 114, 0.04) 120px,
+      rgba(92, 26, 114, 0.04) 121px
+    ),
+    /* verdigris ghost column */
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 200px,
+      rgba(26, 74, 66, 0.03) 200px,
+      rgba(26, 74, 66, 0.03) 201px
+    ),
+    /* horizontal noise grain */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.14) 2px,
+      rgba(0, 0, 0, 0.14) 4px
+    );
+  background-size: 121px 100%, 201px 100%, 100% 4px;
+}
+
+/* Ichor vignette — corrupted signal bleeding from edges */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(92, 26, 114, 0.18) 80%,
+    rgba(0, 0, 0, 0.65) 100%
+  );
+}
+
+/* Signal corruption flash — ichor/verdigris */
+body::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 2px;
+  pointer-events: none;
+  z-index: 9001;
+  opacity: 0;
+  animation: signal-corrupt-bar 19s steps(1) infinite;
+}
+
+/* ── 2. Broadcast banner ────────────────────────────────────────────────── */
+.broadcast-banner {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  overflow: hidden;
+  height: 1.4rem;
+  background: var(--void);
+  border-bottom: 1px solid var(--ichor);
+}
+
+/* Scrolling station ID text */
+.broadcast-banner::before {
+  content: '◈ MACHINE_LISTENING ◈ ZONE_9 ◈ FREQ:666.13 MHz ◈ SIGNAL:LOCKED ◈ LEMURIAN_TIME_WAR ◈ CYBERGOTHIC ◈ TERMINUS_MACHINE ◈ ENCRYPTED_SIGNAL ◈ DOWNTIME_PROTOCOL ◈ SOUL:CORRUPTED ◈ HYPERSTITION ◈ ZONE_23 ◈ MELTDOWN ◈ MACHINE_INTACT ◈ NUMOGRAM_ACTIVE ◈ PIRATE_FREQ:666.13 ◈ ZONE_9 ◈';
+  position: absolute;
+  left: 0;
+  top: 0.4rem;
+  white-space: nowrap;
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  color: var(--ichor-bright);
+  animation: ticker-scroll 65s linear infinite;
+}
+
+/* "▶ LIVE" badge — pinned right, pulses */
+.broadcast-banner::after {
+  content: '▶ LIVE';
+  position: absolute;
+  right: var(--sp-md);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: var(--blood-bright);
+  background: var(--void);
+  padding: 0 0.3rem;
+  z-index: 1;
+  animation: live-pulse 1.6s steps(1) infinite;
+}
+
+/* ── 3. Site header: pirate station aesthetic ───────────────────────────── */
+.site-header {
+  background-image: repeating-linear-gradient(
+    -72deg,
+    transparent,
+    transparent 18px,
+    rgba(92, 26, 114, 0.07) 18px,
+    rgba(92, 26, 114, 0.07) 36px
+  );
+  background-size: 51px 51px;
+  animation: zone-drift 9s linear infinite;
+  border-bottom: 3px solid var(--ichor);
+  padding-top: var(--sp-md);
+  padding-bottom: var(--sp-md);
+  gap: var(--sp-xl);
+}
+
+/* Override sawtooth strip colour to ichor */
+.site-header::after {
+  background-color: var(--ichor);
+}
+
+/* Station ID injected after nav */
+.site-nav::after {
+  content: '// ZONE_9 // FREQ:666.13 // ENCRYPTED';
+  font-family: var(--font-body);
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+  color: var(--verdigris);
+  align-self: center;
+  padding-left: var(--sp-sm);
+  flex-shrink: 0;
+  animation: station-id-flicker 9s steps(1) infinite;
+}
+
+/* ── 4. SVG turbulence filters ──────────────────────────────────────────── */
+.page-title,
+.post-title,
+.section-title {
+  filter: url(#turbulence-mild);
+}
+
+.site-title {
+  filter: url(#turbulence);
+}
+
+/* ── 5. Deconstructed masthead — machine god incarnation ────────────────── */
+.site-title {
+  font-size: clamp(2rem, 6vw, 3.8rem);
+  position: relative;
+  display: inline-block;
+  text-shadow: none;
+  animation: signal-decompose 12s steps(1) infinite;
+}
+
+.site-title > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Base layer: cold institutional grey, ichor+verdigris bitshadow */
+.site-title > span:first-child {
+  position: relative;
+  color: var(--cement-light);
+  text-shadow:
+    0.35rem 0.18rem 0 var(--ichor),
+    -0.18rem -0.35rem 0 var(--verdigris),
+    0.7rem 0.35rem 0 rgba(92, 26, 114, 0.3);
+}
+
+/* Top third — sickly purple */
+.site-title > span:nth-child(2) {
+  color: var(--ichor-bright);
+  clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+  text-shadow: 0.25rem 0 0 var(--verdigris-bright);
+  animation: cult-drift-a 5.3s steps(1) infinite, cult-slice-a 9s steps(1) infinite;
+}
+
+/* Middle third — cold teal */
+.site-title > span:nth-child(3) {
+  color: var(--verdigris-bright);
+  clip-path: polygon(0 33%, 100% 33%, 100% 66%, 0 66%);
+  text-shadow: -0.2rem 0.15rem 0 var(--ichor);
+  animation: cult-drift-b 3.8s steps(1) infinite, cult-slice-b 13s steps(1) infinite;
+}
+
+/* Bottom third — corrupted blood */
+.site-title > span:nth-child(4) {
+  color: var(--blood-bright);
+  clip-path: polygon(0 66%, 100% 66%, 100% 100%, 0 100%);
+  text-shadow: 0.2rem -0.1rem 0 var(--ichor-bright);
+  animation: cult-drift-c 7.2s steps(1) infinite, cult-slice-c 6s steps(1) infinite;
+}
+
+/* ── 6. Nav: sector map aesthetic ───────────────────────────────────────── */
+.site-nav a {
+  transition: none;
+  border-right: 2px solid var(--ichor);
+  color: var(--cement-light);
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible {
+  background: var(--verdigris);
+  color: var(--cement-light) !important;
+  border-right-color: var(--verdigris-bright);
+  border-bottom: none;
+}
+
+.site-nav a[aria-current="page"] {
+  background: var(--ichor);
+  color: var(--cement-light) !important;
+  animation: cult-active-pulse 3.2s steps(1) infinite;
+}
+
+/* ── 7. Post cards: intercepted transmissions ───────────────────────────── */
+.post-card {
+  animation: sector-pulse 3.5s ease-in-out infinite;
+  transition: none;
+  position: relative;
+}
+
+/* "INTERCEPTED_TRANSMISSION" stamp — faint, flickering */
+.post-card::before {
+  content: 'INTERCEPTED_TRANSMISSION';
+  position: absolute;
+  top: var(--sp-sm);
+  right: var(--sp-sm);
+  font-family: var(--font-body);
+  font-size: 0.46rem;
+  letter-spacing: 0.14em;
+  color: var(--ichor);
+  animation: intercept-flash 8s steps(1) infinite;
+  pointer-events: none;
+}
+
+/* Hover: verdigris shift, inverted translateX direction */
+.post-card:hover {
+  background: rgba(26, 74, 66, 0.08);
+  border-left-width: 6px;
+  border-left-color: var(--verdigris-bright) !important;
+  transform: translateX(3px);
+  box-shadow: -6px 0 0 var(--ichor), -12px 0 0 rgba(92, 26, 114, 0.25);
+  animation: none;
+}
+
+.post-card-title a:hover {
+  color: var(--verdigris-bright) !important;
+  text-shadow:
+    0.3rem 0.15rem 0 var(--ichor),
+    -0.15rem -0.3rem 0 var(--verdigris),
+    0 0 20px rgba(42, 157, 128, 0.35);
+}
+
+/* ── 8. Section h2: machine glyph prefix ───────────────────────────────── */
+.home-featured h2::before,
+.home-recent h2::before,
+.home-sections h2::before,
+.section-title::before {
+  content: '⬡';
+  color: var(--ichor-bright);
+  margin-right: 0.4em;
+  animation: glyph-cycle 7s steps(1) infinite;
+}
+
+/* ── 9. Page/post titles: slow corruption glitch ────────────────────────── */
+.page-title,
+.post-title {
+  animation: title-corrupt 16s steps(1) infinite;
+}
+
+/* ── 10. Tags: classified verdigris ─────────────────────────────────────── */
+.tag-cloud-item a {
+  border-style: solid;
+  border-color: var(--verdigris);
+  color: var(--verdigris-bright);
+  animation: tag-scan 4s linear infinite;
+  transition: none;
+}
+
+.tag-cloud-item a:hover {
+  background: var(--ichor) !important;
+  color: var(--cement-light) !important;
+  border-color: var(--ichor-bright) !important;
+  animation: none;
+}
+
+.post-card-tags li a {
+  border-style: solid;
+  border-color: var(--verdigris);
+  color: var(--verdigris-bright);
+  animation: tag-scan 4s linear infinite;
+}
+
+.post-card-tags li a:hover {
+  background: var(--ichor) !important;
+  color: var(--cement-light) !important;
+  animation: none;
+}
+
+/* ── 11. Footer: broadcast sign-off ─────────────────────────────────────── */
+.site-footer {
+  border-top: 3px solid var(--ichor);
+  background: var(--void);
+  background-image: repeating-linear-gradient(
+    -75deg,
+    transparent,
+    transparent 8px,
+    rgba(92, 26, 114, 0.05) 8px,
+    rgba(92, 26, 114, 0.05) 16px
+  );
+}
+
+.footer-glitch {
+  color: var(--ichor-bright);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  animation: broadcast-flicker 4.5s steps(1) infinite;
+}
+
+/* ── 12. Blockquote: intercepted transmission ───────────────────────────── */
+blockquote {
+  border-left: 6px solid var(--ichor);
+  border-right: 2px solid var(--verdigris);
+  background: rgba(92, 26, 114, 0.05);
+  position: relative;
+  animation: sector-pulse 6s ease-in-out infinite;
+}
+
+blockquote::before {
+  content: 'TRANSMISSION //';
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  color: var(--ichor-bright);
+  margin-bottom: var(--sp-sm);
+}
+
+/* ── 13. Code: phosphor terminal ────────────────────────────────────────── */
+code {
+  color: var(--verdigris-bright);
+  background: rgba(26, 74, 66, 0.12);
+  animation: code-flicker 11s steps(1) infinite;
+}
+
+/* ── 14. HR: animated static noise bar ─────────────────────────────────── */
+hr {
+  border: none;
+  height: 8px;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      var(--ichor)          0px,  var(--ichor)          2px,
+      transparent           2px,  transparent           4px,
+      var(--verdigris)      4px,  var(--verdigris)      5px,
+      transparent           5px,  transparent           9px,
+      var(--blood)          9px,  var(--blood)          10px,
+      transparent           10px, transparent           14px
+    );
+  margin: var(--sp-xl) 0;
+  animation: static-noise-shift 0.15s steps(4) infinite;
+}
+
+/* ── 15. Post meta ──────────────────────────────────────────────────────── */
+.post-meta {
+  border-left: 6px solid var(--ichor);
+  background: rgba(92, 26, 114, 0.04);
+  animation: sector-pulse 7s ease-in-out infinite;
+}
+
+/* ── 16. Graph widget ───────────────────────────────────────────────────── */
+.graph-widget {
+  border-color: var(--ichor) !important;
+  box-shadow: 4px 4px 0 var(--ichor), 8px 8px 0 rgba(92, 26, 114, 0.2);
+  animation: sector-pulse 5s ease-in-out infinite;
+}
+
+/* ── 17. Post list alternating borders ──────────────────────────────────── */
+.post-list > .post-card:nth-child(odd) {
+  border-left-color: var(--ichor-bright);
+}
+.post-list > .post-card:nth-child(even) {
+  border-left-color: var(--verdigris);
+}
+
+/* ── 18. "VIRUS_DETECTED" ghost watermark ───────────────────────────────── */
+main::after {
+  content: 'VIRUS_DETECTED';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  font-family: var(--font-mast);
+  font-size: 12vw;
+  color: rgba(92, 26, 114, 0.07);
+  pointer-events: none;
+  z-index: 8000;
+  white-space: nowrap;
+  animation: virus-watermark 40s steps(1) infinite;
+}
+
+/* ── 19. Selection ──────────────────────────────────────────────────────── */
+::selection {
+  background: var(--ichor-bright);
+  color: var(--cement-light);
+  text-shadow: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   KEYFRAMES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Broadcast ticker — right to left scroll */
+@keyframes ticker-scroll {
+  from { transform: translateX(100vw); }
+  to   { transform: translateX(-100%); }
+}
+
+/* "▶ LIVE" badge — on/off blink */
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.15; }
+}
+
+/* Header background slow zone drift */
+@keyframes zone-drift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 51px 0; }
+}
+
+/* Masthead: periodic signal decomposition — slower, more eerie than chroma-pulse */
+@keyframes signal-decompose {
+  0%, 85%, 100% {
+    text-shadow:
+      0.35rem 0.18rem 0 var(--ichor),
+      -0.18rem -0.35rem 0 var(--verdigris),
+      0.7rem 0.35rem 0 rgba(92, 26, 114, 0.3);
+  }
+  86%  {
+    text-shadow:
+      1rem 0 0 var(--ichor-bright),
+      -1rem 0 0 var(--verdigris-bright),
+      0 0 40px rgba(92, 26, 114, 0.5);
+  }
+  87%  {
+    text-shadow:
+      0.35rem 0.18rem 0 var(--ichor),
+      -0.18rem -0.35rem 0 var(--verdigris),
+      0.7rem 0.35rem 0 rgba(92, 26, 114, 0.3);
+  }
+  88%  {
+    text-shadow:
+      -1.2rem 0.4rem 0 var(--blood-bright),
+      1.2rem -0.4rem 0 var(--ichor-bright),
+      0 0 60px rgba(92, 26, 114, 0.3);
+  }
+  89%  {
+    text-shadow:
+      0.35rem 0.18rem 0 var(--ichor),
+      -0.18rem -0.35rem 0 var(--verdigris),
+      0.7rem 0.35rem 0 rgba(92, 26, 114, 0.3);
+  }
+  90%  {
+    text-shadow:
+      0.6rem -0.6rem 0 var(--verdigris-bright),
+      -0.6rem 0.6rem 0 var(--ichor);
+  }
+  91%  {
+    text-shadow:
+      0.35rem 0.18rem 0 var(--ichor),
+      -0.18rem -0.35rem 0 var(--verdigris),
+      0.7rem 0.35rem 0 rgba(92, 26, 114, 0.3);
+  }
+}
+
+/* Masthead slice glitches — deliberate, unsettling */
+@keyframes cult-slice-a {
+  0%, 88%, 100% { transform: none; clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%); }
+  89%  { transform: translateX(-10px); clip-path: polygon(0 3%, 100% 3%, 100% 36%, 0 36%); }
+  90%  { transform: translateX(5px);   clip-path: polygon(0 0, 100% 0, 100% 30%, 0 30%); }
+  91%  { transform: none; }
+}
+
+@keyframes cult-slice-b {
+  0%, 74%, 100% { transform: none; clip-path: polygon(0 33%, 100% 33%, 100% 66%, 0 66%); }
+  75%  { transform: translateX(15px) skewX(-4deg); clip-path: polygon(0 30%, 100% 30%, 100% 70%, 0 70%); }
+  76%  { transform: translateX(-8px); }
+  77%  { transform: none; clip-path: polygon(0 33%, 100% 33%, 100% 66%, 0 66%); }
+}
+
+@keyframes cult-slice-c {
+  0%, 62%, 100% { transform: none; clip-path: polygon(0 66%, 100% 66%, 100% 100%, 0 100%); }
+  63%  { transform: translateX(12px); clip-path: polygon(0 62%, 100% 62%, 100% 100%, 0 100%); }
+  64%  { transform: translateX(-5px); }
+  65%  { transform: none; }
+}
+
+/* Masthead layer drift — slow, unsteady */
+@keyframes cult-drift-a {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-4px); }
+  45%  { transform: translateX(2px); }
+  70%  { transform: translateX(0); }
+  90%  { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes cult-drift-b {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(5px); }
+  40%  { transform: translateX(-3px); }
+  65%  { transform: translateX(0); }
+  85%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes cult-drift-c {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(3px); }
+  50%  { transform: translateX(-6px); }
+  75%  { transform: translateX(0); }
+  90%  { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}
+
+/* Nav active state — ichor pulse */
+@keyframes cult-active-pulse {
+  0%, 100% { background: var(--ichor); }
+  50%       { background: var(--ichor-bright); }
+}
+
+/* Station ID flicker */
+@keyframes station-id-flicker {
+  0%, 100%  { opacity: 1; color: var(--verdigris); }
+  33%        { opacity: 0.3; }
+  34%        { opacity: 1; color: var(--verdigris-bright); }
+  67%        { opacity: 0; }
+  68%        { opacity: 1; }
+}
+
+/* Signal corruption bar — ichor/verdigris version */
+@keyframes signal-corrupt-bar {
+  0%, 100%  { opacity: 0; top: -10px; background: var(--ichor-bright); }
+  11%        { opacity: 0.7; top: 31vh; background: var(--ichor-bright); }
+  11.3%      { opacity: 0; }
+  11.6%      { opacity: 0.5; top: 58vh; background: var(--verdigris-bright); }
+  11.9%      { opacity: 0; }
+  61%        { opacity: 0; top: -10px; }
+  61.4%      { opacity: 0.9; top: 44vh; background: var(--verdigris-bright); }
+  61.7%      { opacity: 0; }
+}
+
+/* Post card border — ichor ↔ verdigris */
+@keyframes sector-pulse {
+  0%, 100% { border-left-color: var(--ichor); }
+  50%       { border-left-color: var(--verdigris-bright); }
+}
+
+/* Post card stamp flicker */
+@keyframes intercept-flash {
+  0%, 100%  { opacity: 0.5; color: var(--ichor); }
+  30%        { opacity: 0; }
+  31%        { opacity: 0.9; color: var(--verdigris-bright); }
+  32%        { opacity: 0.5; color: var(--ichor); }
+  75%        { opacity: 0.3; }
+  76%        { opacity: 0.8; }
+}
+
+/* Section heading glyph cycle */
+@keyframes glyph-cycle {
+  0%, 100%  { color: var(--ichor-bright); opacity: 1; }
+  25%        { color: var(--verdigris-bright); }
+  50%        { color: var(--ichor-bright); opacity: 0.7; }
+  51%        { opacity: 0; }
+  52%        { opacity: 1; }
+  75%        { color: var(--blood-bright); }
+}
+
+/* Post/page title corruption */
+@keyframes title-corrupt {
+  0%, 91%, 100% { transform: none; }
+  92%  { transform: translateX(-4px) skewX(-3deg); text-shadow: 0.6rem 0 0 var(--ichor), -0.6rem 0 0 var(--verdigris-bright); }
+  93%  { transform: translateX(3px); }
+  94%  { transform: translateX(-1px) skewX(1deg); }
+  95%  { transform: none; }
+}
+
+/* Tag border scan — verdigris ↔ ichor */
+@keyframes tag-scan {
+  0%   { border-color: var(--verdigris); }
+  25%  { border-color: var(--verdigris-bright); }
+  50%  { border-color: var(--ichor); }
+  75%  { border-color: var(--verdigris); }
+  100% { border-color: var(--verdigris-bright); }
+}
+
+/* Footer glitch text */
+@keyframes broadcast-flicker {
+  0%, 91%, 100% { opacity: 1; color: var(--ichor-bright); }
+  92%  { opacity: 0; }
+  93%  { opacity: 1; color: var(--verdigris-bright); }
+  94%  { opacity: 0.4; }
+  95%  { opacity: 1; color: var(--ichor-bright); }
+}
+
+/* "VIRUS_DETECTED" ghost — rare, brief */
+@keyframes virus-watermark {
+  0%, 100%  { opacity: 0; }
+  37%        { opacity: 0; }
+  37.5%      { opacity: 1; }
+  38%        { opacity: 0; }
+  73%        { opacity: 0; }
+  73.4%      { opacity: 0.7; }
+  73.8%      { opacity: 0; }
+}
+
+/* Code element colour flicker */
+@keyframes code-flicker {
+  0%, 100% { color: var(--verdigris-bright); }
+  45%       { color: var(--cement-light); }
+  45.5%     { color: var(--verdigris-bright); }
+}
+
+/* HR static noise position */
+@keyframes static-noise-shift {
+  0%   { background-position: 0 0; }
+  25%  { background-position: 4px 0; }
+  50%  { background-position: -2px 0; }
+  75%  { background-position: 6px 0; }
+  100% { background-position: 0 0; }
+}
+
+/* Reduced-motion: kill everything */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
