@@ -173,6 +173,23 @@
   margin-bottom: var(--sp-xl);
 }
 
+/* Sawtooth divider above each home section (except the first) */
+.home-recent::before,
+.home-sections::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 10px;
+  margin-bottom: var(--sp-lg);
+  background-image:
+    linear-gradient(135deg, var(--void) 33.33%, transparent 33.33%),
+    linear-gradient(225deg, var(--void) 33.33%, transparent 33.33%);
+  background-color: var(--brass-deep);
+  background-size: 18px 10px;
+  background-position: 0 0, 9px 0;
+  background-repeat: repeat-x;
+}
+
 .home-featured h2,
 .home-recent h2,
 .home-sections h2 {
@@ -273,7 +290,7 @@
 
 .tag-cloud-count {
   font-size: 0.65rem;
-  color: var(--bone-faint);
+  color: var(--brass-deep);
 }
 
 /* ── Tag page ────────────────────────────────────────────────────────────── */

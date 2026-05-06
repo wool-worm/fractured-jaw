@@ -1,3 +1,7 @@
+/* CSS's display property overrides the HTML `hidden` attribute when a rule
+   explicitly sets display. This selector restores the attribute's intent. */
+[hidden] { display: none !important; }
+
 /* ── Full-page graph view ─────────────────────────────────────────────────── */
 /* graph.njk layout — the dedicated /network_nodes/ page */
 .graph-shell {

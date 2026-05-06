@@ -10,7 +10,7 @@ main {
   width: 100%;
   max-width: var(--col-wide);
   margin: 0 auto;
-  padding: var(--sp-lg) var(--sp-md);
+  padding: calc(var(--sp-lg) + 10px) var(--sp-md) var(--sp-lg);
 }
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
@@ -28,12 +28,18 @@ main {
 .site-header::after {
   content: '';
   position: absolute;
-  bottom: -5px;
+  bottom: -10px;
   left: 0;
   right: 0;
-  height: 3px;
-  background: var(--blood);
-  opacity: 0.6;
+  height: 10px;
+  background-image:
+    linear-gradient(135deg, var(--void) 33.33%, transparent 33.33%),
+    linear-gradient(225deg, var(--void) 33.33%, transparent 33.33%);
+  background-color: var(--blood);
+  background-size: 18px 10px;
+  background-position: 0 0, 9px 0;
+  background-repeat: repeat-x;
+  z-index: 1;
 }
 
 /* ── Masthead ───────────────────────────────────────────────────────────── */
@@ -46,7 +52,7 @@ main {
   text-transform: uppercase;
   white-space: nowrap;
   flex-shrink: 0;
-  text-shadow: var(--bitshadow);
+  text-shadow: var(--bitshadow-mast);
 }
 
 .site-title:hover {
@@ -126,6 +132,20 @@ main {
 }
 
 .site-footer p { margin-bottom: 0; max-width: none; }
+
+.footer-glitch {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  margin-bottom: var(--sp-sm);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.footer-credit {
+  font-size: 0.75rem;
+  color: var(--bone-faint);
+}
 
 /* ── Page headers (shared by section, tag, page layouts) ────────────────── */
 .page-header,

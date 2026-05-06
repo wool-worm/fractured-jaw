@@ -45,10 +45,29 @@
   --border-hot:  1px solid var(--brass);
   --border-hard: 2px solid var(--brass-deep);
 
-  /* ── Bitshadow (applied inline on titles) ──── */
+  /* ── Typography colour hierarchy ───────────────
+     masthead  bone     site title + bitshadow
+     level-1   brass    page/post titles + bitshadow
+     level-2   brass-deep  section h2 labels
+     level-3   bone-dim    descriptions, meta, body prose
+     level-4   bone-faint  timestamps, separators
+     hover     sodium   interactive hover / active state
+     danger    blood    callouts, fracture marks
+     ────────────────────────────────────────────── */
+
+  /* ── Bitshadow ──────────────────────────────── */
+  /* Standard — headings, post titles */
   --bitshadow:
-    0.18rem 0.09rem 0 var(--blood),
-    -0.09rem -0.18rem 0 var(--brass-deep);
+    0.22rem 0.11rem 0 var(--blood),
+    -0.11rem -0.22rem 0 var(--brass-deep),
+    0.44rem 0.22rem 0 rgba(139, 0, 0, 0.25);
+
+  /* Aggressive — masthead only */
+  --bitshadow-mast:
+    0.35rem 0.18rem 0 var(--blood),
+    -0.18rem -0.35rem 0 var(--brass-deep),
+    0.7rem 0.35rem 0 rgba(139, 0, 0, 0.3),
+    -0.35rem -0.7rem 0 rgba(138, 115, 64, 0.2);
 }
 
 @media (prefers-reduced-motion: reduce) {
