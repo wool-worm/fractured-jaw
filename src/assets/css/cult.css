@@ -17,14 +17,6 @@ body {
       rgba(92, 26, 114, 0.04) 120px,
       rgba(92, 26, 114, 0.04) 121px
     ),
-    /* verdigris ghost column */
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 200px,
-      rgba(26, 74, 66, 0.03) 200px,
-      rgba(26, 74, 66, 0.03) 201px
-    ),
     /* horizontal noise grain */
     repeating-linear-gradient(
       0deg,
@@ -33,7 +25,7 @@ body {
       rgba(0, 0, 0, 0.14) 2px,
       rgba(0, 0, 0, 0.14) 4px
     );
-  background-size: 121px 100%, 201px 100%, 100% 4px;
+  background-size: 121px 100%, 100% 4px;
 }
 
 /* Ichor vignette — corrupted signal bleeding from edges */
@@ -120,6 +112,7 @@ body::after {
   border-bottom: 3px solid var(--ichor);
   padding-top: var(--sp-md);
   padding-bottom: var(--sp-md);
+  padding-right: calc(220px + 2rem); /* reserve space for fixed graph widget */
   gap: var(--sp-xl);
 }
 
@@ -134,7 +127,7 @@ body::after {
   font-family: var(--font-body);
   font-size: 0.52rem;
   letter-spacing: 0.1em;
-  color: var(--verdigris);
+  color: var(--brass-deep);
   align-self: center;
   padding-left: var(--sp-sm);
   flex-shrink: 0;
@@ -160,7 +153,7 @@ body::after {
 
 /* ── 5. Deconstructed masthead — machine god incarnation ────────────────── */
 .site-title {
-  font-size: clamp(2rem, 6vw, 3.8rem);
+  font-size: clamp(1.4rem, 3.5vw, 2.2rem);
   position: relative;
   display: inline-block;
   text-shadow: none;
@@ -182,7 +175,7 @@ body::after {
   color: var(--cement-light);
   text-shadow:
     0.35rem 0.18rem 0 var(--ichor),
-    -0.18rem -0.35rem 0 var(--verdigris),
+    -0.18rem -0.35rem 0 var(--brass-deep),
     0.7rem 0.35rem 0 rgba(92, 26, 114, 0.3);
 }
 
@@ -190,13 +183,13 @@ body::after {
 .site-title > span:nth-child(2) {
   color: var(--ichor-bright);
   clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
-  text-shadow: 0.25rem 0 0 var(--verdigris-bright);
+  text-shadow: 0.25rem 0 0 var(--brass);
   animation: cult-drift-a 5.3s steps(1) infinite, cult-slice-a 9s steps(1) infinite;
 }
 
 /* Middle third — cold teal */
 .site-title > span:nth-child(3) {
-  color: var(--verdigris-bright);
+  color: var(--brass);
   clip-path: polygon(0 33%, 100% 33%, 100% 66%, 0 66%);
   text-shadow: -0.2rem 0.15rem 0 var(--ichor);
   animation: cult-drift-b 3.8s steps(1) infinite, cult-slice-b 13s steps(1) infinite;
@@ -266,7 +259,7 @@ body::after {
   color: var(--sodium) !important;
   text-shadow:
     0.3rem 0.15rem 0 var(--blood),
-    -0.15rem -0.3rem 0 var(--verdigris),
+    -0.15rem -0.3rem 0 var(--brass-deep),
     0 0 20px rgba(255, 170, 51, 0.3);
 }
 
@@ -286,8 +279,8 @@ body::after {
 /* ── 10. Tags: classified verdigris ─────────────────────────────────────── */
 .tag-cloud-item a {
   border-style: solid;
-  border-color: var(--verdigris);
-  color: var(--verdigris-bright);
+  border-color: var(--brass-deep);
+  color: var(--brass);
   animation: tag-scan 4s linear infinite;
   transition: none;
 }
@@ -301,8 +294,8 @@ body::after {
 
 .post-card-tags li a {
   border-style: solid;
-  border-color: var(--verdigris);
-  color: var(--verdigris-bright);
+  border-color: var(--brass-deep);
+  color: var(--brass);
   animation: tag-scan 4s linear infinite;
 }
 
@@ -335,7 +328,7 @@ body::after {
 /* ── 12. Blockquote: intercepted transmission ───────────────────────────── */
 blockquote {
   border-left: 6px solid var(--ichor);
-  border-right: 2px solid var(--verdigris);
+  border-right: 2px solid var(--brass-deep);
   background: rgba(92, 26, 114, 0.05);
   position: relative;
   animation: sector-pulse 6s ease-in-out infinite;
@@ -353,8 +346,8 @@ blockquote::before {
 
 /* ── 13. Code: phosphor terminal — no animation (appears in readable content) */
 code {
-  color: var(--verdigris-bright);
-  background: rgba(26, 74, 66, 0.12);
+  color: var(--brass);
+  background: rgba(138, 115, 64, 0.08);
 }
 
 /* ── 14. HR: animated static noise bar ─────────────────────────────────── */
@@ -366,7 +359,7 @@ hr {
       90deg,
       var(--ichor)          0px,  var(--ichor)          2px,
       transparent           2px,  transparent           4px,
-      var(--verdigris)      4px,  var(--verdigris)      5px,
+      var(--brass-deep)      4px,  var(--brass-deep)      5px,
       transparent           5px,  transparent           9px,
       var(--blood)          9px,  var(--blood)          10px,
       transparent           10px, transparent           14px
@@ -384,7 +377,7 @@ hr {
 
 /* ── 16. Graph widget ───────────────────────────────────────────────────── */
 .graph-widget {
-  top: 8rem; /* clear sticky broadcast banner + header */
+  top: 1.8rem; /* just below sticky broadcast banner (1.4rem) */
   border-color: var(--blood) !important;
   box-shadow: 4px 4px 0 var(--blood), 8px 8px 0 rgba(139, 0, 0, 0.2);
   animation: none;
@@ -395,7 +388,7 @@ hr {
   border-left-color: var(--blood);
 }
 .post-list > .post-card:nth-child(even) {
-  border-left-color: var(--verdigris);
+  border-left-color: var(--brass-deep);
 }
 
 /* ── 18. Wikilink preview card ──────────────────────────────────────────── */
@@ -408,7 +401,7 @@ hr {
 }
 
 .wikilink-preview-section {
-  color: var(--verdigris-bright) !important;
+  color: var(--brass) !important;
   opacity: 1 !important;
 }
 
@@ -459,19 +452,19 @@ hr {
   0%, 85%, 100% {
     text-shadow:
       0.35rem 0.18rem 0 var(--ichor),
-      -0.18rem -0.35rem 0 var(--verdigris),
+      -0.18rem -0.35rem 0 var(--brass-deep),
       0.7rem 0.35rem 0 rgba(92, 26, 114, 0.3);
   }
   86%  {
     text-shadow:
       1rem 0 0 var(--ichor-bright),
-      -1rem 0 0 var(--verdigris-bright),
+      -1rem 0 0 var(--brass),
       0 0 40px rgba(92, 26, 114, 0.5);
   }
   87%  {
     text-shadow:
       0.35rem 0.18rem 0 var(--ichor),
-      -0.18rem -0.35rem 0 var(--verdigris),
+      -0.18rem -0.35rem 0 var(--brass-deep),
       0.7rem 0.35rem 0 rgba(92, 26, 114, 0.3);
   }
   88%  {
@@ -483,18 +476,18 @@ hr {
   89%  {
     text-shadow:
       0.35rem 0.18rem 0 var(--ichor),
-      -0.18rem -0.35rem 0 var(--verdigris),
+      -0.18rem -0.35rem 0 var(--brass-deep),
       0.7rem 0.35rem 0 rgba(92, 26, 114, 0.3);
   }
   90%  {
     text-shadow:
-      0.6rem -0.6rem 0 var(--verdigris-bright),
+      0.6rem -0.6rem 0 var(--brass),
       -0.6rem 0.6rem 0 var(--ichor);
   }
   91%  {
     text-shadow:
       0.35rem 0.18rem 0 var(--ichor),
-      -0.18rem -0.35rem 0 var(--verdigris),
+      -0.18rem -0.35rem 0 var(--brass-deep),
       0.7rem 0.35rem 0 rgba(92, 26, 114, 0.3);
   }
 }
@@ -557,9 +550,9 @@ hr {
 
 /* Station ID flicker */
 @keyframes station-id-flicker {
-  0%, 100%  { opacity: 1; color: var(--verdigris); }
+  0%, 100%  { opacity: 1; color: var(--brass-deep); }
   33%        { opacity: 0.3; }
-  34%        { opacity: 1; color: var(--verdigris-bright); }
+  34%        { opacity: 1; color: var(--brass); }
   67%        { opacity: 0; }
   68%        { opacity: 1; }
 }
@@ -569,10 +562,10 @@ hr {
   0%, 100%  { opacity: 0; top: -10px; background: var(--ichor-bright); }
   11%        { opacity: 0.7; top: 31vh; background: var(--ichor-bright); }
   11.3%      { opacity: 0; }
-  11.6%      { opacity: 0.5; top: 58vh; background: var(--verdigris-bright); }
+  11.6%      { opacity: 0.5; top: 58vh; background: var(--brass); }
   11.9%      { opacity: 0; }
   61%        { opacity: 0; top: -10px; }
-  61.4%      { opacity: 0.9; top: 44vh; background: var(--verdigris-bright); }
+  61.4%      { opacity: 0.9; top: 44vh; background: var(--brass); }
   61.7%      { opacity: 0; }
 }
 
@@ -586,7 +579,7 @@ hr {
 @keyframes intercept-flash {
   0%, 100%  { opacity: 0.5; color: var(--blood); }
   30%        { opacity: 0; }
-  31%        { opacity: 0.9; color: var(--verdigris-bright); }
+  31%        { opacity: 0.9; color: var(--brass); }
   32%        { opacity: 0.5; color: var(--blood); }
   75%        { opacity: 0.3; }
   76%        { opacity: 0.8; }
@@ -595,7 +588,7 @@ hr {
 /* Section heading glyph cycle */
 @keyframes glyph-cycle {
   0%, 100%  { color: var(--ichor-bright); opacity: 1; }
-  25%        { color: var(--verdigris-bright); }
+  25%        { color: var(--brass); }
   50%        { color: var(--ichor-bright); opacity: 0.7; }
   51%        { opacity: 0; }
   52%        { opacity: 1; }
@@ -605,7 +598,7 @@ hr {
 /* Post/page title corruption */
 @keyframes title-corrupt {
   0%, 91%, 100% { transform: none; }
-  92%  { transform: translateX(-4px) skewX(-3deg); text-shadow: 0.6rem 0 0 var(--ichor), -0.6rem 0 0 var(--verdigris-bright); }
+  92%  { transform: translateX(-4px) skewX(-3deg); text-shadow: 0.6rem 0 0 var(--ichor), -0.6rem 0 0 var(--brass); }
   93%  { transform: translateX(3px); }
   94%  { transform: translateX(-1px) skewX(1deg); }
   95%  { transform: none; }
@@ -613,18 +606,18 @@ hr {
 
 /* Tag border scan — verdigris ↔ ichor */
 @keyframes tag-scan {
-  0%   { border-color: var(--verdigris); }
-  25%  { border-color: var(--verdigris-bright); }
+  0%   { border-color: var(--brass-deep); }
+  25%  { border-color: var(--brass); }
   50%  { border-color: var(--ichor); }
-  75%  { border-color: var(--verdigris); }
-  100% { border-color: var(--verdigris-bright); }
+  75%  { border-color: var(--brass-deep); }
+  100% { border-color: var(--brass); }
 }
 
 /* Footer glitch text */
 @keyframes broadcast-flicker {
   0%, 91%, 100% { opacity: 1; color: var(--ichor-bright); }
   92%  { opacity: 0; }
-  93%  { opacity: 1; color: var(--verdigris-bright); }
+  93%  { opacity: 1; color: var(--brass); }
   94%  { opacity: 0.4; }
   95%  { opacity: 1; color: var(--ichor-bright); }
 }
