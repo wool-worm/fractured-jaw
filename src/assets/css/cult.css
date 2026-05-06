@@ -142,14 +142,20 @@ body::after {
 }
 
 /* ── 4. SVG turbulence filters ──────────────────────────────────────────── */
-.page-title,
-.post-title,
+/* Only section titles (listing pages) get distortion — not reading pages */
 .section-title {
   filter: url(#turbulence-mild);
 }
 
 .site-title {
   filter: url(#turbulence);
+}
+
+/* Reading pages: no animation or distortion on post/page titles */
+.page-title,
+.post-title {
+  animation: none;
+  filter: none;
 }
 
 /* ── 5. Deconstructed masthead — machine god incarnation ────────────────── */
@@ -207,21 +213,21 @@ body::after {
 /* ── 6. Nav: sector map aesthetic ───────────────────────────────────────── */
 .site-nav a {
   transition: none;
-  border-right: 2px solid var(--ichor);
-  color: var(--cement-light);
+  border-right: 2px solid var(--blood);
+  color: var(--bone-dim);
 }
 
 .site-nav a:hover,
 .site-nav a:focus-visible {
-  background: var(--verdigris);
-  color: var(--cement-light) !important;
-  border-right-color: var(--verdigris-bright);
+  background: var(--void-mid);
+  color: var(--sodium) !important;
+  border-right-color: var(--blood-bright);
   border-bottom: none;
 }
 
 .site-nav a[aria-current="page"] {
-  background: var(--ichor);
-  color: var(--cement-light) !important;
+  background: var(--blood);
+  color: var(--bone) !important;
   animation: cult-active-pulse 3.2s steps(1) infinite;
 }
 
@@ -241,27 +247,27 @@ body::after {
   font-family: var(--font-body);
   font-size: 0.46rem;
   letter-spacing: 0.14em;
-  color: var(--ichor);
+  color: var(--blood);
   animation: intercept-flash 8s steps(1) infinite;
   pointer-events: none;
 }
 
-/* Hover: verdigris shift, inverted translateX direction */
+/* Hover: blood shift, inverted translateX direction */
 .post-card:hover {
-  background: rgba(26, 74, 66, 0.08);
+  background: var(--void-mid);
   border-left-width: 6px;
-  border-left-color: var(--verdigris-bright) !important;
+  border-left-color: var(--blood-bright) !important;
   transform: translateX(3px);
-  box-shadow: -6px 0 0 var(--ichor), -12px 0 0 rgba(92, 26, 114, 0.25);
+  box-shadow: -6px 0 0 var(--blood), -12px 0 0 rgba(139, 0, 0, 0.3);
   animation: none;
 }
 
 .post-card-title a:hover {
-  color: var(--verdigris-bright) !important;
+  color: var(--sodium) !important;
   text-shadow:
-    0.3rem 0.15rem 0 var(--ichor),
+    0.3rem 0.15rem 0 var(--blood),
     -0.15rem -0.3rem 0 var(--verdigris),
-    0 0 20px rgba(42, 157, 128, 0.35);
+    0 0 20px rgba(255, 170, 51, 0.3);
 }
 
 /* ── 8. Section h2: machine glyph prefix ───────────────────────────────── */
@@ -275,11 +281,7 @@ body::after {
   animation: glyph-cycle 7s steps(1) infinite;
 }
 
-/* ── 9. Page/post titles: slow corruption glitch ────────────────────────── */
-.page-title,
-.post-title {
-  animation: title-corrupt 16s steps(1) infinite;
-}
+/* ── 9. Page/post titles: no glitch (overridden in section 4) ───────────── */
 
 /* ── 10. Tags: classified verdigris ─────────────────────────────────────── */
 .tag-cloud-item a {
@@ -291,9 +293,9 @@ body::after {
 }
 
 .tag-cloud-item a:hover {
-  background: var(--ichor) !important;
-  color: var(--cement-light) !important;
-  border-color: var(--ichor-bright) !important;
+  background: var(--sodium) !important;
+  color: var(--void) !important;
+  border-color: var(--sodium-soft) !important;
   animation: none;
 }
 
@@ -305,14 +307,14 @@ body::after {
 }
 
 .post-card-tags li a:hover {
-  background: var(--ichor) !important;
-  color: var(--cement-light) !important;
+  background: var(--sodium) !important;
+  color: var(--void) !important;
   animation: none;
 }
 
 /* ── 11. Footer: broadcast sign-off ─────────────────────────────────────── */
 .site-footer {
-  border-top: 3px solid var(--ichor);
+  border-top: 3px solid var(--blood);
   background: var(--void);
   background-image: repeating-linear-gradient(
     -75deg,
@@ -349,11 +351,10 @@ blockquote::before {
   margin-bottom: var(--sp-sm);
 }
 
-/* ── 13. Code: phosphor terminal ────────────────────────────────────────── */
+/* ── 13. Code: phosphor terminal — no animation (appears in readable content) */
 code {
   color: var(--verdigris-bright);
   background: rgba(26, 74, 66, 0.12);
-  animation: code-flicker 11s steps(1) infinite;
 }
 
 /* ── 14. HR: animated static noise bar ─────────────────────────────────── */
@@ -376,40 +377,52 @@ hr {
 
 /* ── 15. Post meta ──────────────────────────────────────────────────────── */
 .post-meta {
-  border-left: 6px solid var(--ichor);
-  background: rgba(92, 26, 114, 0.04);
-  animation: sector-pulse 7s ease-in-out infinite;
+  border-left: 6px solid var(--blood);
+  background: rgba(139, 0, 0, 0.04);
+  animation: none;
 }
 
 /* ── 16. Graph widget ───────────────────────────────────────────────────── */
 .graph-widget {
-  border-color: var(--ichor) !important;
-  box-shadow: 4px 4px 0 var(--ichor), 8px 8px 0 rgba(92, 26, 114, 0.2);
-  animation: sector-pulse 5s ease-in-out infinite;
+  top: 8rem; /* clear sticky broadcast banner + header */
+  border-color: var(--blood) !important;
+  box-shadow: 4px 4px 0 var(--blood), 8px 8px 0 rgba(139, 0, 0, 0.2);
+  animation: none;
 }
 
 /* ── 17. Post list alternating borders ──────────────────────────────────── */
 .post-list > .post-card:nth-child(odd) {
-  border-left-color: var(--ichor-bright);
+  border-left-color: var(--blood);
 }
 .post-list > .post-card:nth-child(even) {
   border-left-color: var(--verdigris);
 }
 
-/* ── 18. "VIRUS_DETECTED" ghost watermark ───────────────────────────────── */
-main::after {
-  content: 'VIRUS_DETECTED';
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-15deg);
-  font-family: var(--font-mast);
-  font-size: 12vw;
-  color: rgba(92, 26, 114, 0.07);
-  pointer-events: none;
-  z-index: 8000;
-  white-space: nowrap;
-  animation: virus-watermark 40s steps(1) infinite;
+/* ── 18. Wikilink preview card ──────────────────────────────────────────── */
+/* JS sets inline white/black styles; !important overrides them */
+.wikilink-preview {
+  background: var(--void-mid) !important;
+  color: var(--bone) !important;
+  border: 1px solid var(--blood) !important;
+  box-shadow: 3px 3px 0 var(--blood), 5px 5px 0 rgba(139, 0, 0, 0.2) !important;
+}
+
+.wikilink-preview-section {
+  color: var(--verdigris-bright) !important;
+  opacity: 1 !important;
+}
+
+.wikilink-preview-title {
+  color: var(--brass) !important;
+}
+
+.wikilink-preview-description {
+  color: var(--bone-dim);
+}
+
+.wikilink-preview-meta {
+  color: var(--bone-faint) !important;
+  opacity: 1 !important;
 }
 
 /* ── 19. Selection ──────────────────────────────────────────────────────── */
@@ -536,10 +549,10 @@ main::after {
   100% { transform: translateX(0); }
 }
 
-/* Nav active state — ichor pulse */
+/* Nav active state — blood pulse */
 @keyframes cult-active-pulse {
-  0%, 100% { background: var(--ichor); }
-  50%       { background: var(--ichor-bright); }
+  0%, 100% { background: var(--blood); }
+  50%       { background: var(--blood-bright); }
 }
 
 /* Station ID flicker */
@@ -563,18 +576,18 @@ main::after {
   61.7%      { opacity: 0; }
 }
 
-/* Post card border — ichor ↔ verdigris */
+/* Post card border — brass-deep ↔ blood */
 @keyframes sector-pulse {
-  0%, 100% { border-left-color: var(--ichor); }
-  50%       { border-left-color: var(--verdigris-bright); }
+  0%, 100% { border-left-color: var(--brass-deep); }
+  50%       { border-left-color: var(--blood); }
 }
 
 /* Post card stamp flicker */
 @keyframes intercept-flash {
-  0%, 100%  { opacity: 0.5; color: var(--ichor); }
+  0%, 100%  { opacity: 0.5; color: var(--blood); }
   30%        { opacity: 0; }
   31%        { opacity: 0.9; color: var(--verdigris-bright); }
-  32%        { opacity: 0.5; color: var(--ichor); }
+  32%        { opacity: 0.5; color: var(--blood); }
   75%        { opacity: 0.3; }
   76%        { opacity: 0.8; }
 }
@@ -614,24 +627,6 @@ main::after {
   93%  { opacity: 1; color: var(--verdigris-bright); }
   94%  { opacity: 0.4; }
   95%  { opacity: 1; color: var(--ichor-bright); }
-}
-
-/* "VIRUS_DETECTED" ghost — rare, brief */
-@keyframes virus-watermark {
-  0%, 100%  { opacity: 0; }
-  37%        { opacity: 0; }
-  37.5%      { opacity: 1; }
-  38%        { opacity: 0; }
-  73%        { opacity: 0; }
-  73.4%      { opacity: 0.7; }
-  73.8%      { opacity: 0; }
-}
-
-/* Code element colour flicker */
-@keyframes code-flicker {
-  0%, 100% { color: var(--verdigris-bright); }
-  45%       { color: var(--cement-light); }
-  45.5%     { color: var(--verdigris-bright); }
 }
 
 /* HR static noise position */
