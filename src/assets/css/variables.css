@@ -23,6 +23,18 @@
   --blood:       #8b0000;
   --blood-bright:#c62828;
 
+  /* ── Ichor (sickly purple) ─────────────────── */
+  --ichor:        #5c1a72;
+  --ichor-bright: #9b3ab8;
+
+  /* ── Verdigris (cold teal) ─────────────────── */
+  --verdigris:       #1a4a42;
+  --verdigris-bright:#2a9d80;
+
+  /* ── Cement (unfinished concrete) ─────────── */
+  --cement:      #3a3a3c;
+  --cement-light:#9a9892;
+
   /* ── Typography ────────────────────────────── */
   --font-body:    'VCR Mono', 'Courier New', ui-monospace, monospace;
   --font-display: 'Tea For God', 'VCR Mono', 'Courier New', monospace;
