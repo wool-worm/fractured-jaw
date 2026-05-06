@@ -19,7 +19,7 @@ body {
   background-size: 100% 4px;
 }
 
-/* Void vignette — deep black edges, no colour tint */
+/* Vignette — void edges with just a trace of ichor */
 body::before {
   content: '';
   position: fixed;
@@ -29,6 +29,7 @@ body::before {
   background: radial-gradient(
     ellipse at center,
     transparent 55%,
+    rgba(92, 26, 114, 0.07) 80%,
     rgba(0, 0, 0, 0.55) 100%
   );
 }
@@ -103,7 +104,7 @@ body::after {
   padding-top: var(--sp-md);
   padding-bottom: var(--sp-md);
   padding-right: calc(220px + 2rem); /* reserve space for fixed graph widget */
-  gap: var(--sp-xl);
+  gap: var(--sp-md);
 }
 
 /* Override sawtooth strip colour to blood */
@@ -191,7 +192,29 @@ body::after {
   animation: cult-drift-c 7.2s steps(1) infinite, cult-slice-c 6s steps(1) infinite;
 }
 
-/* ── 6. Nav: sector map aesthetic ───────────────────────────────────────── */
+/* ── 6. Site logo mark ──────────────────────────────────────────────────── */
+.site-logo-mark {
+  border-bottom: none;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.site-logo-mark img {
+  height: 54px;
+  width: auto;
+  display: block;
+  opacity: 0.88;
+  filter: drop-shadow(0 0 6px rgba(92, 26, 114, 0.35));
+  transition: none;
+}
+
+.site-logo-mark:hover img {
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgba(92, 26, 114, 0.55));
+}
+
+/* ── 7. Nav: sector map aesthetic ───────────────────────────────────────── */
 .site-nav a {
   transition: none;
   border-right: 2px solid var(--blood);
