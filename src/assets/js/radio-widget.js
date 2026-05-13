@@ -299,9 +299,15 @@
   // Fold/unfold: toggle .is-folded on the shell so CSS translates the
   // widget right, leaving just the fold button visible at the window
   // edge. Audio keeps playing when folded — only the UI hides.
-  function setFolded(next) {
-    if (next === folded) return;
-    folded = next;
+  //
+  // Persistence: setFolded writes to localStorage so the state
+  // survives page navigation. restoreFoldedState() at boot reads it
+  // back and applies the saved state with the CSS transition
+  // disabled, so the widget appears already-folded rather than
+  // visibly sliding into place.
+  var FOLD_STORAGE_KEY = "fj.radio-widget.folded";
+
+  function applyFoldDOM() {
     if (folded) {
       shell.classList.add("is-folded");
       foldBtn.textContent = "«";
@@ -315,6 +321,38 @@
       foldBtn.setAttribute("aria-label", "Fold scanner");
       foldBtn.setAttribute("title", "Fold scanner to right margin");
     }
+  }
+
+  function saveFoldedState() {
+    try { localStorage.setItem(FOLD_STORAGE_KEY, folded ? "1" : "0"); }
+    catch (e) { /* private mode / quota — silently ignore */ }
+  }
+
+  function loadFoldedState() {
+    try { return localStorage.getItem(FOLD_STORAGE_KEY) === "1"; }
+    catch (e) { return false; }
+  }
+
+  function setFolded(next) {
+    if (next === folded) return;
+    folded = next;
+    applyFoldDOM();
+    saveFoldedState();
+  }
+
+  function restoreFoldedState() {
+    var stored = loadFoldedState();
+    if (stored === folded) return;
+    folded = stored;
+    // Disable the transform transition for this single restore so
+    // the widget appears already-folded on page load rather than
+    // visibly sliding from unfolded → folded. Inline `transition:
+    // none` overrides the CSS rule; clearing the inline style next
+    // frame restores the CSS-defined transition for user gestures.
+    shell.style.transition = "none";
+    applyFoldDOM();
+    void shell.offsetWidth;  // force a synchronous reflow
+    requestAnimationFrame(function () { shell.style.transition = ""; });
   }
 
   // ── Audio engine ────────────────────────────────────────────────────────
@@ -1643,6 +1681,10 @@
     setupListeners();
     updateReadout();
     draw();
+    // Restore the saved fold state before any voice-data work so
+    // the widget renders already-folded if the user had folded it
+    // on the previous page.
+    restoreFoldedState();
     // Kick off all voice-data fetches in the background so the first
     // tune to any voice channel doesn't start with a network-bound
     // delay. Fire-and-forget — the engines await the same promises.
