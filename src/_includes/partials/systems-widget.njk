@@ -17,6 +17,13 @@
   id="systems-widget"
   aria-label="System status panel"
 >
+  {# Failure banner — hidden by default, slides in via the
+     .is-encryption-failure class on the shell when the encryption
+     state machine in systems-widget.js fires a failure. #}
+  <div class="systems-failure-banner" aria-hidden="true">
+    <span class="systems-failure-banner-text">invasion detected - encryption compromised... secure your machine immediately ◆ invasion detected - encryption compromised... secure your machine immediately ◆</span>
+  </div>
+
   <div class="systems-widget-header">
     <span class="systems-widget-label">system_status</span>
     <button
@@ -46,6 +53,15 @@
       <span class="antenna-name">ant_δ</span>
       <span class="antenna-state" id="ant-delta" data-state="STANDBY">STANDBY</span>
     </div>
+  </div>
+
+  <div class="systems-section systems-encryption" id="systems-encryption" data-state="ACTIVE">
+    <span class="systems-encryption-label">encryption</span>
+    <span class="systems-encryption-state">
+      <span class="systems-encryption-dot" aria-hidden="true"></span>
+      <span class="systems-encryption-warning" aria-hidden="true">⚠</span>
+      <span id="systems-encryption-state-text">active</span>
+    </span>
   </div>
 
   <div class="systems-section systems-bars">
