@@ -32,6 +32,7 @@
   var powerBtn = document.getElementById("radio-widget-power");
   var trawlBtn = document.getElementById("radio-widget-trawl");
   var foldBtn = document.getElementById("radio-widget-fold");
+  var resumeBtn = document.getElementById("radio-widget-resume");
 
   var BANDS = ["ALPHA", "BETA", "GAMMA", "DELTA"];
   // 64 channels per band — sparse enough that each tick is a real, aimable
@@ -224,6 +225,39 @@
     shell.dataset.signal = powered ? signalAt(currentBand, currentIndex) : "offline";
   }
 
+  // ── Tuner-state persistence ─────────────────────────────────────────────
+  // Band, index, powered, trawling all survive page navigation via
+  // localStorage. Writes are debounced (200ms) so a trawl that bumps
+  // setIndex every 350ms doesn't hammer the disk on every step.
+  // restoreTunerState() runs in boot() to re-apply the saved state
+  // before any audio engine starts.
+  var TUNER_STATE_KEY = "fj.radio.state";
+  var tunerSaveTimer = null;
+
+  function persistTunerStateNow() {
+    try {
+      localStorage.setItem(TUNER_STATE_KEY, JSON.stringify({
+        powered:  powered,
+        band:     currentBand,
+        index:    currentIndex,
+        trawling: trawling
+      }));
+    } catch (e) { /* private mode / quota — silently ignore */ }
+  }
+
+  function saveTunerState() {
+    if (tunerSaveTimer) clearTimeout(tunerSaveTimer);
+    tunerSaveTimer = setTimeout(persistTunerStateNow, 200);
+  }
+
+  function loadTunerState() {
+    try {
+      var raw = localStorage.getItem(TUNER_STATE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) { return null; }
+  }
+
   function setBand(next) {
     if (BANDS.indexOf(next) < 0 || next === currentBand) return;
     currentBand = next;
@@ -234,6 +268,7 @@
     updateReadout();
     draw();
     applyAudio();
+    saveTunerState();
   }
 
   function setIndex(next) {
@@ -243,6 +278,7 @@
     updateReadout();
     draw();
     applyAudio();
+    saveTunerState();
   }
 
   function setPowered(next) {
@@ -256,6 +292,7 @@
     updateReadout();
     draw();
     applyAudio();
+    saveTunerState();
   }
 
   // Trawl: step forward through the band on a timer. Brief pause on
@@ -275,6 +312,82 @@
         trawlTimer = null;
       }
     }
+    saveTunerState();
+  }
+
+  // Restore band / index / powered / trawling from localStorage. Called
+  // at boot. Uses the existing setters so all their side effects
+  // (DOM, readout, audio engine, trawl timer) wire up correctly. The
+  // setters' "no-op if already equal" guards mean only changed fields
+  // actually do work.
+  //
+  // Browser autoplay policy: when powered=true is restored without a
+  // user gesture on the new page, AudioContext is created suspended
+  // and speechSynthesis won't speak. attemptAudioResumeOnGesture()
+  // listens for the first click/keydown/touch anywhere on the
+  // document and resumes the context — audio comes online as soon as
+  // the visitor interacts with anything.
+  function restoreTunerState() {
+    var saved = loadTunerState();
+    if (!saved) return;
+
+    if (saved.band && BANDS.indexOf(saved.band) >= 0) {
+      setBand(saved.band);
+    }
+    if (typeof saved.index === "number") {
+      setIndex(saved.index);
+    }
+    if (saved.powered === true) {
+      setPowered(true);
+      attemptAudioResumeOnGesture();
+    }
+    if (saved.trawling === true) {
+      setTrawling(true);
+    }
+  }
+
+  function setResumePromptVisible(visible) {
+    if (!resumeBtn) return;
+    resumeBtn.hidden = !visible;
+  }
+
+  function attemptAudioResumeOnGesture() {
+    // If audio is already running (e.g., page restored from bfcache with
+    // an active context), no prompt is needed and applyAudio already
+    // produced sound. Bail out so we don't show a stale overlay.
+    if (audioCtx && audioCtx.state === "running") return;
+
+    // Surface the "signal interrupted — tap to resume" overlay on the
+    // dial. Any gesture (clicking the overlay, anywhere else on the
+    // page, a keypress, or a touch) dismisses it and rebuilds the
+    // audio engine inside the now-activated context. The overlay
+    // itself is a real button so the affordance is obvious and
+    // keyboard-accessible, but the document-level listeners mean even
+    // an unrelated click resumes audio — same as before, just with a
+    // visible cue.
+    setResumePromptVisible(true);
+
+    function onGesture() {
+      document.removeEventListener("click", onGesture);
+      document.removeEventListener("keydown", onGesture);
+      document.removeEventListener("touchstart", onGesture);
+      setResumePromptVisible(false);
+      // Re-run applyAudio inside the user-activated context. Just
+      // calling audioCtx.resume() isn't enough — in some browsers
+      // oscillators (.start() during suspended state) and
+      // speechSynthesis utterances queued while suspended don't
+      // reliably produce audio when the context later resumes.
+      // Recreating the engine in a now-running, gesture-blessed
+      // context sidesteps all those quirks: applyAudio's own
+      // resume() call now succeeds, and the freshly-created engine
+      // (oscillators, drone voices, or a new speechSynthesis chain)
+      // plays as expected. This is the same path a widget click
+      // would take, which is why those have always worked.
+      if (powered) applyAudio();
+    }
+    document.addEventListener("click", onGesture);
+    document.addEventListener("keydown", onGesture);
+    document.addEventListener("touchstart", onGesture);
   }
 
   function scheduleNextTrawl() {
@@ -299,9 +412,15 @@
   // Fold/unfold: toggle .is-folded on the shell so CSS translates the
   // widget right, leaving just the fold button visible at the window
   // edge. Audio keeps playing when folded — only the UI hides.
-  function setFolded(next) {
-    if (next === folded) return;
-    folded = next;
+  //
+  // Persistence: setFolded writes to localStorage so the state
+  // survives page navigation. restoreFoldedState() at boot reads it
+  // back and applies the saved state with the CSS transition
+  // disabled, so the widget appears already-folded rather than
+  // visibly sliding into place.
+  var FOLD_STORAGE_KEY = "fj.radio-widget.folded";
+
+  function applyFoldDOM() {
     if (folded) {
       shell.classList.add("is-folded");
       foldBtn.textContent = "«";
@@ -315,6 +434,38 @@
       foldBtn.setAttribute("aria-label", "Fold scanner");
       foldBtn.setAttribute("title", "Fold scanner to right margin");
     }
+  }
+
+  function saveFoldedState() {
+    try { localStorage.setItem(FOLD_STORAGE_KEY, folded ? "1" : "0"); }
+    catch (e) { /* private mode / quota — silently ignore */ }
+  }
+
+  function loadFoldedState() {
+    try { return localStorage.getItem(FOLD_STORAGE_KEY) === "1"; }
+    catch (e) { return false; }
+  }
+
+  function setFolded(next) {
+    if (next === folded) return;
+    folded = next;
+    applyFoldDOM();
+    saveFoldedState();
+  }
+
+  function restoreFoldedState() {
+    var stored = loadFoldedState();
+    if (stored === folded) return;
+    folded = stored;
+    // Disable the transform transition for this single restore so
+    // the widget appears already-folded on page load rather than
+    // visibly sliding from unfolded → folded. Inline `transition:
+    // none` overrides the CSS rule; clearing the inline style next
+    // frame restores the CSS-defined transition for user gestures.
+    shell.style.transition = "none";
+    applyFoldDOM();
+    void shell.offsetWidth;  // force a synchronous reflow
+    requestAnimationFrame(function () { shell.style.transition = ""; });
   }
 
   // ── Audio engine ────────────────────────────────────────────────────────
@@ -1643,6 +1794,16 @@
     setupListeners();
     updateReadout();
     draw();
+    // Restore the saved fold state before any voice-data work so
+    // the widget renders already-folded if the user had folded it
+    // on the previous page.
+    restoreFoldedState();
+    // Restore the saved tuner state (band, index, powered, trawling)
+    // so the visitor lands on the same channel they were on. Audio
+    // will be suspended until they next interact with the page —
+    // attemptAudioResumeOnGesture (set up inside restoreTunerState)
+    // unsuspends it on first click/key/touch anywhere.
+    restoreTunerState();
     // Kick off all voice-data fetches in the background so the first
     // tune to any voice channel doesn't start with a network-bound
     // delay. Fire-and-forget — the engines await the same promises.
