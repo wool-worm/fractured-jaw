@@ -224,6 +224,39 @@
     shell.dataset.signal = powered ? signalAt(currentBand, currentIndex) : "offline";
   }
 
+  // ── Tuner-state persistence ─────────────────────────────────────────────
+  // Band, index, powered, trawling all survive page navigation via
+  // localStorage. Writes are debounced (200ms) so a trawl that bumps
+  // setIndex every 350ms doesn't hammer the disk on every step.
+  // restoreTunerState() runs in boot() to re-apply the saved state
+  // before any audio engine starts.
+  var TUNER_STATE_KEY = "fj.radio.state";
+  var tunerSaveTimer = null;
+
+  function persistTunerStateNow() {
+    try {
+      localStorage.setItem(TUNER_STATE_KEY, JSON.stringify({
+        powered:  powered,
+        band:     currentBand,
+        index:    currentIndex,
+        trawling: trawling
+      }));
+    } catch (e) { /* private mode / quota — silently ignore */ }
+  }
+
+  function saveTunerState() {
+    if (tunerSaveTimer) clearTimeout(tunerSaveTimer);
+    tunerSaveTimer = setTimeout(persistTunerStateNow, 200);
+  }
+
+  function loadTunerState() {
+    try {
+      var raw = localStorage.getItem(TUNER_STATE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) { return null; }
+  }
+
   function setBand(next) {
     if (BANDS.indexOf(next) < 0 || next === currentBand) return;
     currentBand = next;
@@ -234,6 +267,7 @@
     updateReadout();
     draw();
     applyAudio();
+    saveTunerState();
   }
 
   function setIndex(next) {
@@ -243,6 +277,7 @@
     updateReadout();
     draw();
     applyAudio();
+    saveTunerState();
   }
 
   function setPowered(next) {
@@ -256,6 +291,7 @@
     updateReadout();
     draw();
     applyAudio();
+    saveTunerState();
   }
 
   // Trawl: step forward through the band on a timer. Brief pause on
@@ -275,6 +311,52 @@
         trawlTimer = null;
       }
     }
+    saveTunerState();
+  }
+
+  // Restore band / index / powered / trawling from localStorage. Called
+  // at boot. Uses the existing setters so all their side effects
+  // (DOM, readout, audio engine, trawl timer) wire up correctly. The
+  // setters' "no-op if already equal" guards mean only changed fields
+  // actually do work.
+  //
+  // Browser autoplay policy: when powered=true is restored without a
+  // user gesture on the new page, AudioContext is created suspended
+  // and speechSynthesis won't speak. attemptAudioResumeOnGesture()
+  // listens for the first click/keydown/touch anywhere on the
+  // document and resumes the context — audio comes online as soon as
+  // the visitor interacts with anything.
+  function restoreTunerState() {
+    var saved = loadTunerState();
+    if (!saved) return;
+
+    if (saved.band && BANDS.indexOf(saved.band) >= 0) {
+      setBand(saved.band);
+    }
+    if (typeof saved.index === "number") {
+      setIndex(saved.index);
+    }
+    if (saved.powered === true) {
+      setPowered(true);
+      attemptAudioResumeOnGesture();
+    }
+    if (saved.trawling === true) {
+      setTrawling(true);
+    }
+  }
+
+  function attemptAudioResumeOnGesture() {
+    function onGesture() {
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume().catch(function () {});
+      }
+      document.removeEventListener("click", onGesture);
+      document.removeEventListener("keydown", onGesture);
+      document.removeEventListener("touchstart", onGesture);
+    }
+    document.addEventListener("click", onGesture);
+    document.addEventListener("keydown", onGesture);
+    document.addEventListener("touchstart", onGesture);
   }
 
   function scheduleNextTrawl() {
@@ -1685,6 +1767,12 @@
     // the widget renders already-folded if the user had folded it
     // on the previous page.
     restoreFoldedState();
+    // Restore the saved tuner state (band, index, powered, trawling)
+    // so the visitor lands on the same channel they were on. Audio
+    // will be suspended until they next interact with the page —
+    // attemptAudioResumeOnGesture (set up inside restoreTunerState)
+    // unsuspends it on first click/key/touch anywhere.
+    restoreTunerState();
     // Kick off all voice-data fetches in the background so the first
     // tune to any voice channel doesn't start with a network-bound
     // delay. Fire-and-forget — the engines await the same promises.

@@ -167,19 +167,121 @@
     }
   }
 
+  // Persisted state shape:
+  //   { state: "ACTIVE" | "FAILURE", transitionAt: <ms timestamp> }
+  // For ACTIVE  → transitionAt is when the next failure fires.
+  // For FAILURE → transitionAt is when the failure ends.
+  // resumeOrScheduleEncryption() at boot reads this and either
+  // schedules the timer for the remaining delta, or — if the
+  // transition was supposed to happen during the navigation gap —
+  // catches up so the user actually sees the failure.
+  var ENCRYPTION_STATE_KEY = "fj.encryption.state";
+
+  function persistEncryptionState(state, transitionAt) {
+    try {
+      localStorage.setItem(ENCRYPTION_STATE_KEY, JSON.stringify({
+        state: state,
+        transitionAt: transitionAt
+      }));
+    } catch (e) { /* private mode / quota — silently ignore */ }
+  }
+
+  function readEncryptionState() {
+    try {
+      var raw = localStorage.getItem(ENCRYPTION_STATE_KEY);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || (parsed.state !== "ACTIVE" && parsed.state !== "FAILURE")) return null;
+      if (typeof parsed.transitionAt !== "number") return null;
+      return parsed;
+    } catch (e) { return null; }
+  }
+
   function triggerEncryptionFailure() {
     if (encryptionResetTimer) clearTimeout(encryptionResetTimer);
     setEncryptionState("FAILURE");
+    var endsAt = Date.now() + ENCRYPTION_FAILURE_MS;
+    persistEncryptionState("FAILURE", endsAt);
     encryptionResetTimer = setTimeout(function () {
       setEncryptionState("ACTIVE");
       scheduleNextEncryptionFailure();
     }, ENCRYPTION_FAILURE_MS);
   }
 
+  // Variant of triggerEncryptionFailure used when restoring a failure
+  // that was already in progress when the user navigated. Preserves
+  // the original end timestamp (passed in) instead of resetting to
+  // now + ENCRYPTION_FAILURE_MS, so a failure that's already 40s in
+  // doesn't restart the 60s clock from scratch.
+  function resumeEncryptionFailure(endsAt) {
+    if (encryptionResetTimer) clearTimeout(encryptionResetTimer);
+    setEncryptionState("FAILURE");
+    persistEncryptionState("FAILURE", endsAt);
+    var remaining = endsAt - Date.now();
+    encryptionResetTimer = setTimeout(function () {
+      setEncryptionState("ACTIVE");
+      scheduleNextEncryptionFailure();
+    }, remaining);
+  }
+
   function scheduleNextEncryptionFailure() {
     if (encryptionFailureTimer) clearTimeout(encryptionFailureTimer);
     var delay = ENCRYPTION_ACTIVE_MIN_MS + Math.random() * ENCRYPTION_ACTIVE_RANGE_MS;
+    var firesAt = Date.now() + delay;
+    persistEncryptionState("ACTIVE", firesAt);
     encryptionFailureTimer = setTimeout(triggerEncryptionFailure, delay);
+  }
+
+  // Schedule a previously-saved active window using the original fire
+  // time (rather than picking a fresh random delay). This is what
+  // makes the timer survive navigation: if a failure was scheduled
+  // for 8 minutes from now and the user navigates immediately, the
+  // new page still fires at the same wall-clock moment.
+  function resumeScheduledFailure(firesAt) {
+    if (encryptionFailureTimer) clearTimeout(encryptionFailureTimer);
+    persistEncryptionState("ACTIVE", firesAt);
+    var remaining = firesAt - Date.now();
+    encryptionFailureTimer = setTimeout(triggerEncryptionFailure, remaining);
+  }
+
+  // Restore the encryption state machine across navigation. Reads
+  // whatever was stored, compares its transitionAt to the current
+  // time, and either resumes the in-flight timer or catches up.
+  function resumeOrScheduleEncryption() {
+    var saved = readEncryptionState();
+    var now = Date.now();
+
+    if (!saved) {
+      // Cold start — no prior state. Schedule a fresh failure window.
+      setEncryptionState("ACTIVE");
+      scheduleNextEncryptionFailure();
+      return;
+    }
+
+    if (saved.state === "FAILURE") {
+      if (saved.transitionAt > now) {
+        // Still inside the failure window — resume it.
+        resumeEncryptionFailure(saved.transitionAt);
+      } else {
+        // Failure ended during the navigation gap. Return to active
+        // and schedule a fresh next-failure window.
+        setEncryptionState("ACTIVE");
+        scheduleNextEncryptionFailure();
+      }
+    } else {
+      // saved.state === "ACTIVE", waiting to fail at transitionAt
+      setEncryptionState("ACTIVE");
+      if (saved.transitionAt > now) {
+        // Scheduled failure is still in the future — resume the
+        // timer at the original wall-clock moment.
+        resumeScheduledFailure(saved.transitionAt);
+      } else {
+        // Failure was due while away. Fire it now so the user
+        // actually sees it (otherwise heavy navigators would
+        // perpetually reset and never witness one).
+        triggerEncryptionFailure();
+      }
+    }
   }
 
   // ── Fold ────────────────────────────────────────────────────────────────
@@ -343,8 +445,10 @@
 
     encryptionRow = document.getElementById("systems-encryption");
     encryptionStateText = document.getElementById("systems-encryption-state-text");
-    setEncryptionState("ACTIVE");
-    scheduleNextEncryptionFailure();
+    // Resume the encryption state machine from localStorage if a
+    // session is in progress — otherwise this acts like the old
+    // cold-start path (setEncryptionState("ACTIVE") + schedule).
+    resumeOrScheduleEncryption();
 
     loadStats();
   }
