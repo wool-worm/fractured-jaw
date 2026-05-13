@@ -1,0 +1,69 @@
+{# Pirate-radio tuner widget. Pinned bottom-right of the viewport on every page
+   (mirroring graph-widget.njk, which sits top-right). Behavior:
+     - Four "bands" (ALPHA / BETA / GAMMA / DELTA), each with 256 hex frequencies
+       displayed as 0xXX.XX.
+     - Most frequencies are dead_air (static); a minority carry carrier_wave,
+       transmission, or lock signals. Signal type per frequency is deterministic
+       (hash of band+index) so the same dial position always sounds the same.
+     - Audio is gated behind the power toggle to satisfy browser autoplay policy:
+       the first user gesture (clicking power) unlocks AudioContext / speechSynthesis.
+   JS lives at /assets/js/radio-widget.js. CSS in /assets/css/radio.css. #}
+
+
+<aside
+  class="radio-widget"
+  id="radio-widget"
+  aria-label="Pirate radio tuner"
+  data-band="ALPHA"
+  data-frequency="0"
+>
+  <div class="radio-widget-header">
+    {# Fold button is the leftmost header element so it stays visible
+       when the widget translates right and only a thin strip remains
+       at the window edge. Clicking toggles the .is-folded class. #}
+    <button
+      type="button"
+      class="radio-widget-fold"
+      id="radio-widget-fold"
+      aria-pressed="false"
+      title="Fold scanner to right margin"
+      aria-label="Fold scanner"
+    >»</button>
+    <span class="radio-widget-band" id="radio-widget-band">ALPHA</span>
+    <span class="radio-widget-freq" id="radio-widget-freq">0x00</span>
+    <button
+      type="button"
+      class="radio-widget-trawl"
+      id="radio-widget-trawl"
+      aria-pressed="false"
+      title="Trawl — auto-scan the band, lingering on any non-static channel"
+      aria-label="Trawl"
+    >trawl</button>
+    <button
+      type="button"
+      class="radio-widget-power"
+      id="radio-widget-power"
+      aria-pressed="false"
+      title="Power"
+      aria-label="Power"
+    >◯</button>
+  </div>
+
+  <div class="radio-widget-bands" role="group" aria-label="Band selector">
+    <button type="button" data-band="ALPHA" aria-pressed="true">α</button>
+    <button type="button" data-band="BETA" aria-pressed="false">β</button>
+    <button type="button" data-band="GAMMA" aria-pressed="false">γ</button>
+    <button type="button" data-band="DELTA" aria-pressed="false">δ</button>
+  </div>
+
+  <canvas
+    id="radio-widget-dial"
+    class="radio-widget-dial"
+    tabindex="0"
+    aria-label="Tuning dial. Click to coarse-tune, scroll or arrow keys to fine-tune."
+  ></canvas>
+
+  <div class="radio-widget-status">
+    <span id="radio-widget-status">offline</span>
+  </div>
+</aside>

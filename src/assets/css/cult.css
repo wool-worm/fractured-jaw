@@ -58,9 +58,21 @@ body::after {
   border-bottom: 1px solid var(--blood);
 }
 
-/* Scrolling station ID text */
+/* Scrolling station ID text. Content is fed by a CSS custom property
+   so radio-widget.js can splice in real PIRATE_FREQ / COMPROMISED /
+   FJR_FREQ coordinates at runtime. The fallback string here is what
+   shows if JS doesn't run or hasn't booted yet. The FREQ entry below
+   hardcodes the FJR coordinates (GAMMA 0x14) — keep this in sync with
+   the FJR_BAND / FJR_INDEX constants in radio-widget.js if you move
+   the station.
+   The variable is referenced twice so the content renders as two
+   identical copies back-to-back. Combined with the translateX(0) →
+   translateX(-50%) keyframe below, the loop is seamless: as the first
+   copy exits left, the second copy is exactly where the first started,
+   so the snap-back at the end of the animation is invisible. */
 .broadcast-banner::before {
-  content: '◈ MACHINE_LISTENING ◈ ZONE_9 ◈ FREQ:666.13 MHz ◈ SIGNAL:LOCKED ◈ LEMURIAN_TIME_WAR ◈ CYBERGOTHIC ◈ TERMINUS_MACHINE ◈ ENCRYPTED_SIGNAL ◈ DOWNTIME_PROTOCOL ◈ SOUL:CORRUPTED ◈ HYPERSTITION ◈ ZONE_23 ◈ MELTDOWN ◈ MACHINE_INTACT ◈ NUMOGRAM_ACTIVE ◈ PIRATE_FREQ:666.13 ◈ ZONE_9 ◈';
+  content: var(--ticker-content, '◈ MACHINE_LISTENING ◈ ZONE_9 ◈ FREQ:BAND GAMMA 0x14 ◈ SIGNAL:LOCKED ◈ LEMURIAN_TIME_WAR ◈ CYBERGOTHIC ◈ TERMINUS_MACHINE ◈ ENCRYPTED_SIGNAL ◈ DOWNTIME_PROTOCOL ◈ SOUL:CORRUPTED ◈ HYPERSTITION ◈ ZONE_23 ◈ MELTDOWN ◈ MACHINE_INTACT ◈ NUMOGRAM_ACTIVE ◈ PIRATE_FREQ:BAND GAMMA 0x14 ◈ ZONE_9 ◈')
+           var(--ticker-content, '◈ MACHINE_LISTENING ◈ ZONE_9 ◈ FREQ:BAND GAMMA 0x14 ◈ SIGNAL:LOCKED ◈ LEMURIAN_TIME_WAR ◈ CYBERGOTHIC ◈ TERMINUS_MACHINE ◈ ENCRYPTED_SIGNAL ◈ DOWNTIME_PROTOCOL ◈ SOUL:CORRUPTED ◈ HYPERSTITION ◈ ZONE_23 ◈ MELTDOWN ◈ MACHINE_INTACT ◈ NUMOGRAM_ACTIVE ◈ PIRATE_FREQ:BAND GAMMA 0x14 ◈ ZONE_9 ◈');
   position: absolute;
   left: 0;
   top: 0.4rem;
@@ -69,7 +81,20 @@ body::after {
   font-size: 0.58rem;
   letter-spacing: 0.1em;
   color: var(--ichor-bright);
-  animation: ticker-scroll 65s linear infinite;
+  /* First-paint choreography: ticker-intro slides the content in from
+     off-screen right at the same px/sec speed as the steady-state
+     scroll, so the handoff is imperceptible. radio-widget.js measures
+     the rendered content width and sets --ticker-intro-duration to a
+     value where (viewportWidth / introDuration) ≈ (contentWidth /
+     scrollDuration). The 25s fallback is used if JS doesn't run.
+     fill-mode: forwards on the intro pins the element at translateX(0)
+     between intro-end and scroll-start so it doesn't snap back. */
+  animation-name: ticker-intro, ticker-scroll;
+  animation-duration: var(--ticker-intro-duration, 25s), 65s;
+  animation-timing-function: linear, linear;
+  animation-iteration-count: 1, infinite;
+  animation-fill-mode: forwards, none;
+  animation-delay: 0s, var(--ticker-intro-duration, 25s);
 }
 
 /* "▶ LIVE" badge — pinned right, pulses */
@@ -112,9 +137,12 @@ body::after {
   background-color: var(--blood);
 }
 
-/* Station ID injected after nav */
+/* Station ID injected after nav. Splices the FJR coordinates in via
+   the --fjr-coordinates custom property set by radio-widget.js. The
+   fallback ('GAMMA 0x14') stays valid if JS hasn't booted yet — keep
+   it in sync with FJR_BAND / FJR_INDEX if you relocate the station. */
 .site-nav::after {
-  content: '// ZONE_9 // FREQ:666.13 // ENCRYPTED';
+  content: '// ZONE_9 // FREQ:' var(--fjr-coordinates, 'GAMMA 0x14') ' // ENCRYPTED';
   font-family: var(--font-body);
   font-size: 0.52rem;
   letter-spacing: 0.1em;
@@ -440,10 +468,23 @@ hr {
    KEYFRAMES
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* Broadcast ticker — right to left scroll */
-@keyframes ticker-scroll {
+/* Broadcast ticker first-paint intro — slides the duplicated ticker
+   content from off-screen right (translateX(100vw)) to its start
+   position (translateX(0)). Runs once on page load, then ticker-scroll
+   takes over for the seamless infinite loop. */
+@keyframes ticker-intro {
   from { transform: translateX(100vw); }
-  to   { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+/* Broadcast ticker — right to left scroll. Element content is duplicated
+   (see .broadcast-banner::before above), and we translate by exactly
+   half the element's width per cycle. At the end of the animation the
+   second copy occupies the position the first did at the start, so the
+   snap-back is invisible — seamless loop, no gap. */
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 /* "▶ LIVE" badge — on/off blink */
