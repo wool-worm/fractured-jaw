@@ -256,7 +256,7 @@
   padding: var(--sp-sm) var(--sp-md);
 }
 
-/* ── Tag cloud ───────────────────────────────────────────────────────────── */
+/* ── Tag cloud ──────────────────────────────────────────────────────────── */
 .tag-cloud {
   list-style: none;
   display: flex;
@@ -293,19 +293,22 @@
   color: var(--brass-deep);
 }
 
-/* ── Tag page ────────────────────────────────────────────────────────────── */
-.tag-name {
+/* ── Tag page + series page (shared header treatment) ───────────────────── */
+.tag-name,
+.series-name {
   color: var(--sodium);
   font-family: var(--font-title);
 }
 
-.tag-meta {
+.tag-meta,
+.series-meta {
   font-size: 0.8rem;
   color: var(--bone-dim);
   margin-bottom: var(--sp-lg);
 }
 
-.tag-meta a {
+.tag-meta a,
+.series-meta a {
   font-size: 0.8rem;
 }
 
@@ -317,6 +320,174 @@
   margin: var(--sp-lg) 0 var(--sp-sm);
   border-bottom: 1px solid var(--bone-faint);
   padding-bottom: var(--sp-xs);
+}
+
+/* Series-specific header chrome on /series/<slug>/. */
+.series-hero {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border: 1px solid var(--bone-faint);
+  margin-bottom: var(--sp-md);
+}
+
+.series-description {
+  font-size: 1rem;
+  color: var(--bone);
+  max-width: 65ch;
+  margin-bottom: var(--sp-sm);
+}
+
+.series-tags {
+  margin-top: var(--sp-sm);
+}
+
+.series-intro {
+  margin: var(--sp-lg) 0;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--bone);
+  max-width: 65ch;
+}
+
+.series-empty {
+  color: var(--bone-faint);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  border-left: 3px solid var(--bone-faint);
+  padding: var(--sp-sm) var(--sp-md);
+}
+
+/* Series link in the post-meta block (per-post header). */
+.series-link {
+  color: var(--brass);
+  font-family: var(--font-body);
+}
+
+.series-link:hover {
+  color: var(--sodium);
+}
+
+/* ── Series grid (/series/ landing) ─────────────────────────────────────── */
+.series-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-md);
+  margin-top: var(--sp-md);
+}
+
+@media (max-width: 900px) {
+  .series-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .series-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Series card (vertical rectangle) ──────────────────────────────────── */
+.series-card {
+  background: var(--void-soft);
+  border: 1px solid var(--bone-faint);
+  border-left: 3px solid var(--brass-deep);
+  transition: border-left-color 0.12s, background 0.12s;
+  display: flex;
+  flex-direction: column;
+}
+
+.series-card:hover {
+  background: var(--void-mid);
+  border-left-color: var(--sodium);
+}
+
+.series-card article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+  padding: var(--sp-md);
+  flex: 1;
+}
+
+.series-card-image-link {
+  display: block;
+  margin: calc(-1 * var(--sp-md)) calc(-1 * var(--sp-md)) 0;
+  border-bottom: 1px solid var(--bone-faint);
+}
+
+.series-card-image {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.series-card-title {
+  font-family: var(--font-title);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  margin-top: var(--sp-xs);
+}
+
+.series-card-title a {
+  color: var(--bone);
+  border-bottom: none;
+}
+
+.series-card-title a:hover {
+  color: var(--sodium);
+  text-shadow: 0.1rem 0.05rem 0 var(--blood), -0.05rem -0.1rem 0 var(--brass-deep);
+}
+
+.series-card-description {
+  font-size: 0.85rem;
+  color: var(--bone-dim);
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.series-card-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-xs);
+  margin-top: var(--sp-xs);
+}
+
+.series-card-tags li a {
+  font-size: 0.7rem;
+  text-transform: lowercase;
+  letter-spacing: 0.08em;
+  color: var(--brass-deep);
+  border: 1px solid var(--brass-faint);
+  padding: 0.05rem 0.4rem;
+  transition: color 0.1s, border-color 0.1s, background 0.1s;
+}
+
+.series-card-tags li a:hover {
+  color: var(--sodium);
+  border-color: var(--sodium-soft);
+  background: var(--void-soft);
+}
+
+.series-card-count {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--brass-deep);
+  margin: var(--sp-xs) 0 0;
+  padding-top: var(--sp-xs);
+  border-top: 1px solid var(--bone-faint);
+}
+
+.series-card-count a {
+  color: var(--brass-deep);
+  border-bottom: none;
+}
+
+.series-card-count a:hover {
+  color: var(--sodium);
 }
 
 /* ── Individual post layout ─────────────────────────────────────────────── */

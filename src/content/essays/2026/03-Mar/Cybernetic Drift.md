@@ -1,7 +1,7 @@
 ---
 title: Cybernetic Drift
-date_published: 2026-03-15T09:00:00Z
-date_updated: 2026-03-15T09:00:00Z
+date_published: 2026-05-05T07:19:15-05:00
+date_updated: 2026-05-13T16:08:15-05:00
 author: wool-worm
 tags: [essays, cyberpunk, theory]
 description_short: A placeholder essay confirming the essays pipeline routes through layouts/essay.njk correctly.
@@ -12,7 +12,7 @@ exclude: false
 preview_enabled: true
 graph_enabled: true
 image:
-reading_time: 4 min read
+reading_time: 1 min
 ---
 
 This is the essay scaffold. Confirms that:

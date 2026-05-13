@@ -1,5 +1,9 @@
 {# Single post card. Used wherever we list posts (homepage, section pages,
-   tag pages). Caller passes `post` — an Eleventy collection item. #}
+   tag pages, series pages). Caller passes `post` — an Eleventy collection
+   item — and may optionally pass `titlePrefix` (a string prepended inside
+   the card's <h2> link). The series-page layout uses this to render
+   "Entry #N: " in front of each card title without altering the post's
+   actual `data.title`. #}
 <li class="post-card">
   <article>
     {% if post.data.image %}
@@ -13,7 +17,7 @@
       </p>
     {% endif %}
     <h2 class="post-card-title">
-      <a href="{{ post.url }}">{{ post.data.title }}</a>
+      <a href="{{ post.url }}">{% if titlePrefix %}{{ titlePrefix }}{% endif %}{{ post.data.title }}</a>
     </h2>
     {% if post.data.description_short %}
       <p class="post-card-description">{{ post.data.description_short }}</p>

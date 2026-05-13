@@ -28,6 +28,17 @@
     <dd>{{ rating }}</dd>
   {% endif %}
 
+  {% set seriesUrl = series_name | seriesNameToUrl %}
+  {% if seriesUrl %}
+    {% set seriesParent = collections.series | seriesByUrl(seriesUrl) %}
+    {% if seriesParent %}
+      <dt>Series</dt>
+      <dd>
+        <a href="{{ seriesParent.url }}" class="series-link">{{ seriesParent.data.title }}</a>
+      </dd>
+    {% endif %}
+  {% endif %}
+
   {% if tags and tags.length %}
     <dt>Tags</dt>
     <dd>

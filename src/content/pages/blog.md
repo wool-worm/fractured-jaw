@@ -5,6 +5,6 @@ layout: layouts/section.njk
 section_name: blog
 graph_enabled: false
 page_type: section
-date_published: May 5th 2026, 7:19 AM
-date_updated: May 12th 2026, 9:30 PM
+date_published: 2026-05-05T07:19:15-05:00
+date_updated: 2026-05-13T16:07:39-05:00
 ---

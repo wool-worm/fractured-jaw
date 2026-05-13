@@ -1,0 +1,57 @@
+---
+layout: layouts/base.njk
+---
+{# Per-series page (/series/<slug>/). Comes from a real content file at
+   src/content/series/<Name>.md — so `title`, `description_short`,
+   `description_long`, `image`, `tags`, and the rendered body are all
+   driven by the parent's frontmatter + content.
+
+   The member-entries list is appended after the parent's body. Each
+   entry's card title is prepended with "Entry #N: " (oldest in the
+   series = #1, newest = #N). Display order is newest-first. #}
+
+{% set entries = collections.seriesEntries[page.url] %}
+
+<article class="series-page series-{{ page.fileSlug }}">
+  <header class="page-header">
+    {% if image %}
+      <img src="{{ image }}" alt="" class="series-hero" loading="lazy">
+    {% endif %}
+    <h1 class="page-title">
+      Series: <span class="series-name">{{ title }}</span>
+    </h1>
+    {% if description_short %}
+      <p class="series-description">{{ description_short }}</p>
+    {% endif %}
+    <p class="series-meta">
+      {% set count = entries.length or 0 %}
+      {{ count }} entr{% if count == 1 %}y{% else %}ies{% endif %}
+      &middot; <a href="/series/">all series</a>
+    </p>
+    {% if tags and tags.length %}
+      <ul class="tag-list series-tags">
+        {% for tag in tags %}
+          <li><a href="/tags/{{ tag | slug }}/">{{ tag }}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </header>
+
+  {% if content %}
+    <div class="series-intro">{{ content | safe }}</div>
+  {% endif %}
+
+  <section class="series-entries">
+    {% if entries and entries.length %}
+      <ul class="post-list">
+        {% for entry in entries %}
+          {% set post = entry.post %}
+          {% set titlePrefix = "Entry #" + entry.entryNumber + ": " %}
+          {% include "partials/post-card.njk" %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="series-empty">No entries in this series yet.</p>
+    {% endif %}
+  </section>
+</article>

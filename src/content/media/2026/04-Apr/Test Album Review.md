@@ -12,7 +12,7 @@ exclude: false
 preview_enabled: true
 graph_enabled: true
 image:
-reading_time: 2 min read
+reading_time: 1 min
 rating: 4/5
 ---
 

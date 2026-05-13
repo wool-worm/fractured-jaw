@@ -1,0 +1,38 @@
+{# Series card. Used on the /series/ landing grid. Vertical-rectangle
+   layout (top-to-bottom): image (if present), title, short description,
+   tags, entry count.
+
+   Caller passes:
+     `parent`       — Eleventy collection item for the series-parent file
+     `memberCount`  — integer, number of posts in this series (may be 0)
+
+   Discrete links rather than one wrapping anchor so the tag chips can
+   stay as their own links (nested <a> isn't valid HTML). Card-wide
+   hover lift is handled in CSS. #}
+<li class="series-card">
+  <article>
+    {% if parent.data.image %}
+      <a href="{{ parent.url }}" class="series-card-image-link" tabindex="-1" aria-hidden="true">
+        <img src="{{ parent.data.image }}" alt="" class="series-card-image" loading="lazy">
+      </a>
+    {% endif %}
+    <h2 class="series-card-title">
+      <a href="{{ parent.url }}">{{ parent.data.title }}</a>
+    </h2>
+    {% if parent.data.description_short %}
+      <p class="series-card-description">{{ parent.data.description_short }}</p>
+    {% endif %}
+    {% if parent.data.tags and parent.data.tags.length %}
+      <ul class="series-card-tags">
+        {% for tag in parent.data.tags %}
+          <li><a href="/tags/{{ tag | slug }}/">{{ tag }}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <p class="series-card-count">
+      <a href="{{ parent.url }}">
+        {{ memberCount }} entr{% if memberCount == 1 %}y{% else %}ies{% endif %}
+      </a>
+    </p>
+  </article>
+</li>
