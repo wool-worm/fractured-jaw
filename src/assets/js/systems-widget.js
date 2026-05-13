@@ -37,17 +37,15 @@
   // at the top of the widget. Failures last exactly 60s, then return
   // to active.
   //
-  // Timing constants below. The long-run failure ratio depends on
-  // ENCRYPTION_FAILURE_MS vs the mean of ENCRYPTION_ACTIVE_*_MS:
-  // 60s / (60s + ~17.5min) ≈ 5.4% failure ratio, ≈ 94.6% active —
-  // close to the "95% active" target. First failure is scheduled
-  // earlier (30-90s after page load) so visitors see the alarm
-  // during a typical session.
-  var ENCRYPTION_FAILURE_MS         = 60 * 1000;
-  var ENCRYPTION_FIRST_DELAY_MIN_MS = 30 * 1000;
-  var ENCRYPTION_FIRST_DELAY_RANGE_MS = 60 * 1000;       // 30-90s
-  var ENCRYPTION_ACTIVE_MIN_MS      = 10 * 60 * 1000;
-  var ENCRYPTION_ACTIVE_RANGE_MS    = 15 * 60 * 1000;    // 10-25min
+  // Long-run failure ratio: ENCRYPTION_FAILURE_MS / (ENCRYPTION_FAILURE_MS
+  // + mean(ENCRYPTION_ACTIVE_*_MS)) ≈ 60s / (60s + ~17.5min) ≈ 5.4%
+  // failure, ≈ 94.6% active — close to the "95% active" target.
+  // First failure on a fresh page load uses the same active-window
+  // schedule as subsequent ones; visitors who stick around long
+  // enough will see the alarm once or twice an hour on average.
+  var ENCRYPTION_FAILURE_MS      = 60 * 1000;
+  var ENCRYPTION_ACTIVE_MIN_MS   = 10 * 60 * 1000;
+  var ENCRYPTION_ACTIVE_RANGE_MS = 15 * 60 * 1000;     // 10-25 minutes
 
   var encryptionFailureTimer = null;
   var encryptionResetTimer = null;
@@ -184,12 +182,6 @@
     encryptionFailureTimer = setTimeout(triggerEncryptionFailure, delay);
   }
 
-  function scheduleFirstEncryptionFailure() {
-    if (encryptionFailureTimer) clearTimeout(encryptionFailureTimer);
-    var delay = ENCRYPTION_FIRST_DELAY_MIN_MS + Math.random() * ENCRYPTION_FIRST_DELAY_RANGE_MS;
-    encryptionFailureTimer = setTimeout(triggerEncryptionFailure, delay);
-  }
-
   // ── Fold ────────────────────────────────────────────────────────────────
   function setFolded(next) {
     if (next === folded) return;
@@ -310,7 +302,7 @@
     encryptionRow = document.getElementById("systems-encryption");
     encryptionStateText = document.getElementById("systems-encryption-state-text");
     setEncryptionState("ACTIVE");
-    scheduleFirstEncryptionFailure();
+    scheduleNextEncryptionFailure();
 
     loadStats();
   }
