@@ -1,9 +1,9 @@
 ---
 layout: layouts/base.njk
 ---
-{# Series index page (/series/). Lists every series in collections.seriesList
-   with an entry count and a link to the per-series page. Series are
-   pre-sorted alphabetically by .eleventy.js. #}
+{# Series index page (/series/). Renders every series parent (a content
+   file at src/content/series/<Name>.md) as a vertical card in a
+   three-column grid. Series are pre-sorted newest-first by .eleventy.js. #}
 
 <section class="series-index">
   <header class="page-header">
@@ -16,15 +16,12 @@ layout: layouts/base.njk
     {% endif %}
   </header>
 
-  {% if collections.seriesList.length %}
-    <ul class="series-cloud">
-      {% for entry in collections.seriesList %}
-        <li>
-          <a href="/series/{{ entry.series }}/" class="series-cloud-item">
-            <span class="series-cloud-name">{{ entry.displayName }}</span>
-            <span class="series-cloud-count">({{ entry.count }})</span>
-          </a>
-        </li>
+  {% if collections.series.length %}
+    <ul class="series-grid">
+      {% for parent in collections.series %}
+        {% set memberEntries = collections.seriesEntries[parent.url] %}
+        {% set memberCount = memberEntries.length or 0 %}
+        {% include "partials/series-card.njk" %}
       {% endfor %}
     </ul>
   {% else %}

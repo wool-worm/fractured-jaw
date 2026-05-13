@@ -23,6 +23,7 @@ const LAYOUT_BY_SECTION = {
   fragments: "layouts/fragment.njk",
   media: "layouts/media.njk",
   pages: "layouts/page.njk",
+  series: "layouts/series-page.njk",
 };
 
 function shouldExclude(data) {
@@ -70,7 +71,10 @@ module.exports = {
     page_type: (data) => {
       if (data.page_type) return data.page_type;
       const section = extractSection(data.page && data.page.filePathStem);
-      return section === "pages" ? "top" : "content";
+      // pages/ and series/ are navigational hubs — global graph view.
+      // Everything else (blog/essays/fragments/media) pins the current node.
+      if (section === "pages" || section === "series") return "top";
+      return "content";
     },
   },
 };

@@ -6,7 +6,14 @@ const CONTENT_SECTIONS = ["blog", "essays", "fragments", "media"];
 // "pages" is special: it produces top-level URLs (/about/, /contributors/, /).
 const PAGES_SECTION = "pages";
 
-const KNOWN_SECTIONS = [...CONTENT_SECTIONS, PAGES_SECTION];
+// "series" is a navigational section — each file at src/content/series/<Name>.md
+// is the parent page for a series of posts. Routes to /series/<slug>/ via the
+// same filename-slug transform as the content sections, but kept out of
+// CONTENT_SECTIONS so it doesn't accidentally end up in tagList, featured,
+// or the all_content cross-section feed.
+const SERIES_SECTION = "series";
+
+const KNOWN_SECTIONS = [...CONTENT_SECTIONS, PAGES_SECTION, SERIES_SECTION];
 
 // Extract the section name (first directory under src/content/) from an Eleventy
 // `page.filePathStem`. With input dir = "src", the stem looks like
@@ -89,5 +96,6 @@ module.exports = {
   vaultPathToUrl,
   CONTENT_SECTIONS,
   PAGES_SECTION,
+  SERIES_SECTION,
   KNOWN_SECTIONS,
 };
