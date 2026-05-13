@@ -1190,17 +1190,18 @@
       if (!voice) voice = pickVoice("compromised", channelKey);
       // 25% chance of glitching per repetition. When it fires, weighted
       // pick among three variants:
-      //   0.00 .. 0.70  → stutter (favored)
-      //   0.70 .. 0.85  → slowdown (target word at lower rate)
-      //   0.85 .. 1.00  → static  (target word replaced with pink-noise burst)
-      var doGlitch = glitchRng() < 0.25;
+      //   0.00 .. 0.50  → stutter (favored)
+      //   0.50 .. 0.75  → slowdown (target word at lower rate)
+      //   0.75 .. 1.00  → static  (target word replaced with pink-noise burst)
+      var doGlitch = glitchRng() <= 0.25;
+      // var doGlitch = glitchRng() <= 1.00; // Force glitching on every repetition for testing/demo purposes.
       var message = buildCompromisedMessage(template, code, section, sectionLetter, authority);
       var parts;
       if (doGlitch) {
         var pick = glitchRng();
-        if (pick < 0.70) {
+        if (pick < 0.50) {
           parts = [{ text: applyStutterGlitch(message, glitchRng) }];
-        } else if (pick < 0.85) {
+        } else if (pick < 0.75) {
           parts = applySlowdownSplit(message, glitchRng);
         } else {
           parts = applyStaticGlitch(message, glitchRng);
