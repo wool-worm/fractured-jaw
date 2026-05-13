@@ -32,6 +32,7 @@
   var powerBtn = document.getElementById("radio-widget-power");
   var trawlBtn = document.getElementById("radio-widget-trawl");
   var foldBtn = document.getElementById("radio-widget-fold");
+  var resumeBtn = document.getElementById("radio-widget-resume");
 
   var BANDS = ["ALPHA", "BETA", "GAMMA", "DELTA"];
   // 64 channels per band — sparse enough that each tick is a real, aimable
@@ -345,11 +346,32 @@
     }
   }
 
+  function setResumePromptVisible(visible) {
+    if (!resumeBtn) return;
+    resumeBtn.hidden = !visible;
+  }
+
   function attemptAudioResumeOnGesture() {
+    // If audio is already running (e.g., page restored from bfcache with
+    // an active context), no prompt is needed and applyAudio already
+    // produced sound. Bail out so we don't show a stale overlay.
+    if (audioCtx && audioCtx.state === "running") return;
+
+    // Surface the "signal interrupted — tap to resume" overlay on the
+    // dial. Any gesture (clicking the overlay, anywhere else on the
+    // page, a keypress, or a touch) dismisses it and rebuilds the
+    // audio engine inside the now-activated context. The overlay
+    // itself is a real button so the affordance is obvious and
+    // keyboard-accessible, but the document-level listeners mean even
+    // an unrelated click resumes audio — same as before, just with a
+    // visible cue.
+    setResumePromptVisible(true);
+
     function onGesture() {
       document.removeEventListener("click", onGesture);
       document.removeEventListener("keydown", onGesture);
       document.removeEventListener("touchstart", onGesture);
+      setResumePromptVisible(false);
       // Re-run applyAudio inside the user-activated context. Just
       // calling audioCtx.resume() isn't enough — in some browsers
       // oscillators (.start() during suspended state) and
