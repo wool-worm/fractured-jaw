@@ -165,6 +165,11 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/assets/js":  "assets/js"  });
   eleventyConfig.addPassthroughCopy({ "src/assets/images": "assets/images" });
   eleventyConfig.addPassthroughCopy("CNAME");
+  // Crawler hints — robots.txt is the conventional signal, ai.txt is the
+  // emerging Spawning-style opt-out for AI training crawlers. Both live
+  // at the repo root and ship to the site root.
+  eleventyConfig.addPassthroughCopy("robots.txt");
+  eleventyConfig.addPassthroughCopy("ai.txt");
 
   // ---------- Watch targets ----------
 

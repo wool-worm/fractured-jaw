@@ -35,3 +35,12 @@ This repo is being rebuilt in phases. See `MEMORY.md` files in `~/.claude/projec
 7. ⏳ Deploy pipeline (GitHub Actions)
 8. ⏳ Brutalist styling (optional)
 9. ⏳ RSS, sitemap, polish
+
+## Licensing
+
+This repository carries two licenses — one for the code, one for the writing — because they protect different things.
+
+- **Code** (`LICENSE`, [MIT](https://opensource.org/license/mit/)) — everything that builds the site: Eleventy config, templates, stylesheets, JavaScript, build tooling. Reuse is permitted, including commercially, as long as the copyright notice and license text are retained.
+- **Content** (`LICENSE-CONTENT`, [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)) — every Markdown file under `src/content/`: blog posts, essays, fragments, media reviews, pages. You may share and adapt with attribution to *wool-worm* / *Fractured Jaw*. Commercial use, including training generative-AI models, is not permitted.
+
+The site also publishes a `robots.txt` and an `ai.txt` that opt out of common AI-training crawlers as a technical companion to the content license.
