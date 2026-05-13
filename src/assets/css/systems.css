@@ -164,10 +164,10 @@
 
 /* Independent oscillation timings so the two bars don't pulse in
    sync — keeps the panel feeling alive with separate processes.
-   core_load runs at 14s for a slower, more deliberate rise/fall;
+   core_load runs at 28s — a very slow, almost meditative rise/fall.
    signal at 11s gives a faster heartbeat alongside. */
 .bar-core-load {
-  animation: bar-core-load 14s ease-in-out infinite;
+  animation: bar-core-load 28s ease-in-out infinite;
 }
 
 .bar-signal {
