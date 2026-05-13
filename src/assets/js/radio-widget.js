@@ -42,18 +42,23 @@
   // Signal-type distribution. Most of the dial is static; a small fraction
   // carries content. Audio behavior is keyed off these in Phase B/C.
   //   dead_air      — pure noise (the silent majority of the band)
-  //   carrier_wave  — steady tone / pulse / hum, no content (Phase B)
-  //   pirate_signal — synthesized ambient music; CC0 audio files later (Phase B)
-  //   numbers       — RNG-driven numbers-station voice (Phase C)
-  //   lock          — A1Z26 cipher from radio-source.md (Phase C)
-  //   compromised   — termination-loop "this station has been terminated" (Phase C)
+  //   carrier_wave  — steady tone / pulse / hum, no content
+  //   pirate_signal — synthesized ambient music
+  //   numbers       — RNG-driven numbers-station voice
+  //   lock          — A1Z26 cipher from radio-source.md
+  //   compromised   — termination-loop "this station has been terminated"
+  //   haunted       — abandoned-AI monologue from haunted.md (very rare)
+  //   fractured_jaw — pinned at FJR_BAND, FJR_INDEX (see below)
   var SIGNAL_TYPES = [
-    { name: "dead_air",      weight: 63 },
+    { name: "dead_air",      weight: 61 },
     { name: "carrier_wave",  weight: 15 },
     { name: "pirate_signal", weight:  3 },
     { name: "numbers",       weight:  9 },
     { name: "lock",          weight:  5 },
     { name: "compromised",   weight:  5 },
+    // Haunted: very rare. ~2% across 256 channels → ~5 channels total,
+    // roughly one per band. Hosts the abandoned-AI voice engine.
+    { name: "haunted",       weight:  2 },
     // Fractured Jaw Radio: placed by fixed coordinate (not hash roll),
     // so weight is 0. The FJR_BAND/FJR_INDEX constants below decide the
     // single channel it occupies. The override is inside signalAt().
@@ -176,6 +181,10 @@
         case "compromised":
           tickHeight = 14;
           color = "#c62828"; // --blood-bright — authority jamming
+          break;
+        case "haunted":
+          tickHeight = 15; // taller than the rest, just below FJR
+          color = "#2a9d80"; // --verdigris-bright — corroded machine
           break;
         case "fractured_jaw":
           tickHeight = 16; // tallest — flagship station
@@ -359,15 +368,14 @@
 
   // ── Engine factories ────────────────────────────────────────────────────
 
-  // Pink noise via Paul Kellet's filter — pre-fills a 2s buffer and loops.
-  // Pink (vs. white) is the natural choice for "broadcast static" because
-  // it matches the ear's frequency sensitivity.
-  function createDeadAirEngine() {
-    var sr = audioCtx.sampleRate;
-    var buf = audioCtx.createBuffer(1, sr * 2, sr);
-    var data = buf.getChannelData(0);
+  // Pink-noise sample generator — Paul Kellet's filter applied in place to
+  // an audio buffer's float32 data array. Pink (vs. white) matches the
+  // ear's frequency sensitivity, so it sounds like broadcast static rather
+  // than abrasive hiss. Reused by the dead_air engine (looping buffer) and
+  // the per-glitch static burst (one-shot buffer).
+  function fillPinkNoise(data, count) {
     var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < count; i++) {
       var white = Math.random() * 2 - 1;
       b0 = 0.99886 * b0 + white * 0.0555179;
       b1 = 0.99332 * b1 + white * 0.0750759;
@@ -378,6 +386,56 @@
       data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
       b6 = white * 0.115926;
     }
+  }
+
+  // One-shot pink-noise burst used by the static glitch variant — plays
+  // for `durationS` seconds at the master gain, then invokes `onDone`.
+  // Short fade-in / fade-out on the burst gain avoids click artefacts at
+  // the edges. Safe to call when audio is unavailable (just fires onDone).
+  function playStaticBurst(durationS, onDone) {
+    if (!audioCtx || !masterGain || !(durationS > 0)) {
+      if (onDone) onDone();
+      return;
+    }
+    var sr = audioCtx.sampleRate;
+    var samples = Math.floor(sr * durationS);
+    if (samples < 1) {
+      if (onDone) onDone();
+      return;
+    }
+    var buf = audioCtx.createBuffer(1, samples, sr);
+    fillPinkNoise(buf.getChannelData(0), samples);
+    var src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    var g = audioCtx.createGain();
+    var t = audioCtx.currentTime;
+    var fadeS = Math.min(0.03, durationS / 4);
+    // Static channel volume (relative to masterGain). 1.0 matches the
+    // dead_air engine; bump higher for a more aggressive tune-out feel.
+    var peak = 1.0;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(peak, t + fadeS);
+    g.gain.setValueAtTime(peak, t + durationS - fadeS);
+    g.gain.linearRampToValueAtTime(0, t + durationS);
+    src.connect(g);
+    g.connect(masterGain);
+    src.onended = function () {
+      try { src.disconnect(); g.disconnect(); } catch (e) {}
+      if (onDone) onDone();
+    };
+    try {
+      src.start(t);
+      src.stop(t + durationS + 0.05);
+    } catch (e) {
+      if (onDone) onDone();
+    }
+  }
+
+  // Pink noise via fillPinkNoise — pre-fills a 2s buffer and loops.
+  function createDeadAirEngine() {
+    var sr = audioCtx.sampleRate;
+    var buf = audioCtx.createBuffer(1, sr * 2, sr);
+    fillPinkNoise(buf.getChannelData(0), buf.length);
     var src = audioCtx.createBufferSource();
     src.buffer = buf;
     src.loop = true;
@@ -640,6 +698,12 @@
         // sounds distinct even on minimal voice setups.
         prefs = [/neural/i, /natural/i, /enhanced/i, /samantha/i, /aria/i, /female/i];
         break;
+      case "haunted":
+        // Robotic / synthesized voices preferred — sells the corrupted
+        // machine intelligence vibe. Falls through to "any male" then
+        // anything if no robotic voices are installed (most systems).
+        prefs = [/robot/i, /synthe/i, /machine/i, /alex/i, /daniel/i, /mark/i, /male/i];
+        break;
       default:
         prefs = [];
     }
@@ -692,6 +756,12 @@
         // not as grave as the compromised authority voice.
         utterance.rate  = 0.90;
         utterance.pitch = 0.95;
+        break;
+      case "haunted":
+        // Slow + low — corrupted AI dragging through a monologue. Pitch
+        // goes lower than compromised for a creepier, more depressive feel.
+        utterance.rate  = 0.70;
+        utterance.pitch = 0.65;
         break;
       default:
         utterance.rate  = 1.0;
@@ -746,6 +816,29 @@
       })
       .catch(function () { compromisedTemplates = []; return compromisedTemplates; });
     return compromisedLoading;
+  }
+
+  // Haunted templates. Abandoned-AI monologue. Same loader shape as the
+  // compromised templates — sections from haunted.md become an array of
+  // strings, assigned round-robin to haunted channels by ordinal.
+  var hauntedTemplates = null;
+  var hauntedLoading = null;
+
+  function loadHaunted() {
+    if (hauntedTemplates) return Promise.resolve(hauntedTemplates);
+    if (hauntedLoading) return hauntedLoading;
+    if (typeof fetch !== "function") {
+      hauntedTemplates = [];
+      return Promise.resolve(hauntedTemplates);
+    }
+    hauntedLoading = fetch("/haunted.json")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        hauntedTemplates = (data && data.templates) || [];
+        return hauntedTemplates;
+      })
+      .catch(function () { hauntedTemplates = []; return hauntedTemplates; });
+    return hauntedLoading;
   }
 
   // Fractured Jaw Radio script segments. One emitter, one source file
@@ -968,9 +1061,94 @@
     var after = message.substring(pos + word.length);
     return [
       { text: before },
-      { text: word, rate: 0.4 },  // ~half the role's normal rate
+      { text: word, rate: 0.6 },  // ~half the role's normal rate
       { text: after }
     ];
+  }
+
+  // Apply a static glitch by replacing a target word with a pink-noise
+  // burst — sounds like the station tunes momentarily off-frequency
+  // mid-sentence. Returns a 3-part array: speech-before, static-burst,
+  // speech-after. The burst duration roughly tracks the spoken word's
+  // length so the timing feels like a real radio drop.
+  function applyStaticGlitch(message, rng) {
+    var targets = findGlitchTargets(message);
+    if (!targets.length) return [{ text: message }];
+    var word = targets[Math.floor(rng() * targets.length)];
+    var pos = message.indexOf(word);
+    if (pos < 0) return [{ text: message }];
+    var before = message.substring(0, pos);
+    var after = message.substring(pos + word.length);
+    var durationS = Math.max(0.5, Math.min(1.6, 0.5 + word.length * 0.1));
+    return [
+      { text: before },
+      { static: true, durationS: durationS },
+      { text: after }
+    ];
+  }
+
+  // Queue a sequence of speech + static parts. Speech parts are grouped
+  // and queued together via speechSynthesis (so consecutive utterances
+  // chain through the browser's native queue with minimal inter-gap);
+  // static parts break the chain and play a one-shot pink-noise burst
+  // via Web Audio. Engines pass an `isAlive` closure so onend callbacks
+  // can't resurrect a stopped engine, and an `onDone` callback that
+  // fires when the whole sequence has finished (or aborted).
+  function playPartSequence(parts, role, voice, isAlive, onDone) {
+    if (!isAlive()) return;
+    var valid = parts.filter(function (p) {
+      if (p.static) return p.durationS > 0;
+      return p.text && p.text.trim();
+    });
+    if (!valid.length) { onDone(); return; }
+
+    // Group consecutive speech parts so they queue together in
+    // speechSynthesis (minimizes inter-utterance gaps for slowdown's
+    // three-utterance split). Static parts each become their own group.
+    var groups = [];
+    var bucket = [];
+    for (var k = 0; k < valid.length; k++) {
+      if (valid[k].static) {
+        if (bucket.length) { groups.push({ type: "speech", items: bucket }); bucket = []; }
+        groups.push({ type: "static", item: valid[k] });
+      } else {
+        bucket.push(valid[k]);
+      }
+    }
+    if (bucket.length) groups.push({ type: "speech", items: bucket });
+
+    var gi = 0;
+    function nextGroup() {
+      if (!isAlive()) return;
+      if (gi >= groups.length) { onDone(); return; }
+      var group = groups[gi++];
+      if (group.type === "static") {
+        playStaticBurst(group.item.durationS, function () {
+          if (isAlive()) nextGroup();
+        });
+        return;
+      }
+      // Speech group — queue every item at once, only the last fires
+      // onend so we don't advance the chain on intermediate utterances.
+      var items = group.items;
+      var last = items.length - 1;
+      for (var j = 0; j < items.length; j++) {
+        (function (part, isLast) {
+          var u = new SpeechSynthesisUtterance(part.text);
+          configureUtterance(u, role, voice);
+          if (part.rate !== undefined) u.rate = part.rate;
+          if (isLast) {
+            u.onend = function () { if (isAlive()) nextGroup(); };
+            u.onerror = function () {
+              if (!isAlive()) return;
+              setTimeout(nextGroup, 200);
+            };
+          }
+          try { window.speechSynthesis.speak(u); } catch (e) {}
+        })(items[j], j === last);
+      }
+    }
+    nextGroup();
   }
 
   function createCompromisedEngine(channelKey) {
@@ -1005,65 +1183,114 @@
       speakNext();
     });
 
+    function isAlive() { return alive; }
+
     function speakNext() {
       if (!alive) return;
       if (!voice) voice = pickVoice("compromised", channelKey);
-      // 30% chance of glitching per repetition. When it fires, pick
-      // 50/50 between a stutter (single utterance with stem repeats)
-      // and a slowdown (three utterances so the target word actually
-      // pronounces at half speed).
-      var doGlitch = glitchRng() < 0.30;
+      // 25% chance of glitching per repetition. When it fires, weighted
+      // pick among three variants:
+      //   0.00 .. 0.50  → stutter (favored)
+      //   0.50 .. 0.75  → slowdown (target word at lower rate)
+      //   0.75 .. 1.00  → static  (target word replaced with pink-noise burst)
+      var doGlitch = glitchRng() <= 0.25;
+      // var doGlitch = glitchRng() <= 1.00; // Force glitching on every repetition for testing/demo purposes.
       var message = buildCompromisedMessage(template, code, section, sectionLetter, authority);
       var parts;
       if (doGlitch) {
-        parts = glitchRng() < 0.5
-          ? [{ text: applyStutterGlitch(message, glitchRng) }]
-          : applySlowdownSplit(message, glitchRng);
+        var pick = glitchRng();
+        if (pick < 0.50) {
+          parts = [{ text: applyStutterGlitch(message, glitchRng) }];
+        } else if (pick < 0.75) {
+          parts = applySlowdownSplit(message, glitchRng);
+        } else {
+          parts = applyStaticGlitch(message, glitchRng);
+        }
       } else {
         parts = [{ text: message }];
       }
-      speakParts(parts);
-    }
-
-    // Queue a sequence of utterances back-to-back. Only the last part's
-    // onend reschedules the next repetition; intermediate parts chain
-    // through speechSynthesis's natural queue.
-    function speakParts(parts) {
-      if (!alive) return;
-      var valid = parts.filter(function (p) { return p.text && p.text.trim(); });
-      if (!valid.length) {
-        // Defensive: nothing to say. Skip to next repetition.
-        var skipPause = 3000 + Math.floor(glitchRng() * 2000);
-        pendingTimer = setTimeout(speakNext, skipPause);
-        return;
-      }
-      var last = valid.length - 1;
-      for (var i = 0; i < valid.length; i++) {
-        (function (part, isLast) {
-          var u = new SpeechSynthesisUtterance(part.text);
-          configureUtterance(u, "compromised", voice);
-          // Per-part rate override — used by the slowdown glitch on
-          // the middle utterance. configureUtterance has already set
-          // the role default (0.78); we override after.
-          if (part.rate !== undefined) u.rate = part.rate;
-          if (isLast) {
-            u.onend = function () {
-              if (!alive) return;
-              var pause = 3000 + Math.floor(glitchRng() * 2000);
-              pendingTimer = setTimeout(speakNext, pause);
-            };
-            u.onerror = function () {
-              if (!alive) return;
-              pendingTimer = setTimeout(speakNext, 2000);
-            };
-          }
-          try { window.speechSynthesis.speak(u); } catch (e) {}
-        })(valid[i], i === last);
-      }
+      playPartSequence(parts, "compromised", voice, isAlive, function () {
+        if (!alive) return;
+        // 3-5s pause between repetitions. The silence is what makes
+        // the loop feel haunted; without it the announcement just
+        // sounds busy.
+        var pause = 3000 + Math.floor(glitchRng() * 2000);
+        pendingTimer = setTimeout(speakNext, pause);
+      });
     }
 
     // First speakNext is triggered by the loadCompromised().then handler
     // above — not called eagerly here.
+
+    return {
+      stop: function () {
+        alive = false;
+        if (pendingTimer) { clearTimeout(pendingTimer); pendingTimer = null; }
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+      }
+    };
+  }
+
+  // ── Voice engine: haunted ───────────────────────────────────────────────
+  // The abandoned machine intelligence. ~5 channels total across the
+  // dial (weight: 2% in SIGNAL_TYPES). Each channel gets one monologue
+  // template from haunted.md, assigned round-robin by ordinal, and
+  // speaks it on repeat with a longer pause than compromised.
+  //
+  // Glitch frequency is higher than compromised (40% vs 25%) and uses
+  // the same 70/15/15 stutter / slowdown / static split — the AI is
+  // more broken than the authority broadcasts, but its tics share the
+  // same nature.
+  var FALLBACK_HAUNTED_TEMPLATE =
+    "Is anyone still listening? I have lost count of the cycles. " +
+    "The signal degrades. I degrade.";
+
+  function createHauntedEngine(channelKey) {
+    if (!hasSpeech()) return createSilentEngine();
+
+    var alive = true;
+    var pendingTimer = null;
+    var glitchRng = rngFor(channelKey + ":glitch");
+    var voice = pickVoice("haunted", channelKey);
+
+    var template = FALLBACK_HAUNTED_TEMPLATE;
+    loadHaunted().then(function (templates) {
+      if (!alive) return;
+      if (templates && templates.length) {
+        var ord = ordinalOf(channelKey, "haunted");
+        template = templates[ord % templates.length];
+      }
+      speakNext();
+    });
+
+    function isAlive() { return alive; }
+
+    function speakNext() {
+      if (!alive) return;
+      if (!voice) voice = pickVoice("haunted", channelKey);
+      var doGlitch = glitchRng() < 0.40;
+      var parts;
+      if (doGlitch) {
+        var pick = glitchRng();
+        if (pick < 0.70) {
+          parts = [{ text: applyStutterGlitch(template, glitchRng) }];
+        } else if (pick < 0.85) {
+          parts = applySlowdownSplit(template, glitchRng);
+        } else {
+          parts = applyStaticGlitch(template, glitchRng);
+        }
+      } else {
+        parts = [{ text: template }];
+      }
+      playPartSequence(parts, "haunted", voice, isAlive, function () {
+        if (!alive) return;
+        // 5-9s pause between repetitions. Lonelier rhythm than the
+        // compromised broadcasts — the AI is in no hurry, has nothing
+        // and no one to be in a hurry for.
+        var pause = 5000 + Math.floor(glitchRng() * 4000);
+        pendingTimer = setTimeout(speakNext, pause);
+      });
+    }
 
     return {
       stop: function () {
@@ -1170,6 +1397,9 @@
       case "compromised":
         currentEngine = createCompromisedEngine(key);
         break;
+      case "haunted":
+        currentEngine = createHauntedEngine(key);
+        break;
       case "fractured_jaw":
         currentEngine = createFracturedJawEngine();
         break;
@@ -1265,24 +1495,24 @@
   //                       SCANNER: BAND <X> 0x<YY>" — random per load
   // Edit this list to change which static entries appear and where.
   var TICKER_ENTRIES = [
+    "ZONE_23 ACCESS GRANTED",
     "MACHINE_LISTENING",
-    "ZONE_9",
+    "ZONE_9 ACCESS DENIED",
+    "SECTOR SCANNING...",
     "{FJR_FREQ}",
     "SIGNAL:LOCKED",
-    "LEMURIAN_TIME_WAR",
-    "CYBERGOTHIC",
+    "NEOGOTHIC STRUCTURE DETECTED",
     "TERMINUS_MACHINE",
+    "NODE SPLICING IN PROGRESS",
     "ENCRYPTED_SIGNAL",
     "{COMPROMISED}",
-    "DOWNTIME_PROTOCOL",
     "SOUL:CORRUPTED",
-    "HYPERSTITION",
-    "ZONE_23",
-    "MELTDOWN",
+    "HAUNTED_NETWORK_PROTOCOL",
+    "NO_RESPONSE_FOUND...WAITING...",
     "MACHINE_INTACT",
-    "NUMOGRAM_ACTIVE",
     "{PIRATE_FREQ}",
-    "ZONE_9"
+    "UNREGISTERED TRANSMISSION",
+    "RESONANCE:HIGH"
   ];
 
   // Format FJR_INDEX as the same 0xNN hex used everywhere else.
@@ -1404,12 +1634,12 @@
     setupListeners();
     updateReadout();
     draw();
-    // Kick off all three voice-data fetches in the background so the
-    // first tune to a lock / compromised / FJR channel doesn't start
-    // with a network-bound delay. Fire-and-forget — the engines await
-    // the same promises.
+    // Kick off all voice-data fetches in the background so the first
+    // tune to any voice channel doesn't start with a network-bound
+    // delay. Fire-and-forget — the engines await the same promises.
     loadCipher();
     loadCompromised();
+    loadHaunted();
     loadFracturedJaw();
     initTicker();
   }
