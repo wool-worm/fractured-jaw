@@ -164,14 +164,14 @@ body::after {
    carries across the page, not just the systems panel. */
 
 body.is-encryption-failure .broadcast-banner::before {
-  content: var(--ticker-content-failure, '◈ unencrypted ◈')
-           var(--ticker-content-failure, '◈ unencrypted ◈');
+  content: var(--ticker-content-failure, '◈ UNENCRYPTED ◈')
+           var(--ticker-content-failure, '◈ UNENCRYPTED ◈');
   color: var(--blood-bright);
   font-weight: bold;
 }
 
 body.is-encryption-failure .site-nav::after {
-  content: '// ZONE_9 // FREQ:' var(--fjr-coordinates, 'GAMMA 0x14') ' // unencrypted';
+  content: '// ZONE_9 // FREQ:' var(--fjr-coordinates, 'GAMMA 0x14') ' // UNENCRYPTED';
   color: var(--blood-bright);
   font-weight: bold;
 }

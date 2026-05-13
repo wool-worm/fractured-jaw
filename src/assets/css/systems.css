@@ -7,16 +7,18 @@
 
 .systems-widget {
   position: fixed;
-  /* Center vertically, then nudge 30px below center so the panel
-     doesn't visually crowd the masthead area at the top of the page. */
-  top: calc(50% + 30px);
+  /* Center vertically, then nudge 60px below center so the panel
+     sits well clear of the masthead area at the top of the page. */
+  top: calc(50% + 60px);
   left: 1rem;
   transform: translateY(-50%);
   width: 220px;
-  /* Sized to fit header + antennae + encryption + bars + stats +
-     origin race. The failure banner adds ~22px on top when active,
-     and the widget grows symmetrically (centered via translateY). */
-  height: 320px;
+  /* min-height keeps the widget visually consistent when content is
+     sparse, but lets it grow naturally when extra rows appear: a
+     longer author list, the encryption-failure banner, etc. Growth is
+     symmetric (centered via translateY(-50%)), so the widget puffs up
+     and down equally around its centered position. */
+  min-height: 320px;
   background: var(--void-soft);
   border: 1px solid var(--brass-deep);
   z-index: 50;
@@ -26,7 +28,6 @@
   display: flex;
   flex-direction: column;
   transition: transform 0.25s ease-out;
-  overflow: hidden;
 }
 
 /* Folded state: slide left by widget width minus the fold-button
@@ -83,8 +84,10 @@
 
 .systems-section:last-child {
   border-bottom: none;
-  flex: 1;
-  overflow: hidden;
+  /* Origin race takes its natural size now — the widget itself grows
+     to fit when author count is high. No flex:1 / overflow:hidden,
+     since those would clip rows when the failure banner pushes
+     content down. */
 }
 
 /* ── Antennae table ─────────────────────────────────────────────────────── */

@@ -228,24 +228,32 @@
     });
   }
 
-  // Stylized placeholders used to pad the origin race when there are
-  // fewer than three real authors. Reads as "we got blips on the
-  // spectrum but couldn't identify the source" instead of as fake
-  // claims of authorship.
+  // Stylized placeholders used to pad the origin race when fewer
+  // than MIN_ORIGIN_ROWS real authors exist. Reads as "we got blips
+  // on the spectrum but couldn't identify the source" instead of as
+  // fake claims of authorship.
   var SYNTHETIC_ORIGINS = [
     { name: "[unverified]", count: 1 },
     { name: "[redacted]",   count: 0 },
     { name: "(intercept)",  count: 1 }
   ];
 
+  // Show up to MAX_ORIGIN_ROWS real authors; pad with synthetics only
+  // when fewer than MIN_ORIGIN_ROWS real authors exist. As new
+  // pseudonyms publish posts they'll appear automatically; the widget
+  // grows to fit (min-height in CSS, no fixed cap). Bump MAX if you
+  // ever want a longer leaderboard.
+  var MIN_ORIGIN_ROWS = 3;
+  var MAX_ORIGIN_ROWS = 5;
+
   function renderOrigins(authors) {
     var list = document.getElementById("origin-list");
     if (!list) return;
     var rows = [];
-    for (var i = 0; i < authors.length && rows.length < 3; i++) {
+    for (var i = 0; i < authors.length && rows.length < MAX_ORIGIN_ROWS; i++) {
       rows.push({ name: authors[i].name, count: authors[i].count, synthetic: false });
     }
-    for (var j = 0; rows.length < 3 && j < SYNTHETIC_ORIGINS.length; j++) {
+    for (var j = 0; rows.length < MIN_ORIGIN_ROWS && j < SYNTHETIC_ORIGINS.length; j++) {
       rows.push({ name: SYNTHETIC_ORIGINS[j].name, count: SYNTHETIC_ORIGINS[j].count, synthetic: true });
     }
     // Sort so real top-author is first, but keep visual variety by

@@ -1609,10 +1609,12 @@
     banner.style.setProperty("--ticker-content", '"' + content + '"');
 
     // Failure variant: same ticker, but the ENCRYPTED_SIGNAL entry is
-    // swapped for a lowercase "unencrypted". cult.css picks this variant
-    // (and adds bold + blood-red styling) when body.is-encryption-failure
-    // is present — set by systems-widget.js during its 60s failure window.
-    var failureContent = content.replace(/ENCRYPTED_SIGNAL/g, "unencrypted");
+    // swapped for an uppercase "UNENCRYPTED" (matching the all-caps
+    // style of the rest of the ticker entries). cult.css picks this
+    // variant and adds bold + blood-red styling when
+    // body.is-encryption-failure is present — set by systems-widget.js
+    // during its 60s failure window.
+    var failureContent = content.replace(/ENCRYPTED_SIGNAL/g, "UNENCRYPTED");
     banner.style.setProperty("--ticker-content-failure", '"' + failureContent + '"');
 
     // Compute intro duration that matches the steady-state scroll speed.
