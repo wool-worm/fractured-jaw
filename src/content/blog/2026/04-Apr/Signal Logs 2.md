@@ -1,7 +1,7 @@
 ---
 title: Signal Logs 2
-date_published: 2026-05-13T15:17:22-05:00
-date_updated: 2026-05-13T16:11:34-05:00
+date_published: 2026-05-13T16:32:21
+date_updated: 2026-05-13T16:38:52
 author: wool-worm
 tags: [meta, test]
 series_name: "[[series/Transmissions|Transmissions]]"

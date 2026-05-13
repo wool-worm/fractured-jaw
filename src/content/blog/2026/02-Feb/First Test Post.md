@@ -1,7 +1,7 @@
 ---
 title: First Test Post
-date_published: 2026-05-05T07:19:15-05:00
-date_updated: 2026-05-13T16:10:53-05:00
+date_published: 2026-05-05T07:19:15
+date_updated: 2026-05-13T16:38:50
 author: wool-worm
 tags: [meta, test]
 description_short: A scaffolding post used to verify the build, the layouts, and the URL structure.

@@ -1,7 +1,7 @@
 ---
 title: Carrier Wave Theory
-date_published: 2026-05-13T15:17:19-05:00
-date_updated: 2026-05-13T16:10:41-05:00
+date_published: 2026-05-13T16:32:21
+date_updated: 2026-05-13T16:39:06
 author: wool-worm
 tags: [meta, test, theory]
 series_name: "[[series/Transmissions|Transmissions]]"

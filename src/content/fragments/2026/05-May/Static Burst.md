@@ -1,7 +1,7 @@
 ---
 title: Static Burst
-date_published: 2026-05-13T15:17:26-05:00
-date_updated: 2026-05-13T16:08:08-05:00
+date_published: 2026-05-13T16:32:21
+date_updated: 2026-05-13T16:39:14
 author: wool-worm
 tags: [meta, test, fragments]
 series_name: "[[series/Transmissions|Transmissions]]"
