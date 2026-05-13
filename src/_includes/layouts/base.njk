@@ -23,6 +23,10 @@
     {% include "partials/graph-widget.njk" %}
     <script src="/assets/js/graph-widget.js" defer></script>
   {% endif %}
+  {# Pirate-radio tuner widget — bottom-right corner, every page.
+     No dedicated full-page view (unlike the graph), so no suppression. #}
+  {% include "partials/radio-widget.njk" %}
+  <script src="/assets/js/radio-widget.js" defer></script>
   <script src="/assets/js/wikilink-preview.js" defer></script>
   <script src="/assets/js/baffle.js" defer></script>
 </body>
