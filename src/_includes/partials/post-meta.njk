@@ -28,6 +28,13 @@
     <dd>{{ rating }}</dd>
   {% endif %}
 
+  {% if series_name %}
+    <dt>Series</dt>
+    <dd>
+      <a href="/series/{{ series_name | slug }}/" class="series-link">{{ series_name }}</a>
+    </dd>
+  {% endif %}
+
   {% if tags and tags.length %}
     <dt>Tags</dt>
     <dd>

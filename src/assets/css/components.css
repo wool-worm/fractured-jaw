@@ -256,8 +256,9 @@
   padding: var(--sp-sm) var(--sp-md);
 }
 
-/* ── Tag cloud ───────────────────────────────────────────────────────────── */
-.tag-cloud {
+/* ── Tag cloud + series cloud ───────────────────────────────────────────── */
+.tag-cloud,
+.series-cloud {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
@@ -265,7 +266,8 @@
   margin-top: var(--sp-md);
 }
 
-.tag-cloud-item a {
+.tag-cloud-item a,
+.series-cloud-item {
   display: flex;
   align-items: baseline;
   gap: var(--sp-xs);
@@ -278,34 +280,40 @@
   transition: color 0.1s, border-color 0.1s, background 0.1s;
 }
 
-.tag-cloud-item a:hover {
+.tag-cloud-item a:hover,
+.series-cloud-item:hover {
   color: var(--sodium);
   border-color: var(--sodium-soft);
   background: var(--void-soft);
 }
 
-.tag-cloud-name {
+.tag-cloud-name,
+.series-cloud-name {
   color: var(--brass);
 }
 
-.tag-cloud-count {
+.tag-cloud-count,
+.series-cloud-count {
   font-size: 0.65rem;
   color: var(--brass-deep);
 }
 
-/* ── Tag page ────────────────────────────────────────────────────────────── */
-.tag-name {
+/* ── Tag page + series page ─────────────────────────────────────────────── */
+.tag-name,
+.series-name {
   color: var(--sodium);
   font-family: var(--font-title);
 }
 
-.tag-meta {
+.tag-meta,
+.series-meta {
   font-size: 0.8rem;
   color: var(--bone-dim);
   margin-bottom: var(--sp-lg);
 }
 
-.tag-meta a {
+.tag-meta a,
+.series-meta a {
   font-size: 0.8rem;
 }
 
@@ -317,6 +325,16 @@
   margin: var(--sp-lg) 0 var(--sp-sm);
   border-bottom: 1px solid var(--bone-faint);
   padding-bottom: var(--sp-xs);
+}
+
+/* Series link in the post-meta block (per-post header). */
+.series-link {
+  color: var(--brass);
+  font-family: var(--font-body);
+}
+
+.series-link:hover {
+  color: var(--sodium);
 }
 
 /* ── Individual post layout ─────────────────────────────────────────────── */

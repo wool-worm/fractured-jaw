@@ -1,0 +1,33 @@
+---
+layout: layouts/base.njk
+---
+{# Series index page (/series/). Lists every series in collections.seriesList
+   with an entry count and a link to the per-series page. Series are
+   pre-sorted alphabetically by .eleventy.js. #}
+
+<section class="series-index">
+  <header class="page-header">
+    <h1 class="page-title">{{ title or "Series" }}</h1>
+    {% if description_short %}
+      <p>{{ description_short }}</p>
+    {% endif %}
+    {% if content %}
+      <div class="page-intro">{{ content | safe }}</div>
+    {% endif %}
+  </header>
+
+  {% if collections.seriesList.length %}
+    <ul class="series-cloud">
+      {% for entry in collections.seriesList %}
+        <li>
+          <a href="/series/{{ entry.series }}/" class="series-cloud-item">
+            <span class="series-cloud-name">{{ entry.displayName }}</span>
+            <span class="series-cloud-count">({{ entry.count }})</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No series yet.</p>
+  {% endif %}
+</section>

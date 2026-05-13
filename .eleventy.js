@@ -156,6 +156,58 @@ module.exports = function (eleventyConfig) {
     return [...map.values()].sort((a, b) => a.tag.localeCompare(b.tag));
   });
 
+  // Series index: every unique series_name (case-normalized) with the posts
+  // that belong to it. Each post is assigned an `entryNumber` — oldest in
+  // the series = #1, newest = #N — independent of display order. Posts are
+  // returned newest-first so the series page renders most-recent at the top.
+  // Each entry: { series, displayName, count, entries: [{ post, entryNumber }] }
+  eleventyConfig.addCollection("seriesList", (api) => {
+    const all = api.getFilteredByGlob(CONTENT_GLOBS);
+    const map = new Map();
+    for (const item of all) {
+      const raw = item.data.series_name;
+      if (typeof raw !== "string" || raw.trim() === "") continue;
+      const key = slugify(raw);
+      if (!key) continue;
+      if (!map.has(key)) {
+        map.set(key, {
+          series: key,
+          displayName: raw.trim(),
+          count: 0,
+          posts: [],
+        });
+      }
+      const entry = map.get(key);
+      entry.count++;
+      entry.posts.push(item);
+    }
+    // Assign entry numbers by chronological order (oldest = 1), then sort
+    // for display newest-first. Tiebreaker on identical dates: inputPath,
+    // so the numbering is deterministic across builds.
+    for (const entry of map.values()) {
+      const ascending = [...entry.posts].sort((a, b) => {
+        const da = toMillis(a.data.date_published);
+        const db = toMillis(b.data.date_published);
+        if (da !== db) return da - db;
+        return String(a.inputPath).localeCompare(String(b.inputPath));
+      });
+      const numberByInputPath = new Map();
+      ascending.forEach((post, idx) => {
+        numberByInputPath.set(post.inputPath, idx + 1);
+      });
+      entry.entries = [...entry.posts]
+        .sort(byDatePublishedDesc)
+        .map((post) => ({
+          post,
+          entryNumber: numberByInputPath.get(post.inputPath),
+        }));
+      delete entry.posts;
+    }
+    return [...map.values()].sort((a, b) =>
+      a.series.localeCompare(b.series)
+    );
+  });
+
   // ---------- Passthrough copy ----------
 
   // Static assets copied verbatim to _site/. Listed explicitly so that

@@ -1,0 +1,27 @@
+---
+layout: layouts/base.njk
+---
+{# Per-series page (/series/<series>/). Receives `seriesEntry` (a single item
+   from collections.seriesList) via pagination. `seriesEntry.entries` is
+   pre-sorted newest-first; each item carries the post plus its 1-based
+   entryNumber (oldest in the series = #1). #}
+
+<section class="series-page series-{{ seriesEntry.series }}">
+  <header class="page-header">
+    <h1 class="page-title">
+      Series: <span class="series-name">{{ seriesEntry.displayName }}</span>
+    </h1>
+    <p class="series-meta">
+      {{ seriesEntry.count }} entr{% if seriesEntry.count == 1 %}y{% else %}ies{% endif %}
+      &middot; <a href="/series/">all series</a>
+    </p>
+  </header>
+
+  <ul class="post-list">
+    {% for entry in seriesEntry.entries %}
+      {% set post = entry.post %}
+      {% set titlePrefix = "Entry #" + entry.entryNumber + ": " %}
+      {% include "partials/post-card.njk" %}
+    {% endfor %}
+  </ul>
+</section>
