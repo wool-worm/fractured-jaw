@@ -30,6 +30,28 @@
   // ── State ───────────────────────────────────────────────────────────────
   var folded = false;
 
+  // ── Encryption state machine ────────────────────────────────────────────
+  // Most of the time the encryption row reads "active" (green letters,
+  // green dot). Occasionally it fails — the row turns blood red, a
+  // warning triangle replaces the dot, and a scrolling banner appears
+  // at the top of the widget. Failures last exactly 60s, then return
+  // to active.
+  //
+  // Timing constants below. The long-run failure ratio depends on
+  // ENCRYPTION_FAILURE_MS vs the mean of ENCRYPTION_ACTIVE_*_MS:
+  // 60s / (60s + ~17.5min) ≈ 5.4% failure ratio, ≈ 94.6% active —
+  // close to the "95% active" target. First failure is scheduled
+  // earlier (30-90s after page load) so visitors see the alarm
+  // during a typical session.
+  var ENCRYPTION_FAILURE_MS         = 60 * 1000;
+  var ENCRYPTION_FIRST_DELAY_MIN_MS = 30 * 1000;
+  var ENCRYPTION_FIRST_DELAY_RANGE_MS = 60 * 1000;       // 30-90s
+  var ENCRYPTION_ACTIVE_MIN_MS      = 10 * 60 * 1000;
+  var ENCRYPTION_ACTIVE_RANGE_MS    = 15 * 60 * 1000;    // 10-25min
+
+  var encryptionFailureTimer = null;
+  var encryptionResetTimer = null;
+
   // ── FNV-1a 32-bit hash — duplicated locally so this widget doesn't
   //    depend on the radio widget's IIFE-private hash. Tiny function,
   //    not worth a shared module yet.
@@ -126,6 +148,46 @@
       var pct = Math.round((fillW / trackW) * 100);
       b.pct.textContent = pct + "%";
     }
+  }
+
+  // ── Encryption state machine ────────────────────────────────────────────
+
+  var encryptionRow = null;
+  var encryptionStateText = null;
+
+  function setEncryptionState(state) {
+    if (encryptionRow) encryptionRow.setAttribute("data-state", state);
+    if (encryptionStateText) encryptionStateText.textContent = state.toLowerCase();
+    // Put the failure class on <body> so other widgets can react —
+    // the broadcast ticker (cult.css) and the .site-nav::after station
+    // ID both rewrite their "ENCRYPTED" reference to a bold blood-red
+    // "unencrypted" while this class is present.
+    if (state === "FAILURE") {
+      document.body.classList.add("is-encryption-failure");
+    } else {
+      document.body.classList.remove("is-encryption-failure");
+    }
+  }
+
+  function triggerEncryptionFailure() {
+    if (encryptionResetTimer) clearTimeout(encryptionResetTimer);
+    setEncryptionState("FAILURE");
+    encryptionResetTimer = setTimeout(function () {
+      setEncryptionState("ACTIVE");
+      scheduleNextEncryptionFailure();
+    }, ENCRYPTION_FAILURE_MS);
+  }
+
+  function scheduleNextEncryptionFailure() {
+    if (encryptionFailureTimer) clearTimeout(encryptionFailureTimer);
+    var delay = ENCRYPTION_ACTIVE_MIN_MS + Math.random() * ENCRYPTION_ACTIVE_RANGE_MS;
+    encryptionFailureTimer = setTimeout(triggerEncryptionFailure, delay);
+  }
+
+  function scheduleFirstEncryptionFailure() {
+    if (encryptionFailureTimer) clearTimeout(encryptionFailureTimer);
+    var delay = ENCRYPTION_FIRST_DELAY_MIN_MS + Math.random() * ENCRYPTION_FIRST_DELAY_RANGE_MS;
+    encryptionFailureTimer = setTimeout(triggerEncryptionFailure, delay);
   }
 
   // ── Fold ────────────────────────────────────────────────────────────────
@@ -236,6 +298,11 @@
 
     tickBarPercents();
     setInterval(tickBarPercents, 250);
+
+    encryptionRow = document.getElementById("systems-encryption");
+    encryptionStateText = document.getElementById("systems-encryption-state-text");
+    setEncryptionState("ACTIVE");
+    scheduleFirstEncryptionFailure();
 
     loadStats();
   }

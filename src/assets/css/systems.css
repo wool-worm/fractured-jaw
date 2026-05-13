@@ -7,11 +7,16 @@
 
 .systems-widget {
   position: fixed;
-  top: 50%;
+  /* Center vertically, then nudge 30px below center so the panel
+     doesn't visually crowd the masthead area at the top of the page. */
+  top: calc(50% + 30px);
   left: 1rem;
   transform: translateY(-50%);
   width: 220px;
-  height: 288px;
+  /* Sized to fit header + antennae + encryption + bars + stats +
+     origin race. The failure banner adds ~22px on top when active,
+     and the widget grows symmetrically (centered via translateY). */
+  height: 320px;
   background: var(--void-soft);
   border: 1px solid var(--brass-deep);
   z-index: 50;
@@ -155,9 +160,11 @@
 }
 
 /* Independent oscillation timings so the two bars don't pulse in
-   sync — keeps the panel feeling alive with separate processes. */
+   sync — keeps the panel feeling alive with separate processes.
+   core_load runs at 14s for a slower, more deliberate rise/fall;
+   signal at 11s gives a faster heartbeat alongside. */
 .bar-core-load {
-  animation: bar-core-load 7s ease-in-out infinite;
+  animation: bar-core-load 14s ease-in-out infinite;
 }
 
 .bar-signal {
@@ -201,6 +208,126 @@
   flex: 1;
   color: var(--bone-faint);
   font-size: 0.58rem;
+}
+
+/* ── Encryption status ──────────────────────────────────────────────────── */
+
+.systems-encryption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  transition: background 0.25s;
+}
+
+.systems-encryption-label {
+  color: var(--bone-dim);
+  text-transform: lowercase;
+}
+
+.systems-encryption-state {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+
+.systems-encryption-dot {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--verdigris-bright);
+  box-shadow: 0 0 5px var(--verdigris-bright);
+}
+
+.systems-encryption-warning {
+  display: none;
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--bone);
+}
+
+/* ACTIVE — green letters, green dot. */
+.systems-encryption[data-state="ACTIVE"] .systems-encryption-state {
+  color: var(--verdigris-bright);
+}
+
+/* FAILURE — blood-red box, warning triangle, alarm flicker. */
+.systems-encryption[data-state="FAILURE"] {
+  background: var(--blood);
+  animation: encryption-alarm 1.2s steps(1) infinite;
+}
+
+.systems-encryption[data-state="FAILURE"] .systems-encryption-label,
+.systems-encryption[data-state="FAILURE"] .systems-encryption-state {
+  color: var(--bone);
+}
+
+.systems-encryption[data-state="FAILURE"] .systems-encryption-dot {
+  display: none;
+}
+
+.systems-encryption[data-state="FAILURE"] .systems-encryption-warning {
+  display: inline;
+}
+
+@keyframes encryption-alarm {
+  0%, 100% { background: var(--blood); }
+  50%      { background: var(--blood-bright); }
+}
+
+/* ── Failure banner ─────────────────────────────────────────────────────── */
+/* Shown only while the widget is in encryption-failure state. Sits at
+   the very top of the widget shell (above the header). Scrolls
+   continuously while visible. The widget grows by the banner's height
+   when this appears — deliberate "alarm bumps the panel" effect.    */
+
+.systems-failure-banner {
+  display: none;
+  background: var(--blood);
+  color: var(--bone);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  line-height: 1.6rem;
+  height: 1.6rem;
+  overflow: hidden;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--blood-bright);
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Failure state class lives on <body> so it can drive cross-widget
+   styling — the ticker in cult.css and .site-nav::after both react
+   to body.is-encryption-failure as well. */
+body.is-encryption-failure .systems-failure-banner {
+  display: block;
+}
+
+.systems-failure-banner-text {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: failure-banner-scroll 18s linear infinite;
+}
+
+@keyframes failure-banner-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .systems-failure-banner-text {
+    animation: none;
+    padding-left: 0.5rem;
+  }
 }
 
 /* ── Real-data stats ────────────────────────────────────────────────────── */

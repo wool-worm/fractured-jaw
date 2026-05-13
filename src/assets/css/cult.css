@@ -140,7 +140,10 @@ body::after {
 /* Station ID injected after nav. Splices the FJR coordinates in via
    the --fjr-coordinates custom property set by radio-widget.js. The
    fallback ('GAMMA 0x14') stays valid if JS hasn't booted yet — keep
-   it in sync with FJR_BAND / FJR_INDEX if you relocate the station. */
+   it in sync with FJR_BAND / FJR_INDEX if you relocate the station.
+   The "ENCRYPTED" tail flips to bold blood-red "unencrypted" during
+   the systems widget's encryption-failure window (see overrides
+   below). */
 .site-nav::after {
   content: '// ZONE_9 // FREQ:' var(--fjr-coordinates, 'GAMMA 0x14') ' // ENCRYPTED';
   font-family: var(--font-body);
@@ -151,6 +154,26 @@ body::after {
   padding-left: var(--sp-sm);
   flex-shrink: 0;
   animation: station-id-flicker 9s steps(1) infinite;
+}
+
+/* ── Encryption-failure overrides ───────────────────────────────────────
+   While the systems widget is in its 60s encryption-failure window it
+   adds `is-encryption-failure` to <body>. Both the broadcast ticker and
+   the nav station-ID respond: their "ENCRYPTED" references flip to
+   "unencrypted", and the styling shifts to bold blood-red so the alarm
+   carries across the page, not just the systems panel. */
+
+body.is-encryption-failure .broadcast-banner::before {
+  content: var(--ticker-content-failure, '◈ unencrypted ◈')
+           var(--ticker-content-failure, '◈ unencrypted ◈');
+  color: var(--blood-bright);
+  font-weight: bold;
+}
+
+body.is-encryption-failure .site-nav::after {
+  content: '// ZONE_9 // FREQ:' var(--fjr-coordinates, 'GAMMA 0x14') ' // unencrypted';
+  color: var(--blood-bright);
+  font-weight: bold;
 }
 
 /* ── 4. SVG turbulence filters ──────────────────────────────────────────── */
