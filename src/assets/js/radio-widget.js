@@ -347,12 +347,21 @@
 
   function attemptAudioResumeOnGesture() {
     function onGesture() {
-      if (audioCtx && audioCtx.state === "suspended") {
-        audioCtx.resume().catch(function () {});
-      }
       document.removeEventListener("click", onGesture);
       document.removeEventListener("keydown", onGesture);
       document.removeEventListener("touchstart", onGesture);
+      // Re-run applyAudio inside the user-activated context. Just
+      // calling audioCtx.resume() isn't enough — in some browsers
+      // oscillators (.start() during suspended state) and
+      // speechSynthesis utterances queued while suspended don't
+      // reliably produce audio when the context later resumes.
+      // Recreating the engine in a now-running, gesture-blessed
+      // context sidesteps all those quirks: applyAudio's own
+      // resume() call now succeeds, and the freshly-created engine
+      // (oscillators, drone voices, or a new speechSynthesis chain)
+      // plays as expected. This is the same path a widget click
+      // would take, which is why those have always worked.
+      if (powered) applyAudio();
     }
     document.addEventListener("click", onGesture);
     document.addEventListener("keydown", onGesture);
