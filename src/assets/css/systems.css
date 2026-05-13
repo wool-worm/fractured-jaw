@@ -1,0 +1,302 @@
+/* ── Systems-status widget (floating, every page) ────────────────────────
+   Pinned left-center for visual balance against the graph widget
+   (top-right) and the radio widget (bottom-right). Same width as the
+   graph widget (220px), 20% taller (288px). Vertical centering via
+   top:50% + translateY(-50%). When folded, slides left so only the
+   fold button strip remains visible at the screen edge. */
+
+.systems-widget {
+  position: fixed;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  width: 220px;
+  height: 288px;
+  background: var(--void-soft);
+  border: 1px solid var(--brass-deep);
+  z-index: 50;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  box-shadow: 3px 3px 0 var(--brass-faint);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease-out;
+  overflow: hidden;
+}
+
+/* Folded state: slide left by widget width minus the fold-button
+   strip. Preserves the vertical centering via the chained transforms. */
+.systems-widget.is-folded {
+  transform: translateY(-50%) translateX(calc(-100% + 1.4rem));
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+
+.systems-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.2rem 0.4rem;
+  border-bottom: 1px solid var(--bone-faint);
+  background: var(--void);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.systems-widget-label {
+  color: var(--brass);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+}
+
+.systems-widget-fold {
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border: 1px solid var(--brass-faint);
+  background: var(--void-soft);
+  color: var(--bone-dim);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.systems-widget-fold:hover {
+  background: var(--void-mid);
+  color: var(--sodium);
+  border-color: var(--sodium-soft);
+}
+
+/* ── Sections ───────────────────────────────────────────────────────────── */
+
+.systems-section {
+  padding: 0.25rem 0.5rem;
+  border-bottom: 1px solid var(--bone-faint);
+}
+
+.systems-section:last-child {
+  border-bottom: none;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Antennae table ─────────────────────────────────────────────────────── */
+
+.antenna-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.62rem;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+}
+
+.antenna-name {
+  color: var(--bone-dim);
+  text-transform: lowercase;
+}
+
+.antenna-state {
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--bone-dim);
+}
+
+/* State-specific colors. Switches when systems-widget.js updates
+   data-state on the element. */
+.antenna-state[data-state="BROADCASTING"] { color: var(--sodium); }
+.antenna-state[data-state="RECEIVING"]    { color: var(--verdigris-bright); }
+.antenna-state[data-state="CORRUPTED"]    { color: var(--blood-bright); animation: state-corrupt-flicker 1.4s steps(1) infinite; }
+.antenna-state[data-state="STANDBY"]      { color: var(--bone-faint); }
+.antenna-state[data-state="WAITING"]      { color: var(--brass); }
+
+@keyframes state-corrupt-flicker {
+  0%, 100% { opacity: 1; }
+  47%      { opacity: 0.35; }
+  50%      { opacity: 1; }
+  53%      { opacity: 0.35; }
+  56%      { opacity: 1; }
+}
+
+/* ── Bars ───────────────────────────────────────────────────────────────── */
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.58rem;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+}
+
+.bar-label {
+  flex: 0 0 3.5rem;
+  color: var(--bone-dim);
+}
+
+.bar-track {
+  flex: 1;
+  height: 0.45rem;
+  background: var(--void-mid);
+  border: 1px solid var(--bone-faint);
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--brass);
+  width: 50%;
+}
+
+/* Independent oscillation timings so the two bars don't pulse in
+   sync — keeps the panel feeling alive with separate processes. */
+.bar-core-load {
+  animation: bar-core-load 7s ease-in-out infinite;
+}
+
+.bar-signal {
+  animation: bar-signal-integrity 11s ease-in-out infinite;
+  background: var(--verdigris-bright);
+}
+
+@keyframes bar-core-load {
+  0%, 100% { width: 55%; }
+  20% { width: 82%; }
+  45% { width: 64%; }
+  70% { width: 91%; }
+}
+
+@keyframes bar-signal-integrity {
+  0%, 100% { width: 42%; }
+  30% { width: 73%; }
+  60% { width: 31%; }
+  85% { width: 58%; }
+}
+
+.bar-percent {
+  flex: 0 0 1.8rem;
+  text-align: right;
+  color: var(--bone-faint);
+  font-size: 0.55rem;
+}
+
+/* ── Buffer spinner ─────────────────────────────────────────────────────── */
+
+.buffer-spinner {
+  flex: 0 0 auto;
+  color: var(--brass);
+  font-size: 0.7rem;
+  line-height: 1;
+  width: 1rem;
+  text-align: center;
+}
+
+.buffer-count {
+  flex: 1;
+  color: var(--bone-faint);
+  font-size: 0.58rem;
+}
+
+/* ── Real-data stats ────────────────────────────────────────────────────── */
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.62rem;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+}
+
+.stat-label {
+  color: var(--bone-dim);
+}
+
+.stat-value {
+  color: var(--brass);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+}
+
+/* ── Intercepted-origin author race ─────────────────────────────────────── */
+
+.systems-origin {
+  display: flex;
+  flex-direction: column;
+}
+
+.origin-title {
+  color: var(--bone-faint);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-transform: lowercase;
+  margin-bottom: 0.2rem;
+}
+
+.origin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.origin-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.58rem;
+  line-height: 1.4;
+}
+
+.origin-name {
+  flex: 0 0 4.5rem;
+  color: var(--bone-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.origin-bar-track {
+  flex: 1;
+  height: 0.35rem;
+  background: var(--void-mid);
+  border: 1px solid var(--bone-faint);
+  position: relative;
+  overflow: hidden;
+}
+
+.origin-bar-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--ichor-bright);
+  width: 0%;
+  transition: width 0.6s ease-out;
+}
+
+/* Synthetic / unverified entries render duller so it's clear they
+   aren't real authors — atmospheric flavor instead of fake claims. */
+.origin-row.is-synthetic .origin-name { color: var(--bone-faint); font-style: italic; }
+.origin-row.is-synthetic .origin-bar-fill { background: var(--bone-faint); }
+
+.origin-count {
+  flex: 0 0 1.4rem;
+  text-align: right;
+  color: var(--bone-faint);
+  font-size: 0.55rem;
+}
+
+/* ── Responsive: hide below 720px (matches graph + radio widgets) ───────── */
+
+@media (max-width: 720px) {
+  .systems-widget {
+    display: none;
+  }
+}

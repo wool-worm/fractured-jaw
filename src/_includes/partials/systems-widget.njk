@@ -1,0 +1,90 @@
+{# Systems-status widget. Pinned left-center of every page, mirroring
+   the graph widget (top-right) and radio widget (bottom-right) for
+   visual balance. Same width as the graph widget (220px), 20% taller.
+   Foldable: collapses leftward, only the fold button remains visible
+   at the screen edge.
+
+   Antenna states, animated bars, and the buffer spinner are pure
+   flavor — they cycle on timers in systems-widget.js. The real-data
+   block (posts / tags / words) and the intercepted-origin author race
+   are populated from /system-status.json at boot.
+
+   JS at /assets/js/systems-widget.js. CSS in /assets/css/systems.css. #}
+
+
+<aside
+  class="systems-widget"
+  id="systems-widget"
+  aria-label="System status panel"
+>
+  <div class="systems-widget-header">
+    <span class="systems-widget-label">system_status</span>
+    <button
+      type="button"
+      class="systems-widget-fold"
+      id="systems-widget-fold"
+      aria-pressed="false"
+      title="Fold panel to left margin"
+      aria-label="Fold panel"
+    >«</button>
+  </div>
+
+  <div class="systems-section systems-antennae">
+    <div class="antenna-row" data-band="ALPHA">
+      <span class="antenna-name">ant_α</span>
+      <span class="antenna-state" id="ant-alpha" data-state="STANDBY">STANDBY</span>
+    </div>
+    <div class="antenna-row" data-band="BETA">
+      <span class="antenna-name">ant_β</span>
+      <span class="antenna-state" id="ant-beta" data-state="STANDBY">STANDBY</span>
+    </div>
+    <div class="antenna-row" data-band="GAMMA">
+      <span class="antenna-name">ant_γ</span>
+      <span class="antenna-state" id="ant-gamma" data-state="STANDBY">STANDBY</span>
+    </div>
+    <div class="antenna-row" data-band="DELTA">
+      <span class="antenna-name">ant_δ</span>
+      <span class="antenna-state" id="ant-delta" data-state="STANDBY">STANDBY</span>
+    </div>
+  </div>
+
+  <div class="systems-section systems-bars">
+    <div class="bar-row">
+      <span class="bar-label">core_load</span>
+      <span class="bar-track"><span class="bar-fill bar-core-load" id="bar-core-load"></span></span>
+      <span class="bar-percent" id="pct-core-load">--%</span>
+    </div>
+    <div class="bar-row">
+      <span class="bar-label">signal</span>
+      <span class="bar-track"><span class="bar-fill bar-signal" id="bar-signal"></span></span>
+      <span class="bar-percent" id="pct-signal">--%</span>
+    </div>
+    <div class="bar-row">
+      <span class="bar-label">buffer</span>
+      <span class="buffer-spinner" id="systems-spinner">⠋</span>
+      <span class="buffer-count" id="buffer-count">0 pending</span>
+    </div>
+  </div>
+
+  <div class="systems-section systems-stats">
+    <div class="stat-row">
+      <span class="stat-label">transmissions</span>
+      <span class="stat-value" id="stat-posts">--</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">tag_index</span>
+      <span class="stat-value" id="stat-tags">--</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">word_count</span>
+      <span class="stat-value" id="stat-words">--</span>
+    </div>
+  </div>
+
+  <div class="systems-section systems-origin">
+    <div class="origin-title">◆ intercepted_origin ◆</div>
+    <div class="origin-list" id="origin-list">
+      {# Populated by systems-widget.js after fetching /system-status.json. #}
+    </div>
+  </div>
+</aside>
