@@ -1,9 +1,9 @@
 ---
 title: Internal Note
-date_published: May 5th 2026, 7:19 AM
-date_updated: May 11th 2026, 10:02 PM
+date_published: 2026-05-05T07:19:15-05:00
+date_updated: 2026-05-13T16:07:29-05:00
 author: wool-worm
-tags: internal
+tags: [internal]
 description_short: This post has exclude:true. It should never appear in either dev or production builds.
 description_long:
 featured: false

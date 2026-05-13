@@ -1,9 +1,9 @@
 ---
 title: Static Burst
-date_published: May 13th 2026, 3:17 PM
-date_updated: May 13th 2026, 3:27 PM
+date_published: 2026-05-13T15:17:26-05:00
+date_updated: 2026-05-13T16:08:08-05:00
 author: wool-worm
-tags: meta, test, fragments
+tags: [meta, test, fragments]
 series_name: "[[series/Transmissions|Transmissions]]"
 description_short: Fourth entry in the transmissions series — the newest, and a fragment, so the series spans blog + essay + fragment.
 description_long:

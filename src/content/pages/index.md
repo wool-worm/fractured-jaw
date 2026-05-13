@@ -1,9 +1,9 @@
 ---
 title: index
-date_published: May 2nd 2026, 12:20 PM
-date_updated: May 11th 2026, 9:19 PM
+date_published: 2026-05-02T12:20:00-05:00
+date_updated: 2026-05-13T16:07:49-05:00
 author: wool-worm
-tags: 
+tags: []
 description_short:
 description_long:
 draft: false

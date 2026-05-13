@@ -1,9 +1,9 @@
 ---
 title: Carrier Wave Theory
-date_published: May 13th 2026, 3:17 PM
-date_updated: May 13th 2026, 3:27 PM
+date_published: 2026-05-13T15:17:19-05:00
+date_updated: 2026-05-13T16:10:41-05:00
 author: wool-worm
-tags: meta, test, transmissions, theory
+tags: [meta, test, theory]
 series_name: "[[series/Transmissions|Transmissions]]"
 description_short: Second entry in the transmissions series — confirms an essay can sit between two blog posts in the same series.
 description_long:

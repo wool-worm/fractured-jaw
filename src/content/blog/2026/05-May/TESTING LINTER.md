@@ -1,9 +1,9 @@
 ---
 title: TESTING LINTER
-date_published: May 11th 2026, 8:34 PM
-date_updated: May 12th 2026, 9:29 PM
+date_published: 2026-05-11T20:34:29-05:00
+date_updated: 2026-05-13T16:11:37-05:00
 author: wool-worm
-tags: blog
+tags: [blog]
 description_short:
 description_long:
 featured: true

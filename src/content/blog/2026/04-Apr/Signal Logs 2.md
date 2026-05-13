@@ -1,9 +1,9 @@
 ---
 title: Signal Logs 2
-date_published: May 13th 2026, 3:17 PM
-date_updated: May 13th 2026, 3:26 PM
+date_published: 2026-05-13T15:17:22-05:00
+date_updated: 2026-05-13T16:11:34-05:00
 author: wool-worm
-tags: meta, test, transmissions
+tags: [meta, test]
 series_name: "[[series/Transmissions|Transmissions]]"
 description_short: Third entry in the transmissions series — second blog post, lives in a brand-new month folder.
 description_long:
