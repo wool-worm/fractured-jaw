@@ -16,7 +16,7 @@
     "url": "git+https://github.com/wool-worm/fractured-jaw.git"
   },
   "homepage": "https://fractured-jaw.com",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "devDependencies": {
     "@11ty/eleventy": "^3.1.2",
     "cross-env": "^7.0.3",

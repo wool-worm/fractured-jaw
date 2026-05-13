@@ -1,0 +1,10 @@
+# ai.txt — opt-out signal for AI training, ingestion, and derivative use.
+#
+# The content of fractured-jaw.com is licensed under CC BY-NC 4.0
+# (see /LICENSE-CONTENT on the source repository). Commercial use,
+# including training generative-AI models on this content, is not
+# permitted. This file is a machine-readable companion to that
+# license — see https://site.spawning.ai for the spec context.
+
+User-Agent: *
+Disallow: /
