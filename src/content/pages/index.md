@@ -1,10 +1,10 @@
 ---
-title: Fractured Jaw
-date_published: 2026-05-02T00:00:00Z
-date_updated: 2026-05-02T00:00:00Z
+title: index
+date_published: May 2nd 2026, 12:20 PM
+date_updated: May 11th 2026, 9:19 PM
 author: wool-worm
-tags:
-description_short: Anonymous, intermittent, hand-built. Writing, music, politics.
+tags: 
+description_short:
 description_long:
 draft: false
 exclude: false
@@ -13,6 +13,4 @@ graph_enabled: false
 layout: layouts/home.njk
 ---
 
-# Fractured Jaw
-
-A zine. Writing, music, politics. Anonymous and hand-built.
+Hello World

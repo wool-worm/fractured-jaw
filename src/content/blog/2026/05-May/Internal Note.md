@@ -1,9 +1,9 @@
 ---
-title: Internal Note (excluded)
-date_published: 2026-05-02T10:30:00Z
-date_updated: 2026-05-02T10:30:00Z
+title: Internal Note
+date_published: May 5th 2026, 7:19 AM
+date_updated: May 11th 2026, 10:02 PM
 author: wool-worm
-tags: [internal]
+tags: internal
 description_short: This post has exclude:true. It should never appear in either dev or production builds.
 description_long:
 featured: false
@@ -12,7 +12,7 @@ exclude: true
 preview_enabled: true
 graph_enabled: true
 image:
-reading_time:
+reading_time: 1 min
 ---
 
 If you can read this in either dev or production, the `exclude` flag is broken.

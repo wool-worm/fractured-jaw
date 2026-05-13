@@ -1,9 +1,9 @@
 ---
 title: WIP Draft Post
-date_published: 2026-05-02T10:00:00Z
-date_updated: 2026-05-02T10:00:00Z
+date_published: May 5th 2026, 7:19 AM
+date_updated: May 12th 2026, 9:30 PM
 author: wool-worm
-tags: [meta, draft-test]
+tags: 
 description_short: This post has draft:true. It should appear in `npm start` but NOT in `npm run build` (production).
 description_long:
 featured: false
@@ -12,7 +12,7 @@ exclude: false
 preview_enabled: true
 graph_enabled: true
 image:
-reading_time:
+reading_time: 1 min
 ---
 
 If you can read this on the live site, the draft gating is broken.
