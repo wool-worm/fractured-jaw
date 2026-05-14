@@ -3,7 +3,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% if title and title != site.title %}{{ title }} — {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
 <meta name="description" content="{{ description_short or site.description }}">
-<meta name="author" content="{{ author or site.defaultAuthor }}">
+{# HTML5 <meta name="author"> is single-valued. For array authors, join with
+   commas so the meta tag holds the full byline as one string. #}
+{% set _headAuthors = (author or site.defaultAuthor) | asList %}
+<meta name="author" content="{{ _headAuthors | join(', ') }}">
 
 {# Open Graph (used by Discord, Slack, Mastodon, Facebook, etc. when links are shared) #}
 <meta property="og:title" content="{{ title or site.title }}">

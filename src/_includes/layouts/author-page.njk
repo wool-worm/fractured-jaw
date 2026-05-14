@@ -1,0 +1,32 @@
+---
+layout: layouts/base.njk
+---
+{# Per-author page (/authors/<slug>/). Receives `authorEntry` (a single item
+   from collections.authorList) via pagination. Posts are pre-grouped by
+   section in the order blog → essays → fragments → media. Mirrors
+   layouts/tag-page.njk. #}
+
+<section class="author-page author-{{ authorEntry.author }}">
+  <header class="page-header">
+    <h1 class="page-title">
+      Author: <span class="author-name">{{ authorEntry.displayName }}</span>
+    </h1>
+    <p class="author-meta">
+      {{ authorEntry.count }} post{% if authorEntry.count != 1 %}s{% endif %}
+      &middot; <a href="/authors/">all authors</a>
+    </p>
+  </header>
+
+  {% for group in authorEntry.bySection %}
+    <section class="author-section-group">
+      <h2 class="author-section-heading">
+        <a href="/{{ group.section }}/">{{ group.section }}</a>
+      </h2>
+      <ul class="post-list">
+        {% for post in group.posts %}
+          {% include "partials/post-card.njk" %}
+        {% endfor %}
+      </ul>
+    </section>
+  {% endfor %}
+</section>

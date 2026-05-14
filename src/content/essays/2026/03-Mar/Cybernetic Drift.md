@@ -1,8 +1,8 @@
 ---
 title: Cybernetic Drift
 date_published: 2026-05-05T07:19:15
-date_updated: 2026-05-13T16:39:07
-author: wool-worm
+date_updated: 2026-05-13T22:53:35
+author: [wool-worm, another-author]
 tags: [essays, cyberpunk, theory]
 description_short: A placeholder essay confirming the essays pipeline routes through layouts/essay.njk correctly.
 description_long: A placeholder essay used during the rebuild to verify that the essays section produces /essays/cybernetic-drift/ from a deeply nested Obsidian path.

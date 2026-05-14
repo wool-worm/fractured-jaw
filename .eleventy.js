@@ -65,6 +65,14 @@ module.exports = function (eleventyConfig) {
     Array.isArray(value) ? value.slice(0, n) : value
   );
 
+  // Normalize a scalar-or-array into an array. Used by post-meta.njk so the
+  // `author` field can be either a string ("wool-worm") or a string[]
+  // (co-authored posts) without branching in the template.
+  eleventyConfig.addFilter("asList", (value) => {
+    if (value === null || value === undefined || value === "") return [];
+    return Array.isArray(value) ? value : [value];
+  });
+
   // Find a series-parent item by its published URL. Used by post-meta.njk
   // to resolve `series_name: "[[series/Transmissions|…]]"` to the parent's
   // canonical title (per the user's decision: parent title always wins
@@ -177,7 +185,74 @@ module.exports = function (eleventyConfig) {
         entry.bySection.push({ section, posts });
       }
     }
-    return [...map.values()].sort((a, b) => a.tag.localeCompare(b.tag));
+    // Sort by post count descending; tiebreak alphabetically by slug so the
+    // order is deterministic when counts match.
+    return [...map.values()].sort((a, b) => {
+      if (a.count !== b.count) return b.count - a.count;
+      return a.tag.localeCompare(b.tag);
+    });
+  });
+
+  // Author index: every unique author (case-normalized) with the posts that
+  // carry it. Same shape as tagList. `author` frontmatter accepts a string
+  // OR a string[] (for co-authored / guest posts), normalized the same way
+  // as tags. Series parents are intentionally excluded — the author field on
+  // a parent is bookkeeping, not authorship of an entry.
+  eleventyConfig.addCollection("authorList", (api) => {
+    const all = api.getFilteredByGlob(CONTENT_GLOBS);
+    const map = new Map();
+    for (const item of all) {
+      const raw = item.data.author;
+      const list = Array.isArray(raw) ? raw : raw ? [raw] : [];
+      for (const author of list) {
+        const key = slugify(String(author));
+        if (!key) continue;
+        if (!map.has(key)) {
+          map.set(key, {
+            author: key,
+            displayName: String(author),
+            count: 0,
+            posts: [],
+          });
+        }
+        const entry = map.get(key);
+        entry.count++;
+        entry.posts.push(item);
+      }
+    }
+    const SECTION_ORDER = ["blog", "essays", "fragments", "media"];
+    for (const entry of map.values()) {
+      entry.posts.sort(byDatePublishedDesc);
+      // Newest post drives the "last published" timestamp; posts are already
+      // sorted newest-first above, so it's just posts[0].
+      entry.lastPublished =
+        (entry.posts[0] && entry.posts[0].data.date_published) || null;
+
+      const groups = new Map();
+      for (const post of entry.posts) {
+        const section = (post.data && post.data.section) || "other";
+        if (!groups.has(section)) groups.set(section, []);
+        groups.get(section).push(post);
+      }
+      entry.bySection = [];
+      for (const s of SECTION_ORDER) {
+        if (groups.has(s)) {
+          entry.bySection.push({ section: s, posts: groups.get(s) });
+          groups.delete(s);
+        }
+      }
+      const leftovers = [...groups.entries()].sort(([a], [b]) =>
+        a.localeCompare(b)
+      );
+      for (const [section, posts] of leftovers) {
+        entry.bySection.push({ section, posts });
+      }
+    }
+    // Sort by post count descending; tiebreak alphabetically by slug.
+    return [...map.values()].sort((a, b) => {
+      if (a.count !== b.count) return b.count - a.count;
+      return a.author.localeCompare(b.author);
+    });
   });
 
   // Series parents — each file at src/content/series/<Name>.md is a real,

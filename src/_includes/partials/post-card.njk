@@ -28,8 +28,12 @@
           {{ post.data.date_published | humanDate }}
         </time>
       {% endif %}
-      {% if post.data.author %}
-        &middot; {{ post.data.author }}
+      {% set _cardAuthors = post.data.author | asList %}
+      {% if _cardAuthors.length %}
+        &middot;
+        {% for a in _cardAuthors -%}
+          <a href="/authors/{{ a | slug }}/" class="author-link">{{ a }}</a>{% if not loop.last %}, {% endif %}
+        {%- endfor %}
       {% endif %}
       {% if post.data.rating %}
         &middot; <span class="post-card-rating">{{ post.data.rating }}</span>
