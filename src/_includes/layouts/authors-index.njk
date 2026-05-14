@@ -1,0 +1,36 @@
+---
+layout: layouts/base.njk
+---
+{# Author index page (/authors/). Lists every author in collections.authorList
+   with a count and a link to the per-author page. Authors are pre-sorted
+   alphabetically by .eleventy.js. Mirrors layouts/tags-index.njk. #}
+
+<section class="authors-index">
+  <header class="page-header">
+    <h1 class="page-title">{{ title or "Authors" }}</h1>
+    {% if description_short %}
+      <p>{{ description_short }}</p>
+    {% endif %}
+    {% if content %}
+      <div class="page-intro">{{ content | safe }}</div>
+    {% endif %}
+  </header>
+
+  {% if collections.authorList.length %}
+    <ul class="author-cloud">
+      {% for entry in collections.authorList %}
+        <li>
+          <a href="/authors/{{ entry.author }}/" class="author-cloud-item">
+            <span class="author-cloud-name">{{ entry.displayName }}</span>
+            <span class="author-cloud-count">
+              (posts: {{ entry.count }}, last published date:
+              {%- if entry.lastPublished %} {{ entry.lastPublished | humanDate("LL/dd/yyyy") }}{% else %} —{% endif %})
+            </span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No authors yet.</p>
+  {% endif %}
+</section>

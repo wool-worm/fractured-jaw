@@ -1,0 +1,17 @@
+---
+# Pagination generator: emits one HTML file per author in collections.authorList.
+# Lives outside src/content/ so content.11tydata.js doesn't try to compute
+# a permalink for it — the per-iteration permalink below has to win.
+pagination:
+  data: collections.authorList
+  size: 1
+  alias: authorEntry
+permalink: "/authors/{{ authorEntry.author }}/"
+layout: layouts/author-page.njk
+eleventyExcludeFromCollections: true
+# `top` mode: global view, no centering. The graph widget has no native
+# concept of an author cohort, and faking it via `tag` mode would silently
+# fall back to `top` anyway (tag mode anchors on a real `tag:<slug>` node).
+# Be honest about it.
+page_type: top
+---

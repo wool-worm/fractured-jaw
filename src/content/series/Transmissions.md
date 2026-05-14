@@ -1,8 +1,7 @@
 ---
 title: Transmissions
 date_published: 2026-05-13T16:32:21
-date_updated: 2026-05-13T16:39:19
-author: wool-worm
+date_updated: 2026-05-13T23:04:24
 tags: [scifi, series]
 description_short: This is a series about transmissions, what else do you want?
 description_long: This is a series about transmissions, what else do you want? This is a much longer description with lots of text for testing to your hearts content!

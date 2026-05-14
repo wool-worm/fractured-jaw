@@ -1,13 +1,13 @@
 ---
 title: Signal Logs 1
 date_published: 2026-05-13T16:32:21
-date_updated: 2026-05-13T16:38:51
+date_updated: 2026-05-13T23:04:37
 author: wool-worm
 tags: [meta, test]
 series_name: "[[series/Transmissions|Transmissions]]"
 description_short: First entry in the transmissions series — verifies cross-section series grouping.
 description_long:
-featured: false
+featured: true
 draft: true
 exclude: false
 preview_enabled: true

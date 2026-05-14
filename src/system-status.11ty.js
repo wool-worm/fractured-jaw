@@ -56,8 +56,21 @@ class SystemStatus {
       totalWords += countWords(body);
 
       // Author tallies — empty / missing values bucket as "unknown".
-      const author = (data.author && String(data.author).trim()) || "unknown";
-      authorCounts[author] = (authorCounts[author] || 0) + 1;
+      // `author` may be a string OR a string[] (co-authored / guest posts);
+      // each named author gets a +1.
+      const rawAuthor = data.author;
+      const authorList = Array.isArray(rawAuthor)
+        ? rawAuthor
+        : rawAuthor
+        ? [rawAuthor]
+        : [];
+      const names = authorList
+        .map((a) => String(a).trim())
+        .filter(Boolean);
+      const bucket = names.length ? names : ["unknown"];
+      for (const author of bucket) {
+        authorCounts[author] = (authorCounts[author] || 0) + 1;
+      }
 
       // Section tallies — useful for future widget variations.
       const section = data.section || "other";
