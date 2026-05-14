@@ -6,7 +6,24 @@ const CONTENT_SECTIONS = ["blog", "essays", "fragments", "media"];
 // "pages" is special: it produces top-level URLs (/about/, /contributors/, /).
 const PAGES_SECTION = "pages";
 
-const KNOWN_SECTIONS = [...CONTENT_SECTIONS, PAGES_SECTION];
+// "series" is a navigational section — each file at src/content/series/<Name>.md
+// is the parent page for a series of posts. Routes to /series/<slug>/ via the
+// same filename-slug transform as the content sections, but kept out of
+// CONTENT_SECTIONS so it doesn't accidentally end up in tagList, featured,
+// or the all_content cross-section feed.
+const SERIES_SECTION = "series";
+
+const KNOWN_SECTIONS = [...CONTENT_SECTIONS, PAGES_SECTION, SERIES_SECTION];
+
+// Attachments: stored at src/content/_attachments/ in the vault, served at
+// /attachments/ on the site (passthrough copy in .eleventy.js strips the
+// underscore). The underscore inside the vault marks it as plumbing so it
+// reads as "not a section I write in" to the author; the public URL doesn't
+// expose that convention. Both VAULT_ and URL_ forms are accepted by
+// vaultPathToAttachmentUrl so frontmatter or inline references with either
+// spelling resolve correctly.
+const VAULT_ATTACHMENT_DIR = "_attachments";
+const URL_ATTACHMENT_DIR = "attachments";
 
 // Extract the section name (first directory under src/content/) from an Eleventy
 // `page.filePathStem`. With input dir = "src", the stem looks like
@@ -83,11 +100,33 @@ function vaultPathToUrl(vaultPath) {
   return `/${section}/${slugify(fileName)}/`;
 }
 
+// Compute the served URL for an attachment given its vault path. Accepts
+// either spelling — "_attachments/blog/foo/img.png" (what Obsidian writes
+// for a fully scoped link) or "attachments/blog/foo/img.png" (tolerant
+// fallback in case a writer types the URL-side form by hand). Returns null
+// for anything else so callers can fall back to plaintext / dead-link
+// handling.
+function vaultPathToAttachmentUrl(vaultPath) {
+  if (!vaultPath || typeof vaultPath !== "string") return null;
+  const trimmed = vaultPath.trim().replace(/^\/+/, "");
+  const slashIdx = trimmed.indexOf("/");
+  if (slashIdx === -1) return null;
+  const head = trimmed.slice(0, slashIdx);
+  const tail = trimmed.slice(slashIdx + 1);
+  if (head !== VAULT_ATTACHMENT_DIR && head !== URL_ATTACHMENT_DIR) return null;
+  if (!tail) return null;
+  return `/${URL_ATTACHMENT_DIR}/${tail}`;
+}
+
 module.exports = {
   computePermalink,
   extractSection,
   vaultPathToUrl,
+  vaultPathToAttachmentUrl,
   CONTENT_SECTIONS,
   PAGES_SECTION,
+  SERIES_SECTION,
   KNOWN_SECTIONS,
+  VAULT_ATTACHMENT_DIR,
+  URL_ATTACHMENT_DIR,
 };

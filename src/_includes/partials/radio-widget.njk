@@ -56,12 +56,30 @@
     <button type="button" data-band="DELTA" aria-pressed="false">δ</button>
   </div>
 
-  <canvas
-    id="radio-widget-dial"
-    class="radio-widget-dial"
-    tabindex="0"
-    aria-label="Tuning dial. Click to coarse-tune, scroll or arrow keys to fine-tune."
-  ></canvas>
+  {# Dial + resume-prompt overlay share a relative wrapper so the overlay
+     can sit exactly on top of the canvas. The overlay is shown only when
+     the page reloads with powered=true but the AudioContext is still
+     suspended (browser autoplay policy). Clicking it — or anywhere else —
+     dismisses it and rebuilds the audio engine in the gesture-blessed
+     context. See attemptAudioResumeOnGesture() in radio-widget.js. #}
+  <div class="radio-widget-dial-wrap">
+    <canvas
+      id="radio-widget-dial"
+      class="radio-widget-dial"
+      tabindex="0"
+      aria-label="Tuning dial. Click to coarse-tune, scroll or arrow keys to fine-tune."
+    ></canvas>
+    <button
+      type="button"
+      class="radio-widget-resume"
+      id="radio-widget-resume"
+      aria-label="Signal interrupted. Tap to resume."
+      hidden
+    >
+      <span class="radio-widget-resume-line">signal interrupted</span>
+      <span class="radio-widget-resume-cta">▸ tap to resume</span>
+    </button>
+  </div>
 
   <div class="radio-widget-status">
     <span id="radio-widget-status">offline</span>

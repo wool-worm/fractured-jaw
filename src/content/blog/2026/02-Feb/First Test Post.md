@@ -1,18 +1,18 @@
 ---
 title: First Test Post
-date_published: 2026-02-09T14:30:00Z
-date_updated: 2026-02-09T14:30:00Z
+date_published: 2026-05-05T07:19:15
+date_updated: 2026-05-13T23:04:02
 author: wool-worm
 tags: [meta, test]
 description_short: A scaffolding post used to verify the build, the layouts, and the URL structure.
 description_long: A scaffolding post used to verify that the Eleventy pipeline is alive — frontmatter, layouts, the URL transform, and post metadata all rendering as expected. Delete me when real content arrives.
-featured: true
+featured: false
 draft: false
 exclude: false
 preview_enabled: true
 graph_enabled: true
 image:
-reading_time: 1 min read
+reading_time: 1 min
 ---
 
 This is a scaffolding post. It exists to confirm that:

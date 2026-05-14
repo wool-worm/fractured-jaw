@@ -1,7 +1,7 @@
 ---
 title: Test Album Review
-date_published: 2026-04-20T18:00:00Z
-date_updated: 2026-04-20T18:00:00Z
+date_published: 2026-05-05T07:19:15
+date_updated: 2026-05-13T16:39:17
 author: wool-worm
 tags: [music, review]
 description_short: Scaffolding review used to confirm the media layout renders the rating field.
@@ -12,7 +12,7 @@ exclude: false
 preview_enabled: true
 graph_enabled: true
 image:
-reading_time: 2 min read
+reading_time: 1 min
 rating: 4/5
 ---
 

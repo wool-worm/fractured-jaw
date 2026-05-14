@@ -27,6 +27,10 @@
      No dedicated full-page view (unlike the graph), so no suppression. #}
   {% include "partials/radio-widget.njk" %}
   <script src="/assets/js/radio-widget.js" defer></script>
+  {# Systems-status panel — left-center, every page. Counterweight
+     to the graph (top-right) and radio (bottom-right) widgets. #}
+  {% include "partials/systems-widget.njk" %}
+  <script src="/assets/js/systems-widget.js" defer></script>
   <script src="/assets/js/wikilink-preview.js" defer></script>
   <script src="/assets/js/baffle.js" defer></script>
 </body>

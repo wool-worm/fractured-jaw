@@ -1,0 +1,30 @@
+---
+layout: layouts/base.njk
+---
+{# Series index page (/series/). Renders every series parent (a content
+   file at src/content/series/<Name>.md) as a vertical card in a
+   three-column grid. Series are pre-sorted newest-first by .eleventy.js. #}
+
+<section class="series-index">
+  <header class="page-header">
+    <h1 class="page-title">{{ title or "Series" }}</h1>
+    {% if description_short %}
+      <p>{{ description_short }}</p>
+    {% endif %}
+    {% if content %}
+      <div class="page-intro">{{ content | safe }}</div>
+    {% endif %}
+  </header>
+
+  {% if collections.series.length %}
+    <ul class="series-grid">
+      {% for parent in collections.series %}
+        {% set memberEntries = collections.seriesEntries[parent.url] %}
+        {% set memberCount = memberEntries.length or 0 %}
+        {% include "partials/series-card.njk" %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No series yet.</p>
+  {% endif %}
+</section>

@@ -15,8 +15,15 @@
     </dd>
   {% endif %}
 
-  <dt>By</dt>
-  <dd>{{ author or site.defaultAuthor }}</dd>
+  {% set _authors = (author or site.defaultAuthor) | asList %}
+  {% if _authors.length %}
+    <dt>By</dt>
+    <dd>
+      {% for a in _authors -%}
+        <a href="/authors/{{ a | slug }}/" class="author-link">{{ a }}</a>{% if not loop.last %}, {% endif %}
+      {%- endfor %}
+    </dd>
+  {% endif %}
 
   {% if reading_time %}
     <dt>Reading time</dt>
@@ -26,6 +33,17 @@
   {% if rating %}
     <dt>Rating</dt>
     <dd>{{ rating }}</dd>
+  {% endif %}
+
+  {% set seriesUrl = series_name | seriesNameToUrl %}
+  {% if seriesUrl %}
+    {% set seriesParent = collections.series | seriesByUrl(seriesUrl) %}
+    {% if seriesParent %}
+      <dt>Series</dt>
+      <dd>
+        <a href="{{ seriesParent.url }}" class="series-link">{{ seriesParent.data.title }}</a>
+      </dd>
+    {% endif %}
   {% endif %}
 
   {% if tags and tags.length %}

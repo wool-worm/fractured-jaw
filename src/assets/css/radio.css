@@ -164,6 +164,10 @@
   color: var(--void);
 }
 
+.radio-widget-dial-wrap {
+  position: relative;
+}
+
 .radio-widget-dial {
   display: block;
   width: 100%;
@@ -176,6 +180,69 @@
 .radio-widget-dial:focus-visible {
   outline: 1px dashed var(--brass);
   outline-offset: -2px;
+}
+
+/* Resume prompt: covers the dial when audio was supposed to be playing
+   but the browser suspended it after a page navigation. Brutalist plate,
+   subtle flicker, hover shifts to sodium. Hidden by default; JS toggles
+   the hidden attribute. */
+.radio-widget-resume {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.2rem;
+  border: 0;
+  border-top: 1px solid var(--brass-faint);
+  border-bottom: 1px solid var(--brass-faint);
+  background: rgba(8, 6, 4, 0.88);
+  color: var(--brass);
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+  animation: radio-resume-flicker 1.6s ease-in-out infinite;
+}
+
+.radio-widget-resume[hidden] {
+  display: none;
+}
+
+.radio-widget-resume-line {
+  color: var(--bone-dim);
+}
+
+.radio-widget-resume-cta {
+  color: var(--brass);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+}
+
+.radio-widget-resume:hover {
+  background: rgba(12, 10, 6, 0.92);
+  color: var(--sodium);
+  border-color: var(--sodium-soft);
+}
+
+.radio-widget-resume:hover .radio-widget-resume-cta {
+  color: var(--sodium);
+}
+
+.radio-widget-resume:focus-visible {
+  outline: 1px dashed var(--sodium);
+  outline-offset: -3px;
+}
+
+@keyframes radio-resume-flicker {
+  0%, 100% { opacity: 1; }
+  48% { opacity: 0.72; }
+  50% { opacity: 0.45; }
+  52% { opacity: 0.78; }
 }
 
 .radio-widget-status {

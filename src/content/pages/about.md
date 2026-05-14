@@ -1,9 +1,9 @@
 ---
 title: About
-date_published: May 2nd 2026, 12:20 PM
-date_updated: May 12th 2026, 9:30 PM
+date_published: 2026-05-02T12:20:00-05:00
+date_updated: 2026-05-13T16:07:36-05:00
 author: wool-worm
-tags: 
+tags: []
 description_short: About Fractured Jaw — what this is, who writes it, why.
 description_long:
 draft: false

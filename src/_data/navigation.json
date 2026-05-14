@@ -4,7 +4,7 @@
   { "title": "Essays",        "url": "/essays/" },
   { "title": "Fragments",     "url": "/fragments/" },
   { "title": "Media",         "url": "/media/" },
-  { "title": "Tags",          "url": "/tags/" },
+  { "title": "series",        "url": "/series/" },
   { "title": "network_nodes", "url": "/network_nodes/" },
   { "title": "About",         "url": "/about/" }
 ]

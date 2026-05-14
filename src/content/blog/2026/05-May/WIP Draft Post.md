@@ -1,9 +1,9 @@
 ---
 title: WIP Draft Post
-date_published: May 5th 2026, 7:19 AM
-date_updated: May 12th 2026, 9:30 PM
+date_published: 2026-05-05T07:19:15
+date_updated: 2026-05-13T16:38:47
 author: wool-worm
-tags: 
+tags: []
 description_short: This post has draft:true. It should appear in `npm start` but NOT in `npm run build` (production).
 description_long:
 featured: false

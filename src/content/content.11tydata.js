@@ -13,9 +13,43 @@
 //      A file with permalink:false is not written to disk; combined with
 //      eleventyExcludeFromCollections:true it disappears from the build entirely.
 
-const { computePermalink, extractSection } = require("../utils/permalink");
+const { computePermalink, extractSection, vaultPathToAttachmentUrl } = require("../utils/permalink");
 
 const isProduction = process.env.ELEVENTY_ENV === "production";
+
+// Match a single wikilink expression as the entire string: "[[...]]".
+// Tolerates surrounding whitespace and an optional `!` prefix (Obsidian
+// writes `![[…]]` for embeds and `[[…]]` for plain links; either is fine
+// in the frontmatter `image:` slot because we always render it as an <img>).
+const FRONTMATTER_IMAGE_WIKILINK_RE = /^\s*!?\[\[([^\]\n]+?)\]\]\s*$/;
+
+// Resolve the frontmatter `image:` field to a URL string the templates can
+// drop into `src="..."` without thinking. Accepts three shapes:
+//   - Obsidian-style fully scoped wikilink: "[[_attachments/blog/foo/cover.jpg]]"
+//     → "/attachments/blog/foo/cover.jpg"
+//   - Plain string already resembling a URL: "/attachments/...", "https://...",
+//     or any other absolute/relative URL — passed through unchanged so
+//     hand-placed external image URLs still work.
+//   - Empty / null / unparseable → null (templates already guard with
+//     `{% if image %}`).
+function resolveFrontmatterImage(value) {
+  if (value === undefined || value === null || value === "") return null;
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const match = trimmed.match(FRONTMATTER_IMAGE_WIKILINK_RE);
+  if (match) {
+    // Strip any caption|size segments — they make no sense in the
+    // frontmatter slot (post cards and OG tags don't take captions).
+    const vaultPath = match[1].split("|")[0].trim();
+    const url = vaultPathToAttachmentUrl(vaultPath);
+    if (url) return url;
+    return null;
+  }
+  // Plain string: trust the writer.
+  return trimmed;
+}
 
 const LAYOUT_BY_SECTION = {
   blog: "layouts/post.njk",
@@ -23,6 +57,7 @@ const LAYOUT_BY_SECTION = {
   fragments: "layouts/fragment.njk",
   media: "layouts/media.njk",
   pages: "layouts/page.njk",
+  series: "layouts/series-page.njk",
 };
 
 function shouldExclude(data) {
@@ -70,7 +105,15 @@ module.exports = {
     page_type: (data) => {
       if (data.page_type) return data.page_type;
       const section = extractSection(data.page && data.page.filePathStem);
-      return section === "pages" ? "top" : "content";
+      // pages/ and series/ are navigational hubs — global graph view.
+      // Everything else (blog/essays/fragments/media) pins the current node.
+      if (section === "pages" || section === "series") return "top";
+      return "content";
     },
+    // Resolve the frontmatter `image:` field once, before any template reads
+    // it. Templates ([head.njk], [post-card.njk], [series-card.njk],
+    // [series-page.njk]) keep treating `{{ image }}` as a URL string —
+    // wikilink form, plain URL, or empty all flow through this single point.
+    image: (data) => resolveFrontmatterImage(data.image),
   },
 };
