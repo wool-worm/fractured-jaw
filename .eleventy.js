@@ -344,6 +344,13 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/assets/css": "assets/css" });
   eleventyConfig.addPassthroughCopy({ "src/assets/js":  "assets/js"  });
   eleventyConfig.addPassthroughCopy({ "src/assets/images": "assets/images" });
+  // Vault-side content attachments. The underscore prefix marks the folder as
+  // plumbing inside Obsidian; we strip it when copying so the public URL is
+  // /attachments/<section>/<slug>/<file>, not /_attachments/... The Obsidian
+  // plugin (and hand-placement) writes files at
+  //   src/content/_attachments/<section>/<slug>/<file>
+  // which exactly mirrors the post's published URL path.
+  eleventyConfig.addPassthroughCopy({ "src/content/_attachments": "attachments" });
   eleventyConfig.addPassthroughCopy("CNAME");
   // Crawler hints — robots.txt is the conventional signal, ai.txt is the
   // emerging Spawning-style opt-out for AI training crawlers. Both live
