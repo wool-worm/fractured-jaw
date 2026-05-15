@@ -1,12 +1,48 @@
 /* ── Font declarations — all files self-hosted from Brutalist Framework 2.7 ── */
 
-/* VCR Mono — body copy (woff/woff2 only, no ttf in BF package) */
+/* VCR Mono :: body copy (woff/woff2 only, no ttf in BF package) */
 @font-face {
   font-family: 'VCR Mono';
   src: url('fonts/vcr-mono/vcr_mono.001-webfont.woff2') format('woff2'),
        url('fonts/vcr-mono/vcr_mono.001-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
+}
+
+/* Sudo :: scoped body font for post content + post descriptions. One family
+   name, four weight/style variants, so <em> and <strong> in rendered
+   markdown resolve to the matching face without per-element overrides. */
+@font-face {
+  font-family: 'Sudo';
+  src: url('fonts/sudo/Sudo-Regular.woff2') format('woff2'),
+       url('fonts/sudo/Sudo-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Sudo';
+  src: url('fonts/sudo/Sudo-Italic.woff2') format('woff2'),
+       url('fonts/sudo/Sudo-Italic.woff') format('woff');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Sudo';
+  src: url('fonts/sudo/Sudo-Bold.woff2') format('woff2'),
+       url('fonts/sudo/Sudo-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Sudo';
+  src: url('fonts/sudo/Sudo-BoldItalic.woff2') format('woff2'),
+       url('fonts/sudo/Sudo-BoldItalic.woff') format('woff');
+  font-weight: bold;
+  font-style: italic;
   font-display: swap;
 }
 

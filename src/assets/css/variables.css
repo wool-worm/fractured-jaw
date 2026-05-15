@@ -36,10 +36,11 @@
   --cement-light:#9a9892;
 
   /* ── Typography ────────────────────────────── */
-  --font-body:    'VCR Mono', 'Courier New', ui-monospace, monospace;
-  --font-display: 'Tea For God', 'VCR Mono', 'Courier New', monospace;
-  --font-title:   'Sudbury Basin', 'Tea For God', 'Courier New', monospace;
-  --font-mast:    'Crude', 'Brutalism', 'Sudbury Basin', 'Courier New', monospace;
+  --font-body:      'VCR Mono', 'Courier New', ui-monospace, monospace;
+  --font-display:   'Tea For God', 'VCR Mono', 'Courier New', monospace;
+  --font-title:     'Tea For God', 'VCR Mono', 'Courier New', monospace;
+  --font-mast:      'Crude', 'Brutalism', 'Tea For God', 'Courier New', monospace;
+  --font-post-body: 'Sudo', 'VCR Mono', 'Courier New', ui-monospace, monospace;
 
   /* ── Spacing ───────────────────────────────── */
   --sp-xs: 0.25rem;

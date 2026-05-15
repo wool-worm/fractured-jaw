@@ -76,7 +76,7 @@ main {
 .site-nav a {
   display: inline-block;
   font-family: var(--font-body);
-  font-size: 0.8rem;
+  font-size: 0.8625rem;
   text-transform: lowercase;
   letter-spacing: 0.08em;
   color: var(--bone-dim);
@@ -171,11 +171,18 @@ main {
 
 .post-description,
 .section-description,
+.series-description,
 .page-intro {
   color: var(--bone-dim);
   font-size: 0.95rem;
   max-width: 60ch;
   margin-bottom: 0;
+}
+
+/* Scoped to post descriptions only (intentionally not on section/page intro). */
+.post-description {
+  font-family: var(--font-post-body);
+  font-size: 1.0125rem;
 }
 
 /* ── Responsive header collapse ─────────────────────────────────────────── */
