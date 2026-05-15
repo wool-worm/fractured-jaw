@@ -1,6 +1,6 @@
 ---
 title: About
-description_short: About Fractured Jaw — what this is, who writes it, why.
+description: About Fractured Jaw — what this is, who writes it, why.
 graph_enabled: false
 preview_enabled: true
 ---

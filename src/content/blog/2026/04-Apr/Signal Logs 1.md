@@ -5,7 +5,7 @@ date_updated: 2026-05-14T16:06:00
 author: wool-worm
 tags: [test]
 series_name: "[[series/Transmissions|Transmissions]]"
-description_short: First entry in the transmissions series — verifies cross-section series grouping.
+description: First entry in the transmissions series — verifies cross-section series grouping.
 featured: true
 draft: true
 exclude: false

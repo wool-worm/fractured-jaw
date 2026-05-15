@@ -5,7 +5,7 @@ date_updated: 2026-05-14T16:05:32
 author: [wool-worm, another-author]
 tags: [essays, cyberpunk, theory]
 series_name:
-description_short: A placeholder essay confirming the essays pipeline routes through layouts/essay.njk correctly.
+description: A placeholder essay confirming the essays pipeline routes through layouts/essay.njk correctly.
 featured: false
 draft: false
 exclude: false

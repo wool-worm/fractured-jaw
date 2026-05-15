@@ -19,8 +19,8 @@
     <h2 class="post-card-title">
       <a href="{{ post.url }}">{% if titlePrefix %}{{ titlePrefix }}{% endif %}{{ post.data.title }}</a>
     </h2>
-    {% if post.data.description_short %}
-      <p class="post-card-description">{{ post.data.description_short }}</p>
+    {% if post.data.description %}
+      <p class="post-card-description">{{ post.data.description }}</p>
     {% endif %}
     <p class="post-card-meta">
       {% if post.data.date_published %}

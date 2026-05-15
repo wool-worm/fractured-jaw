@@ -5,7 +5,7 @@ date_updated: 2026-05-14T16:08:50
 author: wool-worm
 tags: [meta, test, fragments]
 series_name: "[[series/Transmissions|Transmissions]]"
-description_short: Fourth entry in the transmissions series — the newest, and a fragment, so the series spans blog + essay + fragment.
+description: Fourth entry in the transmissions series — the newest, and a fragment, so the series spans blog + essay + fragment.
 featured: false
 draft: true
 exclude: false

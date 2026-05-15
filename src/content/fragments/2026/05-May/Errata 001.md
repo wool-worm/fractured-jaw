@@ -5,7 +5,7 @@ date_updated: 2026-05-14T16:07:48
 author: wool-worm
 tags: [fragments, errata, meta]
 series_name:
-description_short: First fragment — a short note to verify the fragments section builds correctly.
+description: First fragment — a short note to verify the fragments section builds correctly.
 featured: false
 draft: false
 exclude: false

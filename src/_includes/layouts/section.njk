@@ -10,8 +10,8 @@ layout: layouts/base.njk
 <section class="section-page section-{{ section_name }}">
   <header class="section-header">
     <h1 class="section-title">{{ title }}</h1>
-    {% if description_short %}
-      <p class="section-description">{{ description_short }}</p>
+    {% if description %}
+      <p class="section-description">{{ description }}</p>
     {% endif %}
     {% if content %}
       <div class="section-intro">{{ content | safe }}</div>

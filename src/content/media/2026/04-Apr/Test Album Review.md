@@ -5,7 +5,7 @@ date_updated: 2026-05-14T16:10:23
 author: wool-worm
 tags: [music, review]
 series_name:
-description_short: Scaffolding review used to confirm the media layout renders the rating field.
+description: Scaffolding review used to confirm the media layout renders the rating field.
 featured: false
 draft: false
 exclude: false

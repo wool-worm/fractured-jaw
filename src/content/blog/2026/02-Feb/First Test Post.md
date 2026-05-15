@@ -5,7 +5,7 @@ date_updated: 2026-05-14T16:06:06
 author: wool-worm
 tags: [meta, test]
 series_name:
-description_short: A scaffolding post used to verify the build, the layouts, and the URL structure.
+description: A scaffolding post used to verify the build, the layouts, and the URL structure.
 featured: false
 draft: false
 exclude: false

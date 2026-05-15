@@ -5,7 +5,7 @@ date_updated: 2026-05-14T16:05:42
 author: wool-worm
 tags: [meta, test, theory]
 series_name: "[[series/Transmissions|Transmissions]]"
-description_short: Second entry in the transmissions series — confirms an essay can sit between two blog posts in the same series.
+description: Second entry in the transmissions series — confirms an essay can sit between two blog posts in the same series.
 featured: false
 draft: true
 exclude: false

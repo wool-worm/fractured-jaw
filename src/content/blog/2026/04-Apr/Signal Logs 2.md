@@ -5,7 +5,7 @@ date_updated: 2026-05-14T16:05:56
 author: wool-worm
 tags: [meta, test]
 series_name: "[[series/Transmissions|Transmissions]]"
-description_short: Third entry in the transmissions series — second blog post, lives in a brand-new month folder.
+description: Third entry in the transmissions series — second blog post, lives in a brand-new month folder.
 featured: false
 draft: true
 exclude: false

@@ -5,7 +5,7 @@ date_updated: 2026-05-14T16:05:52
 author: wool-worm
 tags: [internal]
 series_name:
-description_short: This post has exclude:true. It should never appear in either dev or production builds.
+description: This post has exclude:true. It should never appear in either dev or production builds.
 featured: false
 draft: false
 exclude: true

@@ -1,6 +1,6 @@
 ---
 title: media
-description_short: Reviews of books, film, music. Newest first.
+description: Reviews of books, film, music. Newest first.
 layout: layouts/section.njk
 page_type: section
 section_name: media
