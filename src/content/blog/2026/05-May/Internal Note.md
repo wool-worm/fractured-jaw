@@ -1,11 +1,11 @@
 ---
 title: Internal Note
 date_published: 2026-05-05T07:19:15
-date_updated: 2026-05-13T16:36:03
+date_updated: 2026-05-14T16:05:52
 author: wool-worm
 tags: [internal]
+series_name:
 description_short: This post has exclude:true. It should never appear in either dev or production builds.
-description_long:
 featured: false
 draft: false
 exclude: true
