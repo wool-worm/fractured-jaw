@@ -32,7 +32,7 @@ class PreviewIndex {
       index[item.url] = {
         title: item.data.title || "",
         date: item.data.date_published || null,
-        description: item.data.description_short || "",
+        description: item.data.description || "",
         image: item.data.image || null,
         section: item.data.section || null,
       };

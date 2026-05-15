@@ -1,11 +1,11 @@
 ---
 title: Errata 001
 date_published: 2026-05-05T07:19:15
-date_updated: 2026-05-13T16:39:11
+date_updated: 2026-05-14T16:07:48
 author: wool-worm
 tags: [fragments, errata, meta]
-description_short: First fragment — a short note to verify the fragments section builds correctly.
-description_long:
+series_name:
+description: First fragment — a short note to verify the fragments section builds correctly.
 featured: false
 draft: false
 exclude: false

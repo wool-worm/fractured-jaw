@@ -19,8 +19,8 @@
     <h2 class="series-card-title">
       <a href="{{ parent.url }}">{{ parent.data.title }}</a>
     </h2>
-    {% if parent.data.description_short %}
-      <p class="series-card-description">{{ parent.data.description_short }}</p>
+    {% if parent.data.description %}
+      <p class="series-card-description">{{ parent.data.description }}</p>
     {% endif %}
     {% if parent.data.tags and parent.data.tags.length %}
       <ul class="series-card-tags">

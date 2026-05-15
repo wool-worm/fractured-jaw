@@ -1,12 +1,11 @@
 ---
 title: Signal Logs 1
 date_published: 2026-05-13T16:32:21
-date_updated: 2026-05-13T23:04:37
+date_updated: 2026-05-14T16:06:00
 author: wool-worm
-tags: [meta, test]
+tags: [test]
 series_name: "[[series/Transmissions|Transmissions]]"
-description_short: First entry in the transmissions series — verifies cross-section series grouping.
-description_long:
+description: First entry in the transmissions series — verifies cross-section series grouping.
 featured: true
 draft: true
 exclude: false
@@ -16,9 +15,9 @@ image:
 reading_time: 1 min
 ---
 
-First scaffolding entry for the `transmissions` series. Exists so the
+First scaffolding __entry__ for the `transmissions` series. Exists so the
 
-series page has something to list and so cross-section grouping can be
+series page has __something__ to list and so cross-section grouping can be
 
 eyeballed end-to-end.
 

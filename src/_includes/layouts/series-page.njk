@@ -2,9 +2,9 @@
 layout: layouts/base.njk
 ---
 {# Per-series page (/series/<slug>/). Comes from a real content file at
-   src/content/series/<Name>.md — so `title`, `description_short`,
-   `description_long`, `image`, `tags`, and the rendered body are all
-   driven by the parent's frontmatter + content.
+   src/content/series/<Name>.md — so `title`, `description`, `image`,
+   `tags`, and the rendered body are all driven by the parent's
+   frontmatter + content.
 
    The member-entries list is appended after the parent's body. Each
    entry's card title is prepended with "Entry #N: " (oldest in the
@@ -20,8 +20,8 @@ layout: layouts/base.njk
     <h1 class="page-title">
       Series: <span class="series-name">{{ title }}</span>
     </h1>
-    {% if description_short %}
-      <p class="series-description">{{ description_short }}</p>
+    {% if description %}
+      <p class="series-description">{{ description }}</p>
     {% endif %}
     <p class="series-meta">
       {% set count = entries.length or 0 %}
