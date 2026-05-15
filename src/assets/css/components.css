@@ -36,7 +36,7 @@
 
 .post-card-section {
   font-family: var(--font-body);
-  font-size: 0.7rem;
+  font-size: 0.7625rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--bone-dim);
@@ -71,14 +71,15 @@
 }
 
 .post-card-description {
-  font-size: 0.875rem;
+  font-family: var(--font-post-body);
+  font-size: 0.9375rem;
   color: var(--bone-dim);
   max-width: 60ch;
   margin-bottom: 0;
 }
 
 .post-card-meta {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: var(--bone-faint);
   font-family: var(--font-body);
   margin-bottom: 0;
@@ -120,7 +121,7 @@
   grid-template-columns: max-content 1fr;
   gap: var(--sp-xs) var(--sp-md);
   font-family: var(--font-body);
-  font-size: 0.8rem;
+  font-size: 0.8625rem;
   color: var(--bone-dim);
   border-left: 3px solid var(--brass-deep);
   padding: var(--sp-sm) var(--sp-md);
@@ -132,7 +133,7 @@
   color: var(--bone-faint);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: 0.7rem;
+  font-size: 0.7625rem;
 }
 
 .post-meta dd {
@@ -344,7 +345,8 @@
 
 .series-intro {
   margin: var(--sp-lg) 0;
-  font-size: 1rem;
+  font-family: var(--font-post-body);
+  font-size: 1.125rem;
   line-height: 1.8;
   color: var(--bone);
   max-width: 65ch;
@@ -440,6 +442,7 @@
 }
 
 .series-card-description {
+  font-family: var(--font-post-body);
   font-size: 0.85rem;
   color: var(--bone-dim);
   margin-bottom: 0;
@@ -493,7 +496,15 @@
 /* ── Individual post layout ─────────────────────────────────────────────── */
 .post-content {
   margin-top: var(--sp-lg);
-  font-size: 1rem;
+  font-family: var(--font-post-body);
+  font-size: 1.125rem;
+  line-height: 1.8;
+}
+
+/* Top-level static pages (about, contributors). Same body font + size as posts. */
+.page-content {
+  font-family: var(--font-post-body);
+  font-size: 1.125rem;
   line-height: 1.8;
 }
 
