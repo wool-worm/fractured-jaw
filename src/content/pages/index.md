@@ -1,7 +1,7 @@
 ---
 title: Fractured Jaw
-layout: layouts/home.njk
 description:
+layout: layouts/home.njk
 graph_enabled: false
 preview_enabled: false
 ---
