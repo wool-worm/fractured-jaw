@@ -15,6 +15,37 @@
           <a href="{{ item.url }}"{% if page.url == item.url %} aria-current="page"{% endif %}>{{ item.title }}</a>
         </li>
       {% endfor %}
+      <li class="site-nav-search">
+        <button
+          type="button"
+          class="search-icon-button"
+          aria-label="Open search"
+          aria-haspopup="dialog"
+          aria-controls="search-modal"
+          data-search-open
+        >
+          {# Open-eye glyph — slit pupil, brutalist. Inherits currentColor so
+             the nav hover state colours it without per-state SVG swaps. #}
+          <svg
+            class="search-icon-eye"
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              d="M1.5 12 C 4.5 5.5, 10 3.5, 12 3.5 S 19.5 5.5, 22.5 12 C 19.5 18.5, 14 20.5, 12 20.5 S 4.5 18.5, 1.5 12 Z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linejoin="round"
+            />
+            <circle cx="12" cy="12" r="3.6" fill="none" stroke="currentColor" stroke-width="1.6" />
+            <ellipse cx="12" cy="12" rx="0.9" ry="2.6" fill="currentColor" />
+          </svg>
+        </button>
+      </li>
     </ul>
   </nav>
 </header>
