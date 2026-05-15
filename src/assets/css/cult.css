@@ -209,14 +209,18 @@ body.is-encryption-failure .site-nav::after {
   overflow: hidden;
 }
 
-/* Base layer: cold institutional grey, tighter bitshadow */
+/* Base layer: bone — the word reads as one solid title with aggressive
+   bitshadow. The three chromatic layers below sit on top at low opacity
+   as a faint ghost; they only become prominent during the periodic
+   slice/drift glitch beats. */
 .site-title > span:first-child {
   position: relative;
-  color: var(--cement-light);
+  color: var(--bone);
   text-shadow:
-    0.15rem 0.08rem 0 var(--ichor),
-    -0.08rem -0.15rem 0 var(--brass-deep),
-    0.3rem 0.15rem 0 rgba(92, 26, 114, 0.2);
+    0.35rem 0.18rem 0 var(--blood),
+    -0.18rem -0.35rem 0 var(--brass-deep),
+    0.7rem 0.35rem 0 rgba(139, 0, 0, 0.3),
+    -0.35rem -0.7rem 0 rgba(138, 115, 64, 0.2);
 }
 
 /* Top third — sickly purple */
@@ -224,6 +228,7 @@ body.is-encryption-failure .site-nav::after {
   color: var(--ichor-bright);
   clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
   text-shadow: 0.25rem 0 0 var(--brass);
+  opacity: 0.28;
   animation: cult-drift-a 5.3s steps(1) infinite, cult-slice-a 9s steps(1) infinite;
 }
 
@@ -232,6 +237,7 @@ body.is-encryption-failure .site-nav::after {
   color: var(--blood);
   clip-path: polygon(0 33%, 100% 33%, 100% 66%, 0 66%);
   text-shadow: -0.2rem 0.15rem 0 var(--ichor);
+  opacity: 0.28;
   animation: cult-drift-b 3.8s steps(1) infinite, cult-slice-b 13s steps(1) infinite;
 }
 
@@ -240,6 +246,7 @@ body.is-encryption-failure .site-nav::after {
   color: var(--blood-bright);
   clip-path: polygon(0 66%, 100% 66%, 100% 100%, 0 100%);
   text-shadow: 0.2rem -0.1rem 0 var(--ichor-bright);
+  opacity: 0.28;
   animation: cult-drift-c 7.2s steps(1) infinite, cult-slice-c 6s steps(1) infinite;
 }
 
