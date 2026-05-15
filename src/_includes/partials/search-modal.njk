@@ -1,0 +1,43 @@
+{# Search modal — hidden by default; toggled open by the eye icon in the
+   header. Submitting (Enter or the button) navigates to /search/?q=<query>
+   where search.js renders the actual results. #}
+<div
+  id="search-modal"
+  class="search-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="search-modal-title"
+  hidden
+>
+  <div class="search-modal-backdrop" data-search-close></div>
+  <div class="search-modal-panel" role="document">
+    <header class="search-modal-header">
+      <h2 id="search-modal-title" class="search-modal-title">Search</h2>
+      <button
+        type="button"
+        class="search-modal-close"
+        aria-label="Close search"
+        data-search-close
+      >&times;</button>
+    </header>
+    <form class="search-modal-form" action="/search/" method="get" role="search">
+      <label for="search-modal-input" class="visually-hidden">Search query</label>
+      <input
+        id="search-modal-input"
+        class="search-modal-input"
+        type="search"
+        name="q"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder='cyberpunk +opera -racecar "battle hymn"'
+      >
+      <button type="submit" class="search-modal-submit">Search</button>
+    </form>
+    <p class="search-modal-hint">
+      <code>+term</code> require &middot;
+      <code>-term</code> exclude &middot;
+      <code>|term</code> OR (default) &middot;
+      <code>"phrase"</code> exact
+    </p>
+  </div>
+</div>
