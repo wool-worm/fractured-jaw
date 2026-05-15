@@ -24,3 +24,15 @@
 
 <link rel="canonical" href="{{ site.url }}{{ page.url }}">
 <link rel="stylesheet" href="/assets/css/site.css">
+
+{# Feed autodiscovery. The global /feed.xml is on every page so a reader
+   can subscribe from anywhere. Section/series-aggregate feeds add their
+   own <link> when the current URL matches a spec in _data/feeds.js, and
+   individual series parents advertise their per-series feed. #}
+<link rel="alternate" type="application/atom+xml" href="/feed.xml" title="{{ site.title }} — all posts">
+{% for f in feeds %}{% if f.feedUrl != "/feed.xml" and f.pageUrl == page.url %}
+<link rel="alternate" type="application/atom+xml" href="{{ f.feedUrl }}" title="{{ f.title }}">
+{% endif %}{% endfor %}
+{% if section == "series" and page.url != "/series/" %}
+<link rel="alternate" type="application/atom+xml" href="{{ page.url }}feed.xml" title="{{ site.title }} — {{ title }}">
+{% endif %}

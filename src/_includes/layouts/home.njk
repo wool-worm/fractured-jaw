@@ -41,3 +41,9 @@ layout: layouts/base.njk
     <li><a href="/about/">About</a></li>
   </ul>
 </section>
+
+<div class="feed-block">
+  {% set feedUrl = "/feed.xml" %}
+  {% set feedLabel = "subscribe to everything (atom)" %}
+  {% include "partials/feed-icon.njk" %}
+</div>

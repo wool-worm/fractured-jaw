@@ -27,4 +27,10 @@ layout: layouts/base.njk
   {% else %}
     <p>No series yet.</p>
   {% endif %}
+
+  <div class="feed-block">
+    {% set feedUrl = "/series/feed.xml" %}
+    {% set feedLabel = "subscribe to every series (atom)" %}
+    {% include "partials/feed-icon.njk" %}
+  </div>
 </section>
