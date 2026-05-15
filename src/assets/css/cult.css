@@ -193,7 +193,7 @@ body.is-encryption-failure .site-nav::after {
 
 /* ── 5. Deconstructed masthead — machine god incarnation ────────────────── */
 .site-title {
-  font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+  font-size: clamp(1.4rem, 3.5vw, 2.3rem);
   position: relative;
   display: inline-block;
   text-shadow: none;
@@ -250,26 +250,46 @@ body.is-encryption-failure .site-nav::after {
   animation: cult-drift-c 7.2s steps(1) infinite, cult-slice-c 6s steps(1) infinite;
 }
 
-/* ── 6. Site logo mark ──────────────────────────────────────────────────── */
+/* ── 6. Site logo mark — pixel-art skull sprite ─────────────────────────── */
 .site-logo-mark {
   border-bottom: none;
   flex-shrink: 0;
   display: flex;
-  align-items: center;
+  align-items: stretch;
+  align-self: stretch;
 }
 
-.site-logo-mark img {
-  height: 54px;
-  width: auto;
+/* Sprite: 17 frames × 64px = 1088px wide, 64px tall. Timing is baked
+   into the sprite via duplicated frames in Piskel (5 idle + 3+2+2 break
+   + 5 post-break), so this CSS just steps through them at a constant
+   rate. To retune the animation, edit the sprite and re-export — no
+   CSS changes needed. To change the loop tempo, adjust 4s below.
+   If the frame count ever changes, update steps(N) AND the keyframe
+   target (-(N×64)px) to match. */
+.skull-logo {
   display: block;
-  opacity: 0.88;
-  filter: drop-shadow(0 0 6px rgba(92, 26, 114, 0.35));
+  width: 64px;
+  height: 64px;
+  background: url('/assets/images/skull-sprite.png') 0 0 / 1088px 64px no-repeat;
+  image-rendering: pixelated;
+  /* skull-frames steps the sprite; skull-glitch overlays the masthead-style
+     glitch (subtle drift + brief burst aligned with cult-slice-a's 9s
+     cadence). The two animations target different properties
+     (background-position vs transform/opacity) so they don't fight. */
+  animation:
+    skull-frames 6s steps(17) infinite,
+    skull-glitch 9s steps(1) infinite;
+  filter:
+    drop-shadow(2px 4px 0 var(--blood))
+    drop-shadow(-4px -2px 0 var(--brass-deep));
   transition: none;
 }
 
-.site-logo-mark:hover img {
-  opacity: 1;
-  filter: drop-shadow(0 0 10px rgba(92, 26, 114, 0.55));
+.site-logo-mark:hover .skull-logo {
+  filter:
+    drop-shadow(2px 1px 0 var(--blood-bright))
+    drop-shadow(-1px -1px 0 var(--brass))
+    brightness(1.15);
 }
 
 /* ── 7. Nav: sector map aesthetic ───────────────────────────────────────── */
@@ -622,6 +642,31 @@ hr {
   75%  { transform: translateX(0); }
   90%  { transform: translateX(1px); }
   100% { transform: translateX(0); }
+}
+
+/* Skull sprite — step through 17 frames horizontally. Each step holds
+   for 1/17 of the animation duration (~235ms at 4s total). */
+@keyframes skull-frames {
+  to { background-position: -1088px 0; }
+}
+
+/* Skull glitch — masthead-style cadence applied to the whole sprite.
+   Most of the cycle: subtle horizontal drift (1-2px). At 88-91% (a 9s
+   cycle so this aligns with cult-slice-a's slice burst), the entire
+   skull jumps and flickers, mimicking the masthead's slice glitch
+   without clipping out two-thirds of the image. */
+@keyframes skull-glitch {
+  0%   { transform: translateX(0);    opacity: 1; }
+  20%  { transform: translateX(-1px); opacity: 1; }
+  45%  { transform: translateX(1px);  opacity: 1; }
+  70%  { transform: translateX(0);    opacity: 1; }
+  87%  { transform: translateX(0);    opacity: 1; }
+  88%  { transform: translateX(-4px); opacity: 0.7; }
+  89%  { transform: translateX(3px);  opacity: 1;   }
+  90%  { transform: translateX(-2px); opacity: 0.85;}
+  91%  { transform: translateX(0);    opacity: 1;   }
+  95%  { transform: translateX(1px);  opacity: 1; }
+  100% { transform: translateX(0);    opacity: 1; }
 }
 
 /* Nav active state — blood pulse */
