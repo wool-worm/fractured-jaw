@@ -3,20 +3,20 @@
 // but for the Fractured Jaw Radio station (the one fixed channel in
 // the dial, located at FJR_BAND / FJR_INDEX in radio-widget.js).
 //
-// The source file at src/content/_local/radio/fractured-jaw-radio.md
-// contains one or more script segments separated by `---` on its own
-// line. Unlike the cipher emitter, no encoding is applied — segments
-// ship as plain strings and TTS speaks them directly.
+// The source file at src/content/_data/fractured-jaw-radio.md contains
+// one or more script segments separated by `---` on its own line.
+// Unlike the cipher emitter, no encoding is applied — segments ship as
+// plain strings and TTS speaks them directly.
 
 const fs = require("fs");
 const path = require("path");
 
 const SOURCE_PATH = path.join(
-  __dirname, "content", "_local", "radio", "fractured-jaw-radio.md"
+  __dirname, "content", "_data", "fractured-jaw-radio.md"
 );
 
-// Fallback script used if the source file is missing (e.g. on a fresh
-// checkout where _local/ has not been populated yet).
+// Fallback script used if the source file is missing (e.g. on a
+// partial checkout).
 const FALLBACK_SEGMENT =
   "This is Fractured Jaw Radio. You are tuned to the only signal still " +
   "operating on this band. Transmissions resume hourly. Stand by.";

@@ -15,6 +15,4 @@ image:
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
 
-The voice came back, eight minutes after I gave up. It was using the same number sequence as last time but slowed by maybe ten percent. I don't think that's significant. It probably is.
-
-See [[essays/2026/05-May/Notes On A Machine Listening Practice|the previous entry]] for the framing this fragment is leaning against. The whole [[series/Field Notes|series]] is here.
+Duis varius purus vel diam convallis, vitae [[series/Field Notes|Field Notes]] leo semper. Nullam pellentesque nunc in nunc vestibulum, rhoncus convallis libero consequat. Vivamus [[essays/2026/05-May/Notes On A Machine Listening Practice|Notes On A Machine Listening Practice]] ullamcorper arcu et vestibulum suscipit. Phasellus nec odio eget nisl lacinia iaculis.

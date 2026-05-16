@@ -82,7 +82,7 @@ main {
   color: var(--bone-dim);
   border-bottom: none;
   border-right: 1px solid var(--bone-faint);
-  padding: 0.15rem 0.75rem;
+  padding: 0.15rem 0.65rem;
   transition: color 0.1s, background 0.1s;
 }
 

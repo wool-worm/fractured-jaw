@@ -1,6 +1,6 @@
 ---
 title: media
-description: Reviews of books, film, music.
+description:
 layout: layouts/section.njk
 page_type: section
 section_name: media

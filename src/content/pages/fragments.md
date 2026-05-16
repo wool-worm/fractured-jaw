@@ -1,6 +1,6 @@
 ---
 title: fragments
-description: Errata, idea-level notes, marginalia.
+description:
 layout: layouts/section.njk
 page_type: section
 section_name: fragments

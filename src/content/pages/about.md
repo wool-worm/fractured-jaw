@@ -1,8 +1,8 @@
 ---
 title: About
-description: What the hell are we doing here?
+description:
 graph_enabled: false
-preview_enabled: true
+preview_enabled: false
 ---
 Fractured Jaw is a collaborative zine and blog published anonymously. Taking inspiration from an imagined dystopic future where pirate radio stations act as hubs of resistance and humanity, Fractured Jaw hopes to offer some of the same in our own dystopic times. We explore themes of politics, media commentary, cultural criticism, environmental issues–anything else that it on our minds–and place an unashamedly left bent on these issues. 
 

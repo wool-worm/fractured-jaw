@@ -1,6 +1,6 @@
 ---
 title: series
-description: Every series, every entry.
+description:
 layout: layouts/series-index.njk
 graph_enabled: false
 preview_enabled: false

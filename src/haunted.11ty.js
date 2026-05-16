@@ -2,9 +2,9 @@
 //
 // Feeds the `haunted` channels of the pirate-radio widget. These are
 // very rare (~one per band) and host the abandoned-AI voice engine.
-// Source file at src/content/_local/radio/haunted.md is gitignored,
-// so the plaintext monologue never enters the repo — only the JSON of
-// templates ships publicly.
+// Source file at src/content/_data/haunted.md is tracked in git but
+// excluded from Eleventy's content pipeline via .eleventyignore. The
+// monologue templates ship publicly as JSON.
 //
 // Each section in the source file (split on `---` on its own line) is
 // one template, assigned round-robin to haunted channels in
@@ -15,7 +15,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const SOURCE_PATH = path.join(__dirname, "content", "_local", "radio", "haunted.md");
+const SOURCE_PATH = path.join(__dirname, "content", "_data", "haunted.md");
 
 const FALLBACK_TEMPLATE =
   "Is anyone still listening? I have lost count of the cycles. " +
