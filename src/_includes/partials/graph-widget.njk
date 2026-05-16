@@ -27,8 +27,19 @@
   {% if page_type == "section" %}{% set _label = "section_network" %}{% endif %}
   {% if page_type == "tag" %}{% set _label = "tag_network" %}{% endif %}
   <div class="graph-widget-header">
+    {# Fold button is the rightmost interactive element so it stays visible
+       when the widget translates right and only a thin strip remains
+       at the window edge. Clicking toggles the .is-folded class. #}
     <span id="graph-widget-label">{{ _label }}</span>
     <a href="/network_nodes/" title="Open full graph" aria-label="Open full graph">⤢</a>
+    <button
+      type="button"
+      class="graph-widget-fold"
+      id="graph-widget-fold"
+      aria-pressed="false"
+      title="Fold graph to right margin"
+      aria-label="Fold graph"
+    >»</button>
   </div>
   <div class="graph-widget-toggle" role="group" aria-label="Edge mode">
     <button type="button" data-mode="links" aria-pressed="true">links</button>

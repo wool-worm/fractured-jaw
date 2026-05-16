@@ -410,6 +410,59 @@
     }
   }
 
+  // ── Fold ──────────────────────────────────────────────────────────────
+  // Mirrors the radio + systems widget fold pattern. setFolded() persists
+  // the new state to localStorage so the panel stays folded across page
+  // navigation. restoreFoldedState() at boot applies the saved state with
+  // the transform transition temporarily disabled, so the widget appears
+  // already-folded rather than visibly sliding on every page load.
+  var foldBtn = document.getElementById("graph-widget-fold");
+  var folded = false;
+  var FOLD_STORAGE_KEY = "fj.graph-widget.folded";
+
+  function applyFoldDOM() {
+    if (!foldBtn) return;
+    if (folded) {
+      shell.classList.add("is-folded");
+      foldBtn.textContent = "«";
+      foldBtn.setAttribute("aria-pressed", "true");
+      foldBtn.setAttribute("aria-label", "Unfold graph");
+      foldBtn.setAttribute("title", "Unfold graph");
+    } else {
+      shell.classList.remove("is-folded");
+      foldBtn.textContent = "»";
+      foldBtn.setAttribute("aria-pressed", "false");
+      foldBtn.setAttribute("aria-label", "Fold graph");
+      foldBtn.setAttribute("title", "Fold graph to right margin");
+    }
+  }
+
+  function saveFoldedState() {
+    try { localStorage.setItem(FOLD_STORAGE_KEY, folded ? "1" : "0"); }
+    catch (e) { /* private mode / quota — silently ignore */ }
+  }
+
+  function loadFoldedState() {
+    try { return localStorage.getItem(FOLD_STORAGE_KEY) === "1"; }
+    catch (e) { return false; }
+  }
+
+  function setFolded(next) {
+    if (next === folded) return;
+    folded = next;
+    applyFoldDOM();
+    saveFoldedState();
+  }
+
+  function restoreFoldedState() {
+    var stored = loadFoldedState();
+    if (stored === folded) return;
+    folded = stored;
+    shell.style.transition = "none";
+    applyFoldDOM();
+    requestAnimationFrame(function () { shell.style.transition = ""; });
+  }
+
   function setupListeners() {
     canvas.addEventListener("mousemove", function (e) {
       var pos = getPos(e);
@@ -438,6 +491,16 @@
   }
 
   function boot() {
+    // Wire fold button + restore saved state first, before any data
+    // work. setupListeners() only runs after the fetch resolves, so
+    // wiring fold here keeps it responsive even when the graph data
+    // is slow to load.
+    if (foldBtn) {
+      foldBtn.addEventListener("click", function () {
+        setFolded(!folded);
+      });
+    }
+    restoreFoldedState();
     resize();
     fetch("/graph-data.json")
       .then(function (r) { return r.ok ? r.json() : null; })

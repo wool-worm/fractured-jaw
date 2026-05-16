@@ -11,7 +11,22 @@
     <span aria-hidden="true">{{ site.title }}</span>
     <span aria-hidden="true">{{ site.title }}</span>
   </a>
-  <nav class="site-nav" aria-label="Primary">
+  {# Mobile nav toggle. Hidden at desktop widths via CSS; revealed when
+     .site-nav collapses into a dropdown panel below the header.
+     Three-bar brutalist glyph (CSS, no SVG) morphs to an X when open. #}
+  <button
+    type="button"
+    class="site-nav-toggle"
+    id="site-nav-toggle"
+    aria-label="Open navigation"
+    aria-expanded="false"
+    aria-controls="site-nav-menu"
+  >
+    <span class="site-nav-toggle-bar" aria-hidden="true"></span>
+    <span class="site-nav-toggle-bar" aria-hidden="true"></span>
+    <span class="site-nav-toggle-bar" aria-hidden="true"></span>
+  </button>
+  <nav class="site-nav" id="site-nav-menu" aria-label="Primary" data-open="false">
     <ul>
       {% for item in navigation %}
         <li>

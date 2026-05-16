@@ -423,6 +423,24 @@ body.is-encryption-failure .systems-failure-banner {
   font-size: 0.55rem;
 }
 
+/* ── Auto-fold in the medium zone (721–1100px) ──────────────────────────── */
+/* Widget slides leftward to the edge, leaving only the fold-button strip
+   visible — mirrors the graph + radio widgets folding right. The chained
+   translateY(-50%) preserves vertical centering (the unfolded base
+   transform). Fold button is non-interactive in this zone; user must
+   resize past 1100px to interact. Above 1100px the user's manual fold
+   state (localStorage) takes over. */
+
+@media (max-width: 1100px) and (min-width: 721px) {
+  .systems-widget {
+    transform: translateY(-50%) translateX(calc(-100% + 1.4rem));
+  }
+  .systems-widget-fold {
+    pointer-events: none;
+    cursor: default;
+  }
+}
+
 /* ── Responsive: hide below 720px (matches graph + radio widgets) ───────── */
 
 @media (max-width: 720px) {
