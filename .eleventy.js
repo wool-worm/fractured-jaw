@@ -368,6 +368,10 @@ module.exports = function (eleventyConfig) {
   // at the repo root and ship to the site root.
   eleventyConfig.addPassthroughCopy("robots.txt");
   eleventyConfig.addPassthroughCopy("ai.txt");
+  // Google Search Console domain-ownership verification. The filename
+  // is the verification token Google issued; it must be reachable at
+  // /googlee77d1adca24dd205.html on the live site to verify.
+  eleventyConfig.addPassthroughCopy("googlee77d1adca24dd205.html");
 
   // ---------- Watch targets ----------
 
