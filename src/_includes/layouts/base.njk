@@ -7,9 +7,12 @@
   {% include "partials/head.njk" %}
 </head>
 <body>
+  {# Skip-to-content link. Visible only on keyboard focus; lets screen-reader
+     and keyboard users bypass the header + widgets on every page. #}
+  <a href="#main" class="skip-link">skip to content</a>
   {% include "partials/header.njk" %}
   <script src="/assets/js/nav-toggle.js" defer></script>
-  <main>
+  <main id="main" tabindex="-1">
     {{ content | safe }}
   </main>
   {% include "partials/footer.njk" %}

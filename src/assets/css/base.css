@@ -5,6 +5,38 @@
   padding: 0;
 }
 
+/* ── Skip-to-content link ──────────────────────────────────────────────────
+   Off-screen by default; pulled into the top-left on keyboard focus so
+   screen-reader and keyboard users can bypass the header + widgets on
+   every page. Stays inside the site's palette so it doesn't read as a
+   browser-chrome artifact. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 9999;
+  padding: var(--sp-sm) var(--sp-md);
+  background: var(--void);
+  color: var(--brass);
+  border: 1px solid var(--brass);
+  border-bottom: 1px solid var(--brass);
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  left: var(--sp-sm);
+  top: var(--sp-sm);
+  outline: 2px solid var(--sodium);
+  outline-offset: 2px;
+}
+
+main:focus {
+  outline: none;
+}
+
 /* ── Body / scanline ────────────────────────────────────────────────────── */
 html {
   font-size: 16px;
