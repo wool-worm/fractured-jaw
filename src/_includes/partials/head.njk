@@ -8,19 +8,26 @@
 {% set _headAuthors = (author or site.defaultAuthor) | asList %}
 <meta name="author" content="{{ _headAuthors | join(', ') }}">
 
+{# Social-card image. Open Graph and Twitter both require absolute URLs, so
+   relative paths from frontmatter (e.g. /attachments/...) and the site-wide
+   default get site.url prefixed via the absoluteUrl filter. The default
+   lives in _data/site.js so every page has a preview even when frontmatter
+   omits `image:`. #}
+{% set _ogImage = (image or site.defaultImage) | absoluteUrl(site.url) %}
+
 {# Open Graph (used by Discord, Slack, Mastodon, Facebook, etc. when links are shared) #}
 <meta property="og:title" content="{{ title or site.title }}">
 <meta property="og:description" content="{{ description or site.description }}">
 <meta property="og:type" content="{% if section and section != 'pages' %}article{% else %}website{% endif %}">
 <meta property="og:url" content="{{ site.url }}{{ page.url }}">
 <meta property="og:site_name" content="{{ site.title }}">
-{% if image %}<meta property="og:image" content="{{ image }}">{% endif %}
+<meta property="og:image" content="{{ _ogImage }}">
 
 {# Twitter card #}
-<meta name="twitter:card" content="{% if image %}summary_large_image{% else %}summary{% endif %}">
+<meta name="twitter:card" content="{{ card_type or site.defaultCardType }}">
 <meta name="twitter:title" content="{{ title or site.title }}">
 <meta name="twitter:description" content="{{ description or site.description }}">
-{% if image %}<meta name="twitter:image" content="{{ image }}">{% endif %}
+<meta name="twitter:image" content="{{ _ogImage }}">
 
 <link rel="canonical" href="{{ site.url }}{{ page.url }}">
 <link rel="icon" type="image/png" href="/assets/images/skull-favicon-64.png">

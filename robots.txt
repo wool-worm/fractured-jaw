@@ -7,6 +7,8 @@
 # the CC BY-NC 4.0 content license, not an enforcement mechanism — but
 # well-behaved crawlers will honor it. See also /ai.txt.
 
+Sitemap: https://fractured-jaw.com/sitemap.xml
+
 User-agent: *
 Allow: /
 
