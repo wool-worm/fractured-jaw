@@ -73,15 +73,27 @@ function reportIssue({
     `[fractured-jaw] ${kind} ${file}: ${offending}\n` +
     `  reason: ${reason}`;
 
+  const inProd = isProduction();
   let isFatal = false;
   if (severity === "always-fatal") {
     isFatal = true;
   } else if (severity === "fatal-in-prod") {
-    isFatal = isProduction() && !isDraft && !isExcluded;
+    isFatal = inProd && !isDraft && !isExcluded;
   }
 
   if (isFatal) pendingFatalCount++;
-  console.warn(message);
+
+  // Print rules:
+  //   dev mode  → surface every issue (writer wants the full picture
+  //               while iterating, including draft-only problems they'll
+  //               need to fix before promoting).
+  //   prod mode → only surface the issues that ACTUALLY gate the build.
+  //               Draft-suppressed warnings are noise in prod (drafts
+  //               don't ship), and we don't want them mixed in with the
+  //               real failure list.
+  if (!inProd || isFatal) {
+    console.warn(message);
+  }
 }
 
 // Throw a short aggregated error if any fatal-severity issues were
