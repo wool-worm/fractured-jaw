@@ -9,6 +9,9 @@
 // frontmatter) and the spec is stricter / cleaner.
 
 const { DateTime } = require("luxon");
+const { parseAuthorField, resolveAuthors } = require("./authors");
+
+const CONTENT_ROOT = "src/content";
 
 // XML 1.0 forbids most C0 control characters even when escaped. Strip them
 // before encoding so a stray \x01 in pasted content can't break readers.
@@ -46,8 +49,51 @@ function absUrl(siteUrl, path) {
   return `${base}/${rel}`;
 }
 
+// Resolve a post's author frontmatter into a list of display names.
+// `authorsByUrl` is the URL → author-record map built from
+// collections.authors (see src/utils/authors.js). When supplied, wikilink
+// frontmatter is resolved to author-file titles. defaultAuthor is itself
+// a wikilink (or a bare display name as a transitional fallback) and goes
+// through the same resolver. The feed always ends up with at least one
+// <author> per entry.
+function resolveEntryAuthors(data, defaultAuthor, authorsByUrl) {
+  if (authorsByUrl) {
+    const parsed = parseAuthorField(data.author, CONTENT_ROOT);
+    const resolved = resolveAuthors(parsed, mapToArray(authorsByUrl));
+    if (resolved.length) return resolved.map((r) => r.displayName);
+    // Fall through to defaultAuthor resolution when the post has no
+    // author frontmatter.
+    if (defaultAuthor) {
+      const parsedDefault = parseAuthorField(defaultAuthor, CONTENT_ROOT);
+      const resolvedDefault = resolveAuthors(parsedDefault, mapToArray(authorsByUrl));
+      if (resolvedDefault.length) return resolvedDefault.map((r) => r.displayName);
+    }
+  }
+  // Legacy / fallback path: treat frontmatter as raw strings. This branch
+  // is hit when authorsByUrl wasn't passed (caller hasn't been updated)
+  // or when defaultAuthor resolves to nothing. Keeps the renderer from
+  // ever emitting a <feed> entry with no <author> block.
+  if (Array.isArray(data.author) && data.author.length) {
+    return data.author.map((a) => String(a));
+  }
+  if (data.author) return [String(data.author)];
+  return [defaultAuthor ? String(defaultAuthor) : ""];
+}
+
+// resolveAuthors expects an array (the iterable Eleventy hands to filters).
+// FeedAuthor passes a Map for O(1) URL lookups; both shapes have to work
+// through resolveAuthors' internal indexAuthorsByUrl. Cheapest reconciliation:
+// convert Map values back to an array here.
+function mapToArray(authorsLookup) {
+  if (Array.isArray(authorsLookup)) return authorsLookup;
+  if (authorsLookup && typeof authorsLookup.values === "function") {
+    return [...authorsLookup.values()];
+  }
+  return [];
+}
+
 // Render one <entry>. `item` is an Eleventy collection item.
-function renderEntry(item, siteUrl, defaultAuthor) {
+function renderEntry(item, siteUrl, defaultAuthor, authorsByUrl) {
   const data = item.data || {};
   const url = absUrl(siteUrl, item.url);
   const title = data.title || "(untitled)";
@@ -56,11 +102,7 @@ function renderEntry(item, siteUrl, defaultAuthor) {
   // explicit date_updated.
   const updated = toIsoDate(data.date_updated) || published;
 
-  const authors = Array.isArray(data.author)
-    ? data.author
-    : data.author
-    ? [data.author]
-    : [defaultAuthor];
+  const authors = resolveEntryAuthors(data, defaultAuthor, authorsByUrl);
 
   const tags = Array.isArray(data.tags)
     ? data.tags
@@ -117,6 +159,9 @@ function absolutizeUrls(html, siteUrl) {
 //               <link rel="alternate">)
 //   items     — required, array of Eleventy collection items, newest first
 //   defaultAuthor — used when an item has no `author` frontmatter
+//   authorsByUrl — optional, URL → author-record map (or the
+//                  collections.authors array). When present, item.author
+//                  wikilinks are resolved to the author file's title.
 // }
 function renderAtomFeed(opts) {
   const {
@@ -128,6 +173,7 @@ function renderAtomFeed(opts) {
     pageUrl,
     items,
     defaultAuthor,
+    authorsByUrl,
   } = opts;
 
   // <updated> at the feed level: newest entry's updated/published, or now.
@@ -156,7 +202,7 @@ function renderAtomFeed(opts) {
   lines.push("  <generator>fractured-jaw / eleventy</generator>");
 
   for (const item of items) {
-    lines.push(renderEntry(item, siteUrl, defaultAuthor));
+    lines.push(renderEntry(item, siteUrl, defaultAuthor, authorsByUrl));
   }
 
   lines.push("</feed>");

@@ -1,0 +1,38 @@
+---
+# GitHub Pages serves /404.html for any unresolved path; literal permalink
+# (no trailing slash) is required. Lives outside src/content/ so the directory
+# data file doesn't compute a content-style permalink.
+permalink: "/404.html"
+layout: layouts/base.njk
+eleventyExcludeFromCollections: true
+sitemap_enabled: false
+graph_enabled: false
+preview_enabled: false
+page_type: top
+title: 404 — signal lost
+description: This frequency does not respond. The page you tried to tune to does not exist.
+---
+<section class="section-page section-404">
+  <header class="section-header">
+    <h1 class="section-title">404 // no signal</h1>
+    <p class="section-description baffle-forever" aria-hidden="true">FREQUENCY_UNALLOCATED // DEAD_AIR // STATION_OFFLINE // TUNE_AGAIN</p>
+    <div class="section-intro">
+      <p>The frequency you tuned to does not respond. Could be the station went dark, maybe the operator got snatched by LMMC. Whatever it was, it's gone now.</p>
+    </div>
+  </header>
+
+  <ul class="post-list section-post-list">
+    {% for item in navigation %}
+      <li>
+        <article class="post-card">
+          <h2 class="post-card-title"><a href="{{ item.url }}">{{ item.title }}</a></h2>
+        </article>
+      </li>
+    {% endfor %}
+    <li>
+      <article class="post-card">
+        <h2 class="post-card-title"><a href="/search/">search</a></h2>
+      </article>
+    </li>
+  </ul>
+</section>

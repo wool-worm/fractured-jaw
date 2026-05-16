@@ -1,32 +1,62 @@
 ---
 layout: layouts/base.njk
 ---
-{# Per-author page (/authors/<slug>/). Receives `authorEntry` (a single item
-   from collections.authorList) via pagination. Posts are pre-grouped by
-   section in the order blog → essays → fragments → media. Mirrors
-   layouts/tag-page.njk. #}
+{# Per-author page (/authors/<slug>/). Comes from a real content file at
+   src/content/authors/<Name>.md — so `title`, `description`, `image`,
+   `tags`, and the rendered body are all driven by the author's
+   frontmatter + bio body.
 
-<section class="author-page author-{{ authorEntry.author }}">
-  <header class="page-header">
-    <h1 class="page-title">
-      Author: <span class="author-name">{{ authorEntry.displayName }}</span>
+   The post list is appended after the bio. Posts opt in via
+   `author: "[[authors/<Name>|alias]]"` (or an array of those wikilinks
+   for co-authored work). Display order is newest-first. Mirrors
+   layouts/series-page.njk in structure. #}
+
+{% set posts = collections.authorPosts[page.url] %}
+
+<article class="section-page author-page author-{{ page.fileSlug }}">
+  <header class="section-header">
+    {% if image %}
+      <img src="{{ image }}" alt="{{ image_alt or '' }}" class="series-hero" loading="lazy">
+    {% endif %}
+    <h1 class="section-title">
+      Author: <span class="author-name">{{ title }}</span>
     </h1>
-    <p class="author-meta">
-      {{ authorEntry.count }} post{% if authorEntry.count != 1 %}s{% endif %}
+    {% if description %}
+      <p class="section-description">{{ description }}</p>
+    {% endif %}
+    <p class="series-meta">
+      {% set count = posts.length or 0 %}
+      {{ count }} post{% if count != 1 %}s{% endif %}
       &middot; <a href="/authors/">all authors</a>
     </p>
+    {% if tags and tags.length %}
+      <ul class="tag-list series-tags">
+        {% for tag in tags %}
+          <li><a href="/tags/{{ tag | slug }}/">{{ tag }}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
   </header>
 
-  {% for group in authorEntry.bySection %}
-    <section class="author-section-group">
-      <h2 class="author-section-heading">
-        <a href="/{{ group.section }}/">{{ group.section }}</a>
-      </h2>
+  {% if content %}
+    <div class="series-intro">{{ content | safe }}</div>
+  {% endif %}
+
+  <section class="series-entries">
+    {% if posts and posts.length %}
       <ul class="post-list">
-        {% for post in group.posts %}
+        {% for post in posts %}
           {% include "partials/post-card.njk" %}
         {% endfor %}
       </ul>
-    </section>
-  {% endfor %}
-</section>
+    {% else %}
+      <p class="series-empty">No posts under this author yet.</p>
+    {% endif %}
+  </section>
+
+  <div class="feed-block">
+    {% set feedUrl = page.url + "feed.xml" %}
+    {% set feedLabel = "subscribe to this author (atom)" %}
+    {% include "partials/feed-icon.njk" %}
+  </div>
+</article>

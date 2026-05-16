@@ -100,6 +100,13 @@
 
   // Tokenize a raw query into structured terms. Quoted phrases stay intact;
   // a leading +/- on either a word or a quoted phrase sets its mode.
+  //
+  // Bare words are re-tokenized through the same /[a-z0-9]+/ split the index
+  // uses, so that a search like "wool-worm" expands into two same-mode
+  // terms (wool, worm) instead of looking for a literal token that the
+  // indexer would never produce. To match a hyphenated string as one unit,
+  // use quotes: "wool-worm" performs a substring search against the raw
+  // lowercase field.
   function parseQuery(raw) {
     var terms = [];
     if (!raw) return terms;
@@ -137,7 +144,18 @@
       }
       value = value.trim().toLowerCase();
       if (!value) continue;
-      terms.push({ mode: mode, phrase: isPhrase, value: value });
+      if (isPhrase) {
+        terms.push({ mode: mode, phrase: true, value: value });
+      } else {
+        // Re-tokenize bare words so multi-token values (hyphens, punctuation)
+        // expand into multiple terms that match index tokens. Each sub-token
+        // inherits the parent's mode: `+foo-bar` becomes `+foo +bar`,
+        // `-foo-bar` becomes `-foo -bar`, etc.
+        var subTokens = value.match(/[a-z0-9]+/g) || [];
+        for (var st = 0; st < subTokens.length; st++) {
+          terms.push({ mode: mode, phrase: false, value: subTokens[st] });
+        }
+      }
     }
     return terms;
   }

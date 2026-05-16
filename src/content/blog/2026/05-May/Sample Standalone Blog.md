@@ -2,7 +2,7 @@
 title: Sample Standalone Blog
 date_published: 2026-05-14T08:00:00
 date_updated: 2026-05-16T12:18:16
-author: [wool-worm, another-author]
+author: ["[[authors/wool-worm|wool-worm]]", "[[authors/another-author|another-author]]"]
 tags: [signals, broadcast, theory]
 series_name:
 description: Co-authored standalone blog post. Not part of any series; useful as a reference for cross-byline blog formatting.

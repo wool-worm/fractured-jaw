@@ -2,7 +2,7 @@
 title: Notes On A Machine Listening Practice
 date_published: 2026-05-11T14:00:00
 date_updated: 2026-05-16T15:18:26
-author: wool-worm
+author: "[[authors/wool-worm|wool-worm]]"
 tags: [field-notes, theory, machine-listening, hauntology]
 series_name: "[[series/Field Notes|Field Notes]]"
 description: "Second entry. What it means to listen to a transmission you weren't meant to hear, and what changes when the listener is partly mechanical."

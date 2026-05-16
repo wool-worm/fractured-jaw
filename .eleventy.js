@@ -16,10 +16,16 @@ const {
 } = require("./src/utils/frontmatter");
 const wikilinkPlugin = require("./src/utils/wikilinks");
 const { parseSeriesField } = require("./src/utils/series");
+const {
+  parseAuthorField,
+  resolveAuthors,
+  indexAuthorsByUrl,
+} = require("./src/utils/authors");
 const { reportIssue, flush: flushBuildReport } = require("./src/utils/build-report");
 
 const CONTENT_ROOT = "src/content";
 const SERIES_GLOB = "src/content/series/**/*.md";
+const AUTHORS_GLOB = "src/content/authors/**/*.md";
 
 // Glob patterns that match every published content file.
 const CONTENT_GLOBS = CONTENT_SECTIONS.map(
@@ -117,6 +123,28 @@ module.exports = function (eleventyConfig) {
     return null;
   });
 
+  // Resolve an `author` frontmatter value (string OR string[] of
+  // "[[authors/<Name>|alias]]" wikilinks) into an array of display records
+  // pulled from collections.authors. Drops entries that didn't parse or
+  // didn't resolve — the validator inside the `authorPosts` collection
+  // below has already reported those, so this filter stays silent to
+  // avoid double-reporting.
+  //
+  // Each returned record: { slug, displayName, url, image, image_alt }.
+  // Templates iterate and read .displayName + .url for bylines.
+  eleventyConfig.addFilter("authorEntries", (rawAuthor, authorsCollection) => {
+    const parsed = parseAuthorField(rawAuthor, CONTENT_ROOT);
+    return resolveAuthors(parsed, authorsCollection);
+  });
+
+  // Look up a single author record by its URL (e.g. "/authors/wool-worm/").
+  // Used by the author-page layout to fetch the page's own record when
+  // rendering the author header. Returns null when no match.
+  eleventyConfig.addFilter("authorByUrl", (authorsCollection, url) => {
+    if (!Array.isArray(authorsCollection) || !url) return null;
+    return authorsCollection.find((item) => item.url === url) || null;
+  });
+
   // ---------- Collections ----------
 
   // One collection per section, sorted newest-first by date_published.
@@ -139,13 +167,15 @@ module.exports = function (eleventyConfig) {
 
   // Everything wikilink-targetable: content posts + top-level pages
   // (about, index, blog/essays/fragments/media landings, tags index) +
-  // series parents (so [[series/Transmissions|…]] previews on hover).
-  // Used by src/preview-index.11ty.js to generate /preview-index.json.
+  // series parents + author records (so [[series/…|…]] and
+  // [[authors/…|…]] previews on hover). Used by
+  // src/preview-index.11ty.js to generate /preview-index.json.
   eleventyConfig.addCollection("previewable", (api) => {
     return api.getFilteredByGlob([
       ...CONTENT_GLOBS,
       "src/content/pages/**/*.md",
       SERIES_GLOB,
+      AUTHORS_GLOB,
     ]);
   });
 
@@ -217,66 +247,90 @@ module.exports = function (eleventyConfig) {
     });
   });
 
-  // Author index: every unique author (case-normalized) with the posts that
-  // carry it. Same shape as tagList. `author` frontmatter accepts a string
-  // OR a string[] (for co-authored / guest posts), normalized the same way
-  // as tags. Series parents are intentionally excluded — the author field on
-  // a parent is bookkeeping, not authorship of an entry.
-  eleventyConfig.addCollection("authorList", (api) => {
-    const all = api.getFilteredByGlob(CONTENT_GLOBS);
-    const map = new Map();
-    for (const item of all) {
-      const raw = item.data.author;
-      const list = Array.isArray(raw) ? raw : raw ? [raw] : [];
-      for (const author of list) {
-        const key = slugify(String(author));
-        if (!key) continue;
-        if (!map.has(key)) {
-          map.set(key, {
-            author: key,
-            displayName: String(author),
-            count: 0,
-            posts: [],
-          });
-        }
-        const entry = map.get(key);
-        entry.count++;
-        entry.posts.push(item);
-      }
-    }
-    const SECTION_ORDER = ["blog", "essays", "fragments", "media"];
-    for (const entry of map.values()) {
-      entry.posts.sort(byDatePublishedDesc);
-      // Newest post drives the "last published" timestamp; posts are already
-      // sorted newest-first above, so it's just posts[0].
-      entry.lastPublished =
-        (entry.posts[0] && entry.posts[0].data.date_published) || null;
-
-      const groups = new Map();
-      for (const post of entry.posts) {
-        const section = (post.data && post.data.section) || "other";
-        if (!groups.has(section)) groups.set(section, []);
-        groups.get(section).push(post);
-      }
-      entry.bySection = [];
-      for (const s of SECTION_ORDER) {
-        if (groups.has(s)) {
-          entry.bySection.push({ section: s, posts: groups.get(s) });
-          groups.delete(s);
-        }
-      }
-      const leftovers = [...groups.entries()].sort(([a], [b]) =>
-        a.localeCompare(b)
-      );
-      for (const [section, posts] of leftovers) {
-        entry.bySection.push({ section, posts });
-      }
-    }
-    // Sort by post count descending; tiebreak alphabetically by slug.
-    return [...map.values()].sort((a, b) => {
-      if (a.count !== b.count) return b.count - a.count;
-      return a.author.localeCompare(b.author);
+  // Author records — each file at src/content/authors/<Name>.md is a real,
+  // navigable author page (/authors/<slug>/) with full frontmatter (title
+  // = display name, description, optional image) and an optional bio body.
+  // Mirrors the `series` collection shape. Sorted alphabetically by slug
+  // so /authors/ renders in a stable order regardless of join date.
+  eleventyConfig.addCollection("authors", (api) => {
+    const items = api.getFilteredByGlob(AUTHORS_GLOB);
+    validateCollection(items, "authors");
+    detectCollisions(items, "authors");
+    return [...items].sort((a, b) => {
+      const an = (a.data && a.data.title) || "";
+      const bn = (b.data && b.data.title) || "";
+      return String(an).localeCompare(String(bn));
     });
+  });
+
+  // Membership map: author URL → array of posts authored, newest-first.
+  // Posts opt in via `author: "[[authors/<Name>|alias]]"` (or an array of
+  // such wikilinks for co-authored work). Parallel to seriesEntries, but
+  // a post can appear under multiple authors, and there is no
+  // entry-number concept — authors don't sequence their own work.
+  //
+  // Side effect: emits build warnings for posts whose `author` field is
+  // bare-string, malformed, points at a missing author file, or points at
+  // a draft author. Each bad entry inside an array is reported individually
+  // so the writer sees every issue in one pass.
+  eleventyConfig.addCollection("authorPosts", (api) => {
+    const posts = api.getFilteredByGlob(CONTENT_GLOBS);
+    const byUrl = new Map();
+
+    for (const post of posts) {
+      const parsed = parseAuthorField(post.data.author, CONTENT_ROOT);
+      if (parsed.kind === "empty") continue;
+
+      const ctx = {
+        file: post.inputPath,
+        isDraft: post.data.draft === true,
+        isExcluded: post.data.exclude === true,
+      };
+
+      for (const entry of parsed.entries) {
+        if (entry.kind === "bareString") {
+          reportIssue({
+            kind: "author",
+            file: ctx.file,
+            offending: `author entry: ${entry.offending}`,
+            reason: "must be a wikilink (\"[[authors/<Name>|alias]]\"); bare strings are not allowed (and YAML requires the wikilink be quoted)",
+            isDraft: ctx.isDraft,
+            isExcluded: ctx.isExcluded,
+          });
+          continue;
+        }
+
+        if (entry.kind === "deadWikilink") {
+          reportIssue({
+            kind: "author",
+            file: ctx.file,
+            offending: `author entry: [[${entry.vaultPath}]]`,
+            reason: entry.reason,
+            isDraft: ctx.isDraft,
+            isExcluded: ctx.isExcluded,
+          });
+          continue;
+        }
+
+        // kind === "wikilink": resolved and target exists. Add the post
+        // under that author's URL.
+        if (!byUrl.has(entry.url)) byUrl.set(entry.url, []);
+        const list = byUrl.get(entry.url);
+        if (!list.includes(post)) list.push(post);
+      }
+    }
+
+    // Sort each author's posts newest-first by date_published, with
+    // inputPath as a deterministic tiebreaker.
+    const result = {};
+    for (const [url, group] of byUrl.entries()) {
+      result[url] = [...group].sort((a, b) => {
+        const da = toMillis(b.data.date_published) - toMillis(a.data.date_published);
+        if (da !== 0) return da;
+        return String(a.inputPath).localeCompare(String(b.inputPath));
+      });
+    }
+    return result;
   });
 
   // Series parents — each file at src/content/series/<Name>.md is a real,

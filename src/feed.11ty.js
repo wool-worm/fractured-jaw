@@ -7,6 +7,7 @@
 
 const { DateTime } = require("luxon");
 const { renderAtomFeed } = require("./utils/atom-feed");
+const { indexAuthorsByUrl } = require("./utils/authors");
 
 // Cap the number of entries per feed. Most readers display 20-50 anyway,
 // and an unbounded feed grows linearly with the archive. 50 is a comfortable
@@ -41,6 +42,7 @@ class Feed {
       pageUrl: feed.pageUrl,
       items,
       defaultAuthor: site.defaultAuthor,
+      authorsByUrl: indexAuthorsByUrl(collections && collections.authors),
     });
   }
 }

@@ -1,10 +1,13 @@
 name: Deploy to GitHub Pages
 
+# Pushes to `main` build AND deploy. Pushes to `dev` (including merge commits
+# from feature branches) build only, so dev's build health is visible without
+# touching production. Pull requests into either branch build only.
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
   workflow_dispatch:
 
 permissions:
@@ -45,7 +48,9 @@ jobs:
 
   deploy:
     needs: build
-    if: github.event_name != 'pull_request'
+    # Deploy only on main pushes (and manual dispatches against main).
+    # PR builds and dev builds stop after the artifact upload.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

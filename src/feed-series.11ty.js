@@ -7,6 +7,7 @@
 // `series_name:` frontmatter resolves to that parent, newest first.
 
 const { renderAtomFeed } = require("./utils/atom-feed");
+const { indexAuthorsByUrl } = require("./utils/authors");
 
 const MAX_ENTRIES = 50;
 
@@ -48,6 +49,7 @@ class FeedSeries {
       pageUrl: parent.url,
       items,
       defaultAuthor: site.defaultAuthor,
+      authorsByUrl: indexAuthorsByUrl(collections && collections.authors),
     });
   }
 }
