@@ -12,6 +12,4 @@ graph_enabled: true
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
 
-Field Notes is the longest-running thread on this site. Entries take whatever shape suits the moment: a blog log when there's room to think out loud, an essay when the thinking demands it, a fragment when the signal cuts out before the sentence finishes. The thread holds them together.
-
-Read in order if you want the arc. Read out of order if you want the static.
+Morbi sodales enim arcu, a accumsan arcu euismod ac. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed vitae elit et ligula commodo interdum a id ante. Etiam convallis neque vitae ligula facilisis, eu auctor lectus porta. Fusce eget tincidunt nisi. Morbi fermentum augue turpis, eu finibus purus varius at. In iaculis dignissim fringilla.

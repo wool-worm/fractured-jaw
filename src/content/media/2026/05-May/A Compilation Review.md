@@ -1,7 +1,7 @@
 ---
 title: A Compilation Review
 date_published: 2026-05-16T09:00:00
-date_updated: 2026-05-16T13:46:14
+date_updated: 2026-05-16T15:24:27
 author: wool-worm
 tags: [music, review, hauntology]
 series_name:
@@ -12,13 +12,15 @@ exclude: false
 preview_enabled: true
 graph_enabled: true
 image:
-reading_time: 1 min
+reading_time: 2 min
 rating: 4
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
 
-The compilation under review here doesn't exist. Treat the writeup as a layout reference: the media section uses the same post body as everything else, plus a rating slot in the post-meta header. Ratings here are free-form, not enforced to a scale, so 4 out of whatever you want it to be out of.
+Mauris at turpis ex. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In suscipit justo eget eros finibus, non fermentum lectus pretium. Duis varius purus vel diam convallis, vitae condimentum leo semper. Nullam pellentesque nunc in nunc vestibulum, rhoncus convallis libero consequat. Vivamus ullamcorper arcu et vestibulum suscipit. Phasellus nec odio eget nisl lacinia iaculis. Vestibulum euismod ipsum nibh, suscipit placerat purus bibendum ut. Morbi pretium dolor diam, a maximus metus dapibus vel. Curabitur vitae sapien nec lacus vestibulum auctor. Proin a nunc porttitor, bibendum velit non, interdum mi. Vestibulum nec faucibus urna. Maecenas at metus aliquet, laoreet tortor sed, bibendum justo. Nunc vitae risus sed arcu commodo feugiat et sagittis lacus.
 
-A real review would say something about what the record sounds like, what tradition it sits inside, whether the sequencing earns its length, and what it doesn't try to do. Pretend this one did.
+Donec a quam orci. Duis non risus sit amet lorem efficitur faucibus nec vitae sapien. Etiam rutrum sed metus ut tincidunt. Nullam vehicula mi vitae dui bibendum, eu pulvinar magna facilisis. Donec eget vulputate ligula. Aliquam erat volutpat. Vestibulum in erat leo. Nullam velit sem, porttitor ut fermentum eleifend, varius eget diam. Nulla ac posuere enim. Vestibulum est ante, egestas in [[essays/2026/05-May/Notes On A Machine Listening Practice|Notes On A Machine Listening Practice]] quis, volutpat ut tortor.
 
-Adjacent reading: [[essays/2026/05-May/Notes On A Machine Listening Practice|the machine-listening essay]] tries to articulate the question this review is dancing around.
+Morbi sodales enim arcu, a accumsan arcu euismod ac. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed vitae elit et ligula commodo interdum a id ante. Etiam convallis neque vitae ligula facilisis, eu auctor lectus porta. Fusce eget tincidunt nisi. Morbi fermentum augue turpis, eu finibus purus varius at. In iaculis dignissim fringilla.
+
+![[_attachments/blog/sample-standalone-blog/image.png|Pirate Radio|400]]
