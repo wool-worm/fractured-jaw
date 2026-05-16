@@ -16,7 +16,7 @@
 const fs = require("fs");
 const path = require("path");
 const { computePermalink, extractSection, vaultPathToAttachmentUrl, VAULT_ATTACHMENT_DIR } = require("../utils/permalink");
-const { reportIssue } = require("../utils/wikilink-report");
+const { reportIssue } = require("../utils/build-report");
 
 const isProduction = process.env.ELEVENTY_ENV === "production";
 

@@ -16,7 +16,7 @@ const {
 } = require("./src/utils/frontmatter");
 const wikilinkPlugin = require("./src/utils/wikilinks");
 const { parseSeriesField } = require("./src/utils/series");
-const { reportIssue } = require("./src/utils/wikilink-report");
+const { reportIssue, flush: flushBuildReport } = require("./src/utils/build-report");
 
 const CONTENT_ROOT = "src/content";
 const SERIES_GLOB = "src/content/series/**/*.md";
@@ -27,6 +27,18 @@ const CONTENT_GLOBS = CONTENT_SECTIONS.map(
 );
 
 module.exports = function (eleventyConfig) {
+  // ---------- Build-issue aggregation ----------
+
+  // Every reportIssue() call across the build that resolves to fatal
+  // severity gets collected in src/utils/build-report.js's
+  // pendingFatalErrors. After Eleventy finishes its render pass, we
+  // flush — throwing a single aggregated Error with every blocking
+  // issue from this build so the writer can fix them all in one pass
+  // rather than fix-build-fix-build cycling on the first one.
+  // Files are still written to _site/ before flush throws; that's
+  // harmless because the npm script exits non-zero and CI gates on it.
+  eleventyConfig.on("eleventy.after", () => flushBuildReport());
+
   // ---------- Markdown ----------
 
   // Extend Eleventy's bundled markdown-it instance with our wikilink plugin

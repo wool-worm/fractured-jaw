@@ -49,7 +49,7 @@
 const fs = require("fs");
 const path = require("path");
 const { vaultPathToUrl, vaultPathToAttachmentUrl, VAULT_ATTACHMENT_DIR } = require("./permalink");
-const { reportIssue } = require("./wikilink-report");
+const { reportIssue } = require("./build-report");
 
 const OPEN = 0x5b; // [
 const BANG = 0x21; // !
