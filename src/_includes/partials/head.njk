@@ -3,10 +3,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% if title and title != site.title %}{{ title }} :: {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
 <meta name="description" content="{{ description or site.description }}">
-{# HTML5 <meta name="author"> is single-valued. For array authors, join with
-   commas so the meta tag holds the full byline as one string. #}
-{% set _headAuthors = (author or site.defaultAuthor) | asList %}
-<meta name="author" content="{{ _headAuthors | join(', ') }}">
+{# HTML5 <meta name="author"> is single-valued. For array authors, join
+   with commas so the meta tag holds the full byline as one string.
+   Wikilink `author:` frontmatter is resolved to display names via the
+   `authorEntries` filter (see .eleventy.js). When `author:` is empty,
+   site.defaultAuthor (also a wikilink) is used. #}
+{% set _headAuthors = (author or site.defaultAuthor) | authorEntries(collections.authors) %}
+{% if _headAuthors.length %}
+<meta name="author" content="{% for a in _headAuthors %}{{ a.displayName }}{% if not loop.last %}, {% endif %}{% endfor %}">
+{% endif %}
 
 {# Social-card image. Open Graph and Twitter both require absolute URLs, so
    relative paths from frontmatter (e.g. /attachments/...) and the site-wide
@@ -45,5 +50,8 @@
 <link rel="alternate" type="application/atom+xml" href="{{ f.feedUrl }}" title="{{ f.title }}">
 {% endif %}{% endfor %}
 {% if section == "series" and page.url != "/series/" %}
+<link rel="alternate" type="application/atom+xml" href="{{ page.url }}feed.xml" title="{{ site.title }} — {{ title }}">
+{% endif %}
+{% if section == "authors" and page.url != "/authors/" %}
 <link rel="alternate" type="application/atom+xml" href="{{ page.url }}feed.xml" title="{{ site.title }} — {{ title }}">
 {% endif %}

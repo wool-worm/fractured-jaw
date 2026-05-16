@@ -2,7 +2,7 @@
 title: Static Between Stations
 date_published: 2026-05-13T16:00:00
 date_updated: 2026-05-16T13:46:08
-author: wool-worm
+author: "[[authors/wool-worm|wool-worm]]"
 tags: [field-notes, errata, signals]
 series_name: "[[series/Field Notes|Field Notes]]"
 description: Third entry. A note from the gap between two known channels. Not yet a thought.

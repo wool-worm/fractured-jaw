@@ -145,6 +145,7 @@ const LAYOUT_BY_SECTION = {
   media: "layouts/media.njk",
   pages: "layouts/page.njk",
   series: "layouts/series-page.njk",
+  authors: "layouts/author-page.njk",
 };
 
 function shouldExclude(data) {
@@ -192,9 +193,10 @@ module.exports = {
     page_type: (data) => {
       if (data.page_type) return data.page_type;
       const section = extractSection(data.page && data.page.filePathStem);
-      // pages/ and series/ are navigational hubs — global graph view.
-      // Everything else (blog/essays/fragments/media) pins the current node.
-      if (section === "pages" || section === "series") return "top";
+      // pages/, series/, and authors/ are navigational hubs — global
+      // graph view. Everything else (blog/essays/fragments/media) pins
+      // the current node.
+      if (section === "pages" || section === "series" || section === "authors") return "top";
       return "content";
     },
     // Resolve the frontmatter `image:` field once, before any template

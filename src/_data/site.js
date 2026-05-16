@@ -7,7 +7,9 @@ module.exports = {
   url: "https://fractured-jaw.com",
   language: "en",
   // Default author shown when a post's frontmatter doesn't override it.
-  defaultAuthor: "wool-worm",
+  // Wikilink form — resolved through the `authors` collection so the
+  // display name comes from the author file's `title:` frontmatter.
+  defaultAuthor: "[[authors/wool-worm|wool-worm]]",
   // Fallback social-card image for pages without per-post frontmatter `image:`.
   // Path is site-absolute; head.njk prefixes site.url to produce a fully
   // qualified URL (Open Graph requires absolute URLs).
