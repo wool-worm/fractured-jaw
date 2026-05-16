@@ -332,13 +332,6 @@
   margin-bottom: var(--sp-md);
 }
 
-.series-description {
-  font-size: 1rem;
-  color: var(--bone);
-  max-width: 65ch;
-  margin-bottom: var(--sp-sm);
-}
-
 .series-tags {
   margin-top: var(--sp-sm);
 }

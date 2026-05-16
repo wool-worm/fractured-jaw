@@ -12,16 +12,16 @@ layout: layouts/base.njk
 
 {% set entries = collections.seriesEntries[page.url] %}
 
-<article class="series-page series-{{ page.fileSlug }}">
-  <header class="page-header">
+<article class="section-page series-page series-{{ page.fileSlug }}">
+  <header class="section-header">
     {% if image %}
       <img src="{{ image }}" alt="" class="series-hero" loading="lazy">
     {% endif %}
-    <h1 class="page-title">
+    <h1 class="section-title">
       Series: <span class="series-name">{{ title }}</span>
     </h1>
     {% if description %}
-      <p class="series-description">{{ description }}</p>
+      <p class="section-description">{{ description }}</p>
     {% endif %}
     <p class="series-meta">
       {% set count = entries.length or 0 %}

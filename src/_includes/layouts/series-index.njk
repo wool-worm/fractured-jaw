@@ -5,14 +5,14 @@ layout: layouts/base.njk
    file at src/content/series/<Name>.md) as a vertical card in a
    three-column grid. Series are pre-sorted newest-first by .eleventy.js. #}
 
-<section class="series-index">
-  <header class="page-header">
-    <h1 class="page-title">{{ title or "Series" }}</h1>
+<section class="section-page section-series">
+  <header class="section-header">
+    <h1 class="section-title">{{ title or "Series" }}</h1>
     {% if description %}
-      <p>{{ description }}</p>
+      <p class="section-description">{{ description }}</p>
     {% endif %}
     {% if content %}
-      <div class="page-intro">{{ content | safe }}</div>
+      <div class="section-intro">{{ content | safe }}</div>
     {% endif %}
   </header>
 
