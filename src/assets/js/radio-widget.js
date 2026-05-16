@@ -453,19 +453,45 @@
     saveFoldedState();
   }
 
-  function restoreFoldedState() {
-    var stored = loadFoldedState();
-    if (stored === folded) return;
-    folded = stored;
-    // Disable the transform transition for this single restore so
-    // the widget appears already-folded on page load rather than
-    // visibly sliding from unfolded → folded. Inline `transition:
-    // none` overrides the CSS rule; clearing the inline style next
-    // frame restores the CSS-defined transition for user gestures.
-    shell.style.transition = "none";
-    applyFoldDOM();
-    void shell.offsetWidth;  // force a synchronous reflow
-    requestAnimationFrame(function () { shell.style.transition = ""; });
+  // Auto-fold viewport range. While the viewport is in this range the
+  // widget is forced folded regardless of the localStorage preference,
+  // because at narrow desktop / tablet widths the unfolded panel
+  // overlaps the main column. Outside the range, the widget falls back
+  // to the user's stored choice. matchMedia gives us instant change
+  // events so we don't need a resize listener.
+  var AUTOFOLD_MQ = window.matchMedia(
+    "(max-width: 1100px) and (min-width: 721px)"
+  );
+
+  function targetFoldState() {
+    return AUTOFOLD_MQ.matches ? true : loadFoldedState();
+  }
+
+  // Sync folded → target. Called at boot (skipTransition=true so the
+  // widget appears already-folded rather than sliding from its rendered
+  // unfolded position) and on every matchMedia change. User button
+  // clicks bypass this and go through setFolded() instead, so manual
+  // clicks in the auto-fold zone still persist + immediately unfold for
+  // peek-ability.
+  function syncFoldedState(skipTransition) {
+    var target = targetFoldState();
+    if (target === folded) return;
+    folded = target;
+    if (skipTransition) {
+      shell.style.transition = "none";
+      applyFoldDOM();
+      void shell.offsetWidth;  // force a synchronous reflow
+      requestAnimationFrame(function () { shell.style.transition = ""; });
+    } else {
+      applyFoldDOM();
+    }
+  }
+
+  function onAutofoldMQChange() { syncFoldedState(false); }
+  if (AUTOFOLD_MQ.addEventListener) {
+    AUTOFOLD_MQ.addEventListener("change", onAutofoldMQChange);
+  } else if (AUTOFOLD_MQ.addListener) {
+    AUTOFOLD_MQ.addListener(onAutofoldMQChange);
   }
 
   // ── Audio engine ────────────────────────────────────────────────────────
@@ -1794,10 +1820,13 @@
     setupListeners();
     updateReadout();
     draw();
-    // Restore the saved fold state before any voice-data work so
-    // the widget renders already-folded if the user had folded it
-    // on the previous page.
-    restoreFoldedState();
+    // Resolve fold state before any voice-data work so the widget
+    // renders in the right state (already-folded with no slide if the
+    // user had folded it on the previous page, or auto-folded with no
+    // slide if the viewport is currently in the auto-fold zone).
+    // skipTransition=true suppresses the CSS transform animation on
+    // this initial application.
+    syncFoldedState(true);
     // Restore the saved tuner state (band, index, powered, trawling)
     // so the visitor lands on the same channel they were on. Audio
     // will be suspended until they next interact with the page —

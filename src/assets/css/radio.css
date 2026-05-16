@@ -257,21 +257,11 @@
   text-align: center;
 }
 
-/* Auto-fold in the medium zone (721–1100px) — matches the graph + systems
-   widgets. Widget translates to the edge so only the fold-button strip is
-   visible. Fold button is non-interactive in this zone; user resizes past
-   1100px to interact. Above 1100px the user's manual fold state (in
-   localStorage) takes over. Audio keeps playing when auto-folded — only
-   the UI hides. */
-@media (max-width: 1100px) and (min-width: 721px) {
-  .radio-widget {
-    transform: translateX(calc(100% - 1.4rem));
-  }
-  .radio-widget-fold {
-    pointer-events: none;
-    cursor: default;
-  }
-}
+/* Auto-fold in the medium zone is driven by JS (matchMedia) in
+   radio-widget.js — see syncFoldedState(). The JS toggles .is-folded
+   so the fold button's state (» vs «) stays in sync with the visual.
+   Click-to-peek works in the auto-fold zone too. Audio keeps playing
+   when folded — only the UI hides. */
 
 /* Hide widget below 720px — matches the graph widget's breakpoint. */
 @media (max-width: 720px) {

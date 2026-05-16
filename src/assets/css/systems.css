@@ -423,24 +423,10 @@ body.is-encryption-failure .systems-failure-banner {
   font-size: 0.55rem;
 }
 
-/* ── Auto-fold in the medium-wide zone (1001–1400px) ────────────────────── */
-/* Systems widget folds earlier than graph + radio because at ~1400px its
-   left edge starts crowding the main column (100ch ≈ 800px, centered).
-   Widget slides leftward to the edge, leaving only the fold-button strip
-   visible. Chained translateY(-50%) preserves vertical centering.
-   Fold button is non-interactive in this zone; resize past 1400px to
-   interact. Above 1400px the user's manual fold state (localStorage)
-   takes over. */
-
-@media (max-width: 1400px) and (min-width: 1001px) {
-  .systems-widget {
-    transform: translateY(-50%) translateX(calc(-100% + 1.4rem));
-  }
-  .systems-widget-fold {
-    pointer-events: none;
-    cursor: default;
-  }
-}
+/* Auto-fold in the medium-wide zone (1001–1400px) is driven by JS
+   (matchMedia) in systems-widget.js — see syncFoldedState(). The JS
+   toggles .is-folded so the fold button's state (« vs ») stays in sync
+   with the visual. Click-to-peek works in the auto-fold zone too. */
 
 /* ── Hide below 1000px ──────────────────────────────────────────────────── */
 /* Systems hides earlier than graph + radio. Even folded it would still

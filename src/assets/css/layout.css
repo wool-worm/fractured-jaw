@@ -252,7 +252,7 @@ main {
    line. Hamburger button stays hidden in this zone (handled below 720px).
    Achieved with flex-wrap on the header + flex: 0 0 100% on the nav,
    which forces the nav onto its own line below the skull + masthead. */
-@media (max-width: 1100px) and (min-width: 721px) {
+@media (max-width: 1200px) and (min-width: 721px) {
   .site-header {
     flex-wrap: wrap;
     row-gap: var(--sp-xs);

@@ -454,13 +454,44 @@
     saveFoldedState();
   }
 
-  function restoreFoldedState() {
-    var stored = loadFoldedState();
-    if (stored === folded) return;
-    folded = stored;
-    shell.style.transition = "none";
-    applyFoldDOM();
-    requestAnimationFrame(function () { shell.style.transition = ""; });
+  // Auto-fold viewport range. While the viewport is in this range the
+  // widget is forced folded regardless of the localStorage preference,
+  // because at narrow desktop / tablet widths the unfolded panel
+  // overlaps the main column. Outside the range, the widget falls back
+  // to the user's stored choice. matchMedia gives us instant change
+  // events so we don't need a resize listener.
+  var AUTOFOLD_MQ = window.matchMedia(
+    "(max-width: 1100px) and (min-width: 721px)"
+  );
+
+  function targetFoldState() {
+    return AUTOFOLD_MQ.matches ? true : loadFoldedState();
+  }
+
+  // Sync folded → target. Called at boot (skipTransition=true so the
+  // widget appears already-folded rather than sliding from its rendered
+  // unfolded position) and on every matchMedia change. User button
+  // clicks bypass this and go through setFolded() instead, so manual
+  // clicks in the auto-fold zone still persist + immediately unfold for
+  // peek-ability.
+  function syncFoldedState(skipTransition) {
+    var target = targetFoldState();
+    if (target === folded) return;
+    folded = target;
+    if (skipTransition) {
+      shell.style.transition = "none";
+      applyFoldDOM();
+      requestAnimationFrame(function () { shell.style.transition = ""; });
+    } else {
+      applyFoldDOM();
+    }
+  }
+
+  function onAutofoldMQChange() { syncFoldedState(false); }
+  if (AUTOFOLD_MQ.addEventListener) {
+    AUTOFOLD_MQ.addEventListener("change", onAutofoldMQChange);
+  } else if (AUTOFOLD_MQ.addListener) {
+    AUTOFOLD_MQ.addListener(onAutofoldMQChange);
   }
 
   function setupListeners() {
@@ -491,16 +522,16 @@
   }
 
   function boot() {
-    // Wire fold button + restore saved state first, before any data
-    // work. setupListeners() only runs after the fetch resolves, so
-    // wiring fold here keeps it responsive even when the graph data
+    // Wire fold button + resolve initial fold state first, before any
+    // data work. setupListeners() only runs after the fetch resolves,
+    // so wiring fold here keeps it responsive even when the graph data
     // is slow to load.
     if (foldBtn) {
       foldBtn.addEventListener("click", function () {
         setFolded(!folded);
       });
     }
-    restoreFoldedState();
+    syncFoldedState(true);
     resize();
     fetch("/graph-data.json")
       .then(function (r) { return r.ok ? r.json() : null; })
