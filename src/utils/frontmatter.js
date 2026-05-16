@@ -5,7 +5,7 @@
 // so you notice you forgot, but the build still succeeds.
 
 const REQUIRED = ["title", "date_published"];
-const RECOMMENDED = ["author", "description_short"];
+const RECOMMENDED = ["author", "description"];
 const RECOMMENDED_FOR_MEDIA = ["rating"];
 
 // Check a single Eleventy collection item. Returns { errors, warnings }.

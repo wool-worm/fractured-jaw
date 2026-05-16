@@ -423,9 +423,17 @@ body.is-encryption-failure .systems-failure-banner {
   font-size: 0.55rem;
 }
 
-/* ── Responsive: hide below 720px (matches graph + radio widgets) ───────── */
+/* Auto-fold in the medium-wide zone (1001–1400px) is driven by JS
+   (matchMedia) in systems-widget.js — see syncFoldedState(). The JS
+   toggles .is-folded so the fold button's state (« vs ») stays in sync
+   with the visual. Click-to-peek works in the auto-fold zone too. */
 
-@media (max-width: 720px) {
+/* ── Hide below 1000px ──────────────────────────────────────────────────── */
+/* Systems hides earlier than graph + radio. Even folded it would still
+   crowd the narrower content column at <1000px, so we remove it entirely
+   here instead of leaving an edge tab. */
+
+@media (max-width: 1000px) {
   .systems-widget {
     display: none;
   }

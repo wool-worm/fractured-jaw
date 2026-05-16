@@ -1,11 +1,11 @@
 ---
 title: Test Album Review
 date_published: 2026-05-05T07:19:15
-date_updated: 2026-05-13T16:39:17
+date_updated: 2026-05-14T16:10:23
 author: wool-worm
 tags: [music, review]
-description_short: Scaffolding review used to confirm the media layout renders the rating field.
-description_long: Scaffolding review used to confirm that media posts produce /media/test-album-review/ and that the post-meta partial surfaces the rating frontmatter field.
+series_name:
+description: Scaffolding review used to confirm the media layout renders the rating field.
 featured: false
 draft: false
 exclude: false
@@ -13,7 +13,7 @@ preview_enabled: true
 graph_enabled: true
 image:
 reading_time: 1 min
-rating: 4/5
+rating: 4
 ---
 
 A placeholder review. Confirms:

@@ -286,8 +286,9 @@
 
   // ── Fold ────────────────────────────────────────────────────────────────
   // setFolded() persists the new state to localStorage so the panel
-  // stays folded across page navigation. restoreFoldedState() at boot
-  // reads it back and applies the saved state with the transform
+  // stays folded across page navigation. syncFoldedState() at boot
+  // resolves either the saved state OR a forced auto-fold (when the
+  // viewport is in the medium zone) and applies it with the transform
   // transition temporarily disabled, so the widget appears already-
   // folded rather than visibly sliding on every page load.
   var FOLD_STORAGE_KEY = "fj.systems-widget.folded";
@@ -325,19 +326,46 @@
     saveFoldedState();
   }
 
-  function restoreFoldedState() {
-    var stored = loadFoldedState();
-    if (stored === folded) return;
-    folded = stored;
-    // Disable the transform transition for this single restore so
-    // the widget appears already-folded on page load rather than
-    // visibly sliding from unfolded → folded. Inline `transition:
-    // none` overrides the CSS rule; clearing the inline style next
-    // frame restores the CSS-defined transition for user gestures.
-    shell.style.transition = "none";
-    applyFoldDOM();
-    void shell.offsetWidth;  // force a synchronous reflow
-    requestAnimationFrame(function () { shell.style.transition = ""; });
+  // Auto-fold viewport range. Systems folds earlier than the right-side
+  // widgets (1400 vs 1100) because as the widest left-side element it
+  // hits the main column first as the viewport narrows. While the
+  // viewport is in this range the widget is forced folded regardless of
+  // the localStorage preference. Outside the range, the widget falls
+  // back to the user's stored choice. matchMedia gives us instant change
+  // events so we don't need a resize listener.
+  var AUTOFOLD_MQ = window.matchMedia(
+    "(max-width: 1400px) and (min-width: 1001px)"
+  );
+
+  function targetFoldState() {
+    return AUTOFOLD_MQ.matches ? true : loadFoldedState();
+  }
+
+  // Sync folded → target. Called at boot (skipTransition=true so the
+  // widget appears already-folded rather than sliding from its rendered
+  // unfolded position) and on every matchMedia change. User button
+  // clicks bypass this and go through setFolded() instead, so manual
+  // clicks in the auto-fold zone still persist + immediately unfold for
+  // peek-ability.
+  function syncFoldedState(skipTransition) {
+    var target = targetFoldState();
+    if (target === folded) return;
+    folded = target;
+    if (skipTransition) {
+      shell.style.transition = "none";
+      applyFoldDOM();
+      void shell.offsetWidth;  // force a synchronous reflow
+      requestAnimationFrame(function () { shell.style.transition = ""; });
+    } else {
+      applyFoldDOM();
+    }
+  }
+
+  function onAutofoldMQChange() { syncFoldedState(false); }
+  if (AUTOFOLD_MQ.addEventListener) {
+    AUTOFOLD_MQ.addEventListener("change", onAutofoldMQChange);
+  } else if (AUTOFOLD_MQ.addListener) {
+    AUTOFOLD_MQ.addListener(onAutofoldMQChange);
   }
 
   if (foldBtn) {
@@ -426,10 +454,12 @@
 
   // ── Boot ────────────────────────────────────────────────────────────────
   function boot() {
-    // Restore the saved fold state first so the widget renders
-    // already-folded (no visible slide) if the user folded it on the
-    // previous page.
-    restoreFoldedState();
+    // Resolve fold state first so the widget renders in the right state
+    // (already-folded with no slide if the user had folded it on the
+    // previous page, or auto-folded with no slide if the viewport is
+    // currently in the auto-fold zone). skipTransition=true suppresses
+    // the CSS transform animation on this initial application.
+    syncFoldedState(true);
 
     rotateAntennas();
     setInterval(rotateAntennas, ANTENNA_TICK_MS);

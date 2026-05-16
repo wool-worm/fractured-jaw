@@ -257,6 +257,12 @@
   text-align: center;
 }
 
+/* Auto-fold in the medium zone is driven by JS (matchMedia) in
+   radio-widget.js — see syncFoldedState(). The JS toggles .is-folded
+   so the fold button's state (» vs «) stays in sync with the visual.
+   Click-to-peek works in the auto-fold zone too. Audio keeps playing
+   when folded — only the UI hides. */
+
 /* Hide widget below 720px — matches the graph widget's breakpoint. */
 @media (max-width: 720px) {
   .radio-widget {

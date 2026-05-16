@@ -1,0 +1,41 @@
+---
+# Site search results page. Lives outside src/content/ so the directory data
+# file there doesn't compute a content-style permalink for it. The shell is
+# rendered server-side; results are populated client-side by search.js from
+# /search-index.json based on the ?q= URL parameter.
+permalink: "/search/"
+layout: layouts/base.njk
+eleventyExcludeFromCollections: true
+graph_enabled: false
+page_type: top
+title: Search
+description: Search posts by title, tags, authors, description, and content.
+---
+<section class="section-page section-search">
+  <header class="section-header">
+    <h1 class="section-title">Search</h1>
+    <p class="section-description">
+      Search across titles, tags, authors, descriptions, and post content.
+      Use <code>+term</code> to require, <code>-term</code> to exclude,
+      <code>|term</code> for OR (default), and <code>"quoted phrase"</code> for exact phrases.
+    </p>
+
+    <form class="search-results-form" role="search" aria-label="Site search">
+      <label for="search-results-input" class="visually-hidden">Search query</label>
+      <input
+        id="search-results-input"
+        class="search-results-input"
+        type="search"
+        name="q"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder='try: cyberpunk +opera -racecar "battle hymn"'
+      >
+      <button type="submit" class="search-results-submit">Search</button>
+    </form>
+  </header>
+
+  <p class="search-status" data-search-status aria-live="polite"></p>
+
+  <ul class="post-list section-post-list" data-search-results hidden></ul>
+</section>

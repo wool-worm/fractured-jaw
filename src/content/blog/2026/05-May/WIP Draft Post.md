@@ -4,8 +4,8 @@ date_published: 2026-05-05T07:19:15
 date_updated: 2026-05-13T16:38:47
 author: wool-worm
 tags: []
-description_short: This post has draft:true. It should appear in `npm start` but NOT in `npm run build` (production).
-description_long:
+series_name:
+description: This post has draft:true. It should appear in `npm start` but NOT in `npm run build` (production).
 featured: false
 draft: true
 exclude: false

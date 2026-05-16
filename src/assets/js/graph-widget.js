@@ -410,6 +410,90 @@
     }
   }
 
+  // ── Fold ──────────────────────────────────────────────────────────────
+  // Mirrors the radio + systems widget fold pattern. setFolded() persists
+  // the new state to localStorage so the panel stays folded across page
+  // navigation. restoreFoldedState() at boot applies the saved state with
+  // the transform transition temporarily disabled, so the widget appears
+  // already-folded rather than visibly sliding on every page load.
+  var foldBtn = document.getElementById("graph-widget-fold");
+  var folded = false;
+  var FOLD_STORAGE_KEY = "fj.graph-widget.folded";
+
+  function applyFoldDOM() {
+    if (!foldBtn) return;
+    if (folded) {
+      shell.classList.add("is-folded");
+      foldBtn.textContent = "«";
+      foldBtn.setAttribute("aria-pressed", "true");
+      foldBtn.setAttribute("aria-label", "Unfold graph");
+      foldBtn.setAttribute("title", "Unfold graph");
+    } else {
+      shell.classList.remove("is-folded");
+      foldBtn.textContent = "»";
+      foldBtn.setAttribute("aria-pressed", "false");
+      foldBtn.setAttribute("aria-label", "Fold graph");
+      foldBtn.setAttribute("title", "Fold graph to right margin");
+    }
+  }
+
+  function saveFoldedState() {
+    try { localStorage.setItem(FOLD_STORAGE_KEY, folded ? "1" : "0"); }
+    catch (e) { /* private mode / quota — silently ignore */ }
+  }
+
+  function loadFoldedState() {
+    try { return localStorage.getItem(FOLD_STORAGE_KEY) === "1"; }
+    catch (e) { return false; }
+  }
+
+  function setFolded(next) {
+    if (next === folded) return;
+    folded = next;
+    applyFoldDOM();
+    saveFoldedState();
+  }
+
+  // Auto-fold viewport range. While the viewport is in this range the
+  // widget is forced folded regardless of the localStorage preference,
+  // because at narrow desktop / tablet widths the unfolded panel
+  // overlaps the main column. Outside the range, the widget falls back
+  // to the user's stored choice. matchMedia gives us instant change
+  // events so we don't need a resize listener.
+  var AUTOFOLD_MQ = window.matchMedia(
+    "(max-width: 1100px) and (min-width: 721px)"
+  );
+
+  function targetFoldState() {
+    return AUTOFOLD_MQ.matches ? true : loadFoldedState();
+  }
+
+  // Sync folded → target. Called at boot (skipTransition=true so the
+  // widget appears already-folded rather than sliding from its rendered
+  // unfolded position) and on every matchMedia change. User button
+  // clicks bypass this and go through setFolded() instead, so manual
+  // clicks in the auto-fold zone still persist + immediately unfold for
+  // peek-ability.
+  function syncFoldedState(skipTransition) {
+    var target = targetFoldState();
+    if (target === folded) return;
+    folded = target;
+    if (skipTransition) {
+      shell.style.transition = "none";
+      applyFoldDOM();
+      requestAnimationFrame(function () { shell.style.transition = ""; });
+    } else {
+      applyFoldDOM();
+    }
+  }
+
+  function onAutofoldMQChange() { syncFoldedState(false); }
+  if (AUTOFOLD_MQ.addEventListener) {
+    AUTOFOLD_MQ.addEventListener("change", onAutofoldMQChange);
+  } else if (AUTOFOLD_MQ.addListener) {
+    AUTOFOLD_MQ.addListener(onAutofoldMQChange);
+  }
+
   function setupListeners() {
     canvas.addEventListener("mousemove", function (e) {
       var pos = getPos(e);
@@ -438,6 +522,16 @@
   }
 
   function boot() {
+    // Wire fold button + resolve initial fold state first, before any
+    // data work. setupListeners() only runs after the fetch resolves,
+    // so wiring fold here keeps it responsive even when the graph data
+    // is slow to load.
+    if (foldBtn) {
+      foldBtn.addEventListener("click", function () {
+        setFolded(!folded);
+      });
+    }
+    syncFoldedState(true);
     resize();
     fetch("/graph-data.json")
       .then(function (r) { return r.ok ? r.json() : null; })

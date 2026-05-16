@@ -8,8 +8,8 @@ layout: layouts/base.njk
 
 <header class="page-header">
   <h1 class="page-title">{{ title }}</h1>
-  {% if description_short %}
-    <p>{{ description_short }}</p>
+  {% if description %}
+    <p>{{ description }}</p>
   {% endif %}
   {% if content %}
     <div class="page-intro">{{ content | safe }}</div>

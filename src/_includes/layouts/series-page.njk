@@ -2,9 +2,9 @@
 layout: layouts/base.njk
 ---
 {# Per-series page (/series/<slug>/). Comes from a real content file at
-   src/content/series/<Name>.md — so `title`, `description_short`,
-   `description_long`, `image`, `tags`, and the rendered body are all
-   driven by the parent's frontmatter + content.
+   src/content/series/<Name>.md — so `title`, `description`, `image`,
+   `tags`, and the rendered body are all driven by the parent's
+   frontmatter + content.
 
    The member-entries list is appended after the parent's body. Each
    entry's card title is prepended with "Entry #N: " (oldest in the
@@ -12,16 +12,16 @@ layout: layouts/base.njk
 
 {% set entries = collections.seriesEntries[page.url] %}
 
-<article class="series-page series-{{ page.fileSlug }}">
-  <header class="page-header">
+<article class="section-page series-page series-{{ page.fileSlug }}">
+  <header class="section-header">
     {% if image %}
       <img src="{{ image }}" alt="" class="series-hero" loading="lazy">
     {% endif %}
-    <h1 class="page-title">
+    <h1 class="section-title">
       Series: <span class="series-name">{{ title }}</span>
     </h1>
-    {% if description_short %}
-      <p class="series-description">{{ description_short }}</p>
+    {% if description %}
+      <p class="section-description">{{ description }}</p>
     {% endif %}
     <p class="series-meta">
       {% set count = entries.length or 0 %}
@@ -54,4 +54,10 @@ layout: layouts/base.njk
       <p class="series-empty">No entries in this series yet.</p>
     {% endif %}
   </section>
+
+  <div class="feed-block">
+    {% set feedUrl = page.url + "feed.xml" %}
+    {% set feedLabel = "subscribe to this series (atom)" %}
+    {% include "partials/feed-icon.njk" %}
+  </div>
 </article>
