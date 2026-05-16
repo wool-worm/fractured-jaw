@@ -106,7 +106,7 @@ Frontmatter (all sections):
 | `exclude`         | Boolean. Hidden in both dev and prod.                       |
 | `preview_enabled` | Boolean (default true). False = omit from wikilink hover.   |
 | `graph_enabled`   | Boolean (default true). False = omit from graph data.       |
-| `image`           | Wikilink to `_attachments/...` or absolute URL.             |
+| `image`           | Wikilink to `_attachments/<section>/<slug>/<file>` (required form). Caption after the pipe drives the alt text on cards + og:image. Bare URLs and bare strings are rejected by the strict validator. |
 | `reading_time`    | Auto-computed by an Obsidian plugin.                        |
 | `series_name`     | Wikilink to `[[series/<Name>|...]]` (optional).             |
 | `rating`          | Media section only. Free-form scale.                        |
