@@ -15,12 +15,12 @@
     </dd>
   {% endif %}
 
-  {% set _authors = (author or site.defaultAuthor) | asList %}
+  {% set _authors = (author or site.defaultAuthor) | authorEntries(collections.authors) %}
   {% if _authors.length %}
     <dt>By</dt>
     <dd>
       {% for a in _authors -%}
-        <a href="/authors/{{ a | slug }}/" class="author-link">{{ a }}</a>{% if not loop.last %}, {% endif %}
+        <a href="{{ a.url }}" class="author-link">{{ a.displayName }}</a>{% if not loop.last %}, {% endif %}
       {%- endfor %}
     </dd>
   {% endif %}

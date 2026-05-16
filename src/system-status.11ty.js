@@ -8,6 +8,9 @@
 // numbers come from this emitter.
 
 const fs = require("fs");
+const { parseAuthorField, resolveAuthors } = require("./utils/authors");
+
+const CONTENT_ROOT = "src/content";
 
 function readBody(inputPath) {
   try {
@@ -42,6 +45,7 @@ class SystemStatus {
 
   render({ collections }) {
     const items = (collections && collections.all_content) || [];
+    const authorsCollection = (collections && collections.authors) || [];
 
     let totalWords = 0;
     const authorCounts = {};
@@ -55,19 +59,15 @@ class SystemStatus {
       const body = readBody(item.inputPath);
       totalWords += countWords(body);
 
-      // Author tallies — empty / missing values bucket as "unknown".
-      // `author` may be a string OR a string[] (co-authored / guest posts);
-      // each named author gets a +1.
-      const rawAuthor = data.author;
-      const authorList = Array.isArray(rawAuthor)
-        ? rawAuthor
-        : rawAuthor
-        ? [rawAuthor]
-        : [];
-      const names = authorList
-        .map((a) => String(a).trim())
-        .filter(Boolean);
-      const bucket = names.length ? names : ["unknown"];
+      // Author tallies — resolve wikilink frontmatter through the authors
+      // collection so the bucket key matches the rendered display name.
+      // Posts with no resolvable author bucket as "unknown" so the widget
+      // never silently drops them.
+      const parsedAuthors = parseAuthorField(data.author, CONTENT_ROOT);
+      const resolved = resolveAuthors(parsedAuthors, authorsCollection);
+      const bucket = resolved.length
+        ? resolved.map((r) => r.displayName)
+        : ["unknown"];
       for (const author of bucket) {
         authorCounts[author] = (authorCounts[author] || 0) + 1;
       }

@@ -2,7 +2,7 @@
 title: Sample Standalone Essay
 date_published: 2026-05-14T15:00:00
 date_updated: 2026-05-16T13:45:55
-author: wool-worm
+author: "[[authors/wool-worm|wool-worm]]"
 tags: [theory, hauntology]
 series_name:
 description: A standalone essay. Cold-written. Not part of any series; useful as a layout reference for one-off long-form pieces.

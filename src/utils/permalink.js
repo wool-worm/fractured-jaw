@@ -13,7 +13,14 @@ const PAGES_SECTION = "pages";
 // or the all_content cross-section feed.
 const SERIES_SECTION = "series";
 
-const KNOWN_SECTIONS = [...CONTENT_SECTIONS, PAGES_SECTION, SERIES_SECTION];
+// "authors" mirrors series: each file at src/content/authors/<Name>.md is a
+// real author record with bio body + frontmatter (title = display name).
+// Routes to /authors/<slug>/. Kept out of CONTENT_SECTIONS so author files
+// don't appear in cross-section feeds or featured rows — they're navigation,
+// not authored entries themselves.
+const AUTHORS_SECTION = "authors";
+
+const KNOWN_SECTIONS = [...CONTENT_SECTIONS, PAGES_SECTION, SERIES_SECTION, AUTHORS_SECTION];
 
 // Attachments: stored at src/content/_attachments/ in the vault, served at
 // /attachments/ on the site (passthrough copy in .eleventy.js strips the
@@ -126,6 +133,7 @@ module.exports = {
   CONTENT_SECTIONS,
   PAGES_SECTION,
   SERIES_SECTION,
+  AUTHORS_SECTION,
   KNOWN_SECTIONS,
   VAULT_ATTACHMENT_DIR,
   URL_ATTACHMENT_DIR,

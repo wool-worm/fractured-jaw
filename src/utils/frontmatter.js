@@ -18,11 +18,16 @@ const RECOMMENDED_DEFAULT = ["author", "description"];
 // the individual posts carry the author bylines. Description still matters
 // because it appears in the series-card on the /series/ landing.
 const RECOMMENDED_FOR_SERIES = ["description"];
+// Author files ARE the author — checking for an `author:` field on an
+// author record would be circular. Description still matters because it
+// appears under the display name on the /authors/ index.
+const RECOMMENDED_FOR_AUTHORS = ["description"];
 const RECOMMENDED_FOR_MEDIA = ["rating"];
 
 function recommendedFieldsFor(inputPath) {
   if (!inputPath) return RECOMMENDED_DEFAULT;
   if (inputPath.includes("/series/")) return RECOMMENDED_FOR_SERIES;
+  if (inputPath.includes("/authors/")) return RECOMMENDED_FOR_AUTHORS;
   return RECOMMENDED_DEFAULT;
 }
 

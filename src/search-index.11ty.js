@@ -8,6 +8,9 @@
 // a permalink for it. The data() permalink wins.
 
 const slugify = require("./utils/slugify");
+const { parseAuthorField, resolveAuthors } = require("./utils/authors");
+
+const CONTENT_ROOT = "src/content";
 
 class SearchIndex {
   data() {
@@ -19,6 +22,7 @@ class SearchIndex {
 
   render({ collections }) {
     const items = (collections && collections.all_content) || [];
+    const authorsCollection = (collections && collections.authors) || [];
     const records = [];
 
     for (const item of items) {
@@ -32,7 +36,13 @@ class SearchIndex {
       const plain = stripHtml(rawHtml);
 
       const tags = toStringArray(data.tags);
-      const authors = toStringArray(data.author);
+      // Resolve `author` frontmatter (wikilink-only) to author display
+      // names + slugs. The same shape the index used to carry — the search
+      // runtime stays unchanged.
+      const parsedAuthors = parseAuthorField(data.author, CONTENT_ROOT);
+      const resolved = resolveAuthors(parsedAuthors, authorsCollection);
+      const authors = resolved.map((r) => r.displayName);
+      const authorSlugs = resolved.map((r) => r.slug);
       records.push({
         url: item.url,
         title: data.title || "",
@@ -42,7 +52,7 @@ class SearchIndex {
         // rules (underscore preservation, diacritic stripping) in JS.
         tagSlugs: tags.map((t) => slugify(t)),
         authors: authors,
-        authorSlugs: authors.map((a) => slugify(a)),
+        authorSlugs: authorSlugs,
         section: data.section || "",
         date: data.date_published || null,
         image: data.image || null,

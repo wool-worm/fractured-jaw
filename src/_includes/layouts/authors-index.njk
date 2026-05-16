@@ -1,9 +1,12 @@
 ---
 layout: layouts/base.njk
 ---
-{# Author index page (/authors/). Lists every author in collections.authorList
-   with a count and a link to the per-author page. Authors are pre-sorted
-   alphabetically by .eleventy.js. Mirrors layouts/tags-index.njk. #}
+{# Author index page (/authors/). Lists every author record in
+   collections.authors with a count derived from collections.authorPosts
+   and a link to the per-author page. Authors are pre-sorted alphabetically
+   by display name (title) in .eleventy.js. Mirrors layouts/series-index
+   structurally, but uses .author-cloud styling for compact tag-style
+   chips. #}
 
 <section class="authors-index">
   <header class="page-header">
@@ -16,15 +19,17 @@ layout: layouts/base.njk
     {% endif %}
   </header>
 
-  {% if collections.authorList.length %}
+  {% if collections.authors.length %}
     <ul class="author-cloud">
-      {% for entry in collections.authorList %}
+      {% for entry in collections.authors %}
+        {% set _posts = collections.authorPosts[entry.url] or [] %}
+        {% set _lastPublished = _posts[0].data.date_published if _posts.length else null %}
         <li>
-          <a href="/authors/{{ entry.author }}/" class="author-cloud-item">
-            <span class="author-cloud-name">{{ entry.displayName }}</span>
+          <a href="{{ entry.url }}" class="author-cloud-item">
+            <span class="author-cloud-name">{{ entry.data.title }}</span>
             <span class="author-cloud-count">
-              (posts: {{ entry.count }}, last published date:
-              {%- if entry.lastPublished %} {{ entry.lastPublished | humanDate("LL/dd/yyyy") }}{% else %} —{% endif %})
+              (posts: {{ _posts.length }}, last published date:
+              {%- if _lastPublished %} {{ _lastPublished | humanDate("LL/dd/yyyy") }}{% else %} &mdash;{% endif %})
             </span>
           </a>
         </li>

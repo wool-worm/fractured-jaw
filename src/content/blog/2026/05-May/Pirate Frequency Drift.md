@@ -1,11 +1,15 @@
 ---
 title: Pirate Frequency Drift
 date_published: 2026-05-09T10:00:00
-date_updated: 2026-05-16T12:16:30
-author: wool-worm
-tags: [field-notes, signals, broadcast]
+date_updated: 2026-05-16T16:50:22
+author:
+  - "[[authors/wool-worm|wool-worm]]"
+tags:
+  - field-notes
+  - signals
+  - broadcast
 series_name: "[[series/Field Notes|Field Notes]]"
-description: "First entry. The unlicensed band keeps wandering. Notes on a station that won't stay put on the dial."
+description: First entry. The unlicensed band keeps wandering. Notes on a station that won't stay put on the dial.
 featured: true
 draft: false
 exclude: false
