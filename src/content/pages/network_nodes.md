@@ -7,4 +7,6 @@ graph_enabled: false
 preview_enabled: false
 ---
 
+A force-directed map of every post, edged by the wikilinks between them and (in tag mode) the tags they share. The site sideways. Less a navigation tool than an excuse to wander.
+
 Drag a node to pin it. Click to navigate.
