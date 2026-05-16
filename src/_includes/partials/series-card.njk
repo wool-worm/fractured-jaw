@@ -13,7 +13,7 @@
   <article>
     {% if parent.data.image %}
       <a href="{{ parent.url }}" class="series-card-image-link" tabindex="-1" aria-hidden="true">
-        <img src="{{ parent.data.image }}" alt="" class="series-card-image" loading="lazy">
+        <img src="{{ parent.data.image }}" alt="{{ parent.data.image_alt or '' }}" class="series-card-image" loading="lazy">
       </a>
     {% endif %}
     <h2 class="series-card-title">

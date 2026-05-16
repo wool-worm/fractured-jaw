@@ -1,10 +1,10 @@
 [
-  { "title": "Home",          "url": "/" },
-  { "title": "Blog",          "url": "/blog/" },
-  { "title": "Essays",        "url": "/essays/" },
-  { "title": "Fragments",     "url": "/fragments/" },
-  { "title": "Media",         "url": "/media/" },
+  { "title": "home",          "url": "/" },
+  { "title": "blog",          "url": "/blog/" },
+  { "title": "essays",        "url": "/essays/" },
+  { "title": "fragments",     "url": "/fragments/" },
+  { "title": "media",         "url": "/media/" },
   { "title": "series",        "url": "/series/" },
   { "title": "network_nodes", "url": "/network_nodes/" },
-  { "title": "About",         "url": "/about/" }
+  { "title": "about",         "url": "/about/" }
 ]

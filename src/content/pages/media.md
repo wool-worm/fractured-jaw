@@ -7,3 +7,5 @@ section_name: media
 graph_enabled: false
 preview_enabled: false
 ---
+
+Reviews of records, films, books, anything that produces enough signal to talk about. Ratings are free-form.

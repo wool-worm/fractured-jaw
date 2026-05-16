@@ -49,6 +49,7 @@
 const fs = require("fs");
 const path = require("path");
 const { vaultPathToUrl, vaultPathToAttachmentUrl, VAULT_ATTACHMENT_DIR } = require("./permalink");
+const { reportIssue } = require("./build-report");
 
 const OPEN = 0x5b; // [
 const BANG = 0x21; // !
@@ -56,10 +57,29 @@ const BANG = 0x21; // !
 // Module-level cache: vault path → boolean (file exists). Cleared per build
 // is unnecessary — Eleventy spawns a fresh Node process for each build, and
 // the dev server invalidates between rebuilds via require cache. fs.existsSync
-// is fast enough that this cache is more about keeping logs tidy (warn once
-// per dead link per build) than about performance.
+// is fast enough that this cache is just there to avoid hammering the disk
+// during a single build with many references to the same target.
 const existsCache = new Map();
-const warnedThisBuild = new Set();
+
+// Pull host-page context off the markdown-it `state.env` Eleventy supplies.
+// We need the input path (to attribute errors), plus draft/exclude flags so
+// the reporter can suppress prod errors for posts that won't ship anyway.
+//
+// Eleventy 3.x exposes the full data cascade AS the markdown-it env object
+// (not nested under env.data). `env.page` is a property carrying inputPath,
+// url, etc. `env.draft` / `env.exclude` are the frontmatter flags. The
+// `page.data` fallback is a defensive catch in case Eleventy ever moves
+// where the cascade lives.
+function envContext(state) {
+  const env = (state && state.env) || {};
+  const page = env.page || {};
+  const data = (page.data && typeof page.data === "object") ? page.data : env;
+  return {
+    file: page.inputPath || env.inputPath || "(unknown source)",
+    isDraft: data.draft === true,
+    isExcluded: data.exclude === true,
+  };
+}
 
 function vaultPathExists(vaultPath, contentRoot) {
   const cacheKey = `${contentRoot}::${vaultPath}`;
@@ -68,6 +88,36 @@ function vaultPathExists(vaultPath, contentRoot) {
   const exists = fs.existsSync(abs);
   existsCache.set(cacheKey, exists);
   return exists;
+}
+
+// Check whether the wikilink TARGET file carries `draft: true` or
+// `exclude: true` in its frontmatter. A published host post linking at an
+// excluded target would render a live <a> in dev (drafts visible) but the
+// URL would 404 in production. Strictly a YAML-head scan — we don't want
+// to instantiate a full markdown parser per target.
+const targetExcludedCache = new Map();
+function vaultPathTargetIsExcluded(vaultPath, contentRoot) {
+  const cacheKey = `${contentRoot}::${vaultPath}`;
+  if (targetExcludedCache.has(cacheKey)) return targetExcludedCache.get(cacheKey);
+  const abs = path.join(contentRoot, `${vaultPath}.md`);
+  let excluded = false;
+  try {
+    const content = fs.readFileSync(abs, "utf8");
+    const head = content.match(/^---\s*\r?\n([\s\S]*?)\r?\n---/);
+    if (head) {
+      // Match the frontmatter line for `draft:` or `exclude:` evaluating to
+      // a truthy literal. We accept `true`, `True`, or `yes` (the same set
+      // YAML parses as boolean true). Anything else, including quoted
+      // strings like "true", is treated as not-excluded — matches the rest
+      // of the codebase, which checks strict `=== true`.
+      const truthy = /^\s*(draft|exclude)\s*:\s*(true|True|yes)\s*$/m;
+      excluded = truthy.test(head[1]);
+    }
+  } catch (e) {
+    excluded = false;
+  }
+  targetExcludedCache.set(cacheKey, excluded);
+  return excluded;
 }
 
 // Check whether an attachment file exists on disk. Vault path is in the
@@ -184,16 +234,50 @@ function emitContentLink(state, inner, contentRoot) {
   const exists = url ? vaultPathExists(vaultPath, contentRoot) : false;
 
   if (!url || !exists) {
-    const where = (state.env && state.env.page && state.env.page.inputPath) || "(unknown source)";
-    const warnKey = `link::${where}::${vaultPath}`;
-    if (!warnedThisBuild.has(warnKey)) {
-      const reason = !url ? "unknown section or malformed path" : "no matching .md file in src/content/";
-      console.warn(`[fractured-jaw] dead wikilink in ${where}: [[${inner}]] — ${reason}`);
-      warnedThisBuild.add(warnKey);
+    const ctx = envContext(state);
+    let reason;
+    if (!url) {
+      // Special-case: writer probably meant an image embed but forgot the
+      // leading `!`. The `_?attachments/` prefix is never a valid section
+      // for a content link.
+      if (/^_?attachments\//.test(vaultPath)) {
+        reason = "looks like an image embed missing the leading '!'. Use ![[_attachments/...]] to render as an image";
+      } else {
+        reason = "unknown section or malformed path";
+      }
+    } else {
+      reason = "no matching .md file in src/content/";
     }
+    reportIssue({
+      kind: "wikilink",
+      file: ctx.file,
+      offending: `[[${inner}]]`,
+      reason,
+      isDraft: ctx.isDraft,
+      isExcluded: ctx.isExcluded,
+    });
     const token = state.push("text", "", 0);
     token.content = alias;
     return;
+  }
+
+  // Target file exists on disk — but if it's draft or excluded, it won't
+  // ship in production, so a live <a> here would 404 once deployed. The
+  // reporter still treats host draft/exclude as warn-only, matching the
+  // existing rule.
+  if (vaultPathTargetIsExcluded(vaultPath, contentRoot)) {
+    const ctx = envContext(state);
+    reportIssue({
+      kind: "wikilink",
+      file: ctx.file,
+      offending: `[[${inner}]]`,
+      reason: "target is draft or excluded; the URL will 404 in production",
+      isDraft: ctx.isDraft,
+      isExcluded: ctx.isExcluded,
+    });
+    // Fall through to render as a live link anyway — in dev the target
+    // page IS reachable, so the link works. In prod, the reporter has
+    // already thrown for non-draft hosts and the build halts.
   }
 
   const open = state.push("link_open", "a", 1);
@@ -212,17 +296,19 @@ function emitImageEmbed(state, inner, contentRoot) {
   const exists = url ? attachmentExists(vaultPath, contentRoot) : false;
 
   if (!url || !exists) {
-    const where = (state.env && state.env.page && state.env.page.inputPath) || "(unknown source)";
-    const warnKey = `image::${where}::${vaultPath}`;
-    if (!warnedThisBuild.has(warnKey)) {
-      const reason = !url
+    const ctx = envContext(state);
+    reportIssue({
+      kind: "image-embed",
+      file: ctx.file,
+      offending: `![[${inner}]]`,
+      reason: !url
         ? "path must start with _attachments/ (or attachments/)"
-        : `no file at src/content/_attachments/${vaultPath.replace(/^\/+/, "").replace(/^(?:_?attachments)\//, "")}`;
-      console.warn(`[fractured-jaw] dead image embed in ${where}: ![[${inner}]] — ${reason}`);
-      warnedThisBuild.add(warnKey);
-    }
-    // Render a visible placeholder rather than swallowing the embed silently —
-    // a broken image in dev is a stronger signal than a missing one.
+        : `no file at src/content/_attachments/${vaultPath.replace(/^\/+/, "").replace(/^(?:_?attachments)\//, "")}`,
+      isDraft: ctx.isDraft,
+      isExcluded: ctx.isExcluded,
+    });
+    // Render a visible placeholder rather than swallowing the embed silently.
+    // A broken image in dev is a stronger signal than a missing one.
     const token = state.push("html_inline", "", 0);
     token.content = `<!-- broken image embed: ${state.md.utils.escapeHtml(inner)} -->`;
     return;
@@ -265,3 +351,4 @@ function plugin(md, options = {}) {
 module.exports = plugin;
 module.exports.parseWikilink = parseWikilink;
 module.exports.vaultPathExists = vaultPathExists;
+module.exports.vaultPathTargetIsExcluded = vaultPathTargetIsExcluded;
