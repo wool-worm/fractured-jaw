@@ -8,6 +8,10 @@ module.exports = {
   language: "en",
   // Default author shown when a post's frontmatter doesn't override it.
   defaultAuthor: "wool-worm",
+  // Fallback social-card image for pages without per-post frontmatter `image:`.
+  // Path is site-absolute; head.njk prefixes site.url to produce a fully
+  // qualified URL (Open Graph requires absolute URLs).
+  defaultImage: "/assets/images/og-default.png",
   // Whether the build is running in production. Templates that need to behave
   // differently in dev (e.g. show drafts) should read this rather than calling
   // process.env directly.

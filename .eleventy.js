@@ -73,6 +73,17 @@ module.exports = function (eleventyConfig) {
     return Array.isArray(value) ? value : [value];
   });
 
+  // Promote a possibly-relative URL to an absolute one by prefixing site.url.
+  // Used in head.njk for og:image (Open Graph rejects relative paths). Passes
+  // through any value that already starts with http:// or https://.
+  eleventyConfig.addFilter("absoluteUrl", (value, base) => {
+    if (!value) return "";
+    const s = String(value);
+    if (/^https?:\/\//i.test(s)) return s;
+    if (!base) return s;
+    return String(base).replace(/\/$/, "") + (s.startsWith("/") ? s : "/" + s);
+  });
+
   // Find a series-parent item by its published URL. Used by post-meta.njk
   // to resolve `series_name: "[[series/Transmissions|…]]"` to the parent's
   // canonical title (per the user's decision: parent title always wins
