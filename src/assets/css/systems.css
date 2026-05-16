@@ -423,15 +423,16 @@ body.is-encryption-failure .systems-failure-banner {
   font-size: 0.55rem;
 }
 
-/* ── Auto-fold in the medium zone (721–1100px) ──────────────────────────── */
-/* Widget slides leftward to the edge, leaving only the fold-button strip
-   visible — mirrors the graph + radio widgets folding right. The chained
-   translateY(-50%) preserves vertical centering (the unfolded base
-   transform). Fold button is non-interactive in this zone; user must
-   resize past 1100px to interact. Above 1100px the user's manual fold
-   state (localStorage) takes over. */
+/* ── Auto-fold in the medium-wide zone (1001–1400px) ────────────────────── */
+/* Systems widget folds earlier than graph + radio because at ~1400px its
+   left edge starts crowding the main column (100ch ≈ 800px, centered).
+   Widget slides leftward to the edge, leaving only the fold-button strip
+   visible. Chained translateY(-50%) preserves vertical centering.
+   Fold button is non-interactive in this zone; resize past 1400px to
+   interact. Above 1400px the user's manual fold state (localStorage)
+   takes over. */
 
-@media (max-width: 1100px) and (min-width: 721px) {
+@media (max-width: 1400px) and (min-width: 1001px) {
   .systems-widget {
     transform: translateY(-50%) translateX(calc(-100% + 1.4rem));
   }
@@ -441,9 +442,12 @@ body.is-encryption-failure .systems-failure-banner {
   }
 }
 
-/* ── Responsive: hide below 720px (matches graph + radio widgets) ───────── */
+/* ── Hide below 1000px ──────────────────────────────────────────────────── */
+/* Systems hides earlier than graph + radio. Even folded it would still
+   crowd the narrower content column at <1000px, so we remove it entirely
+   here instead of leaving an edge tab. */
 
-@media (max-width: 720px) {
+@media (max-width: 1000px) {
   .systems-widget {
     display: none;
   }
