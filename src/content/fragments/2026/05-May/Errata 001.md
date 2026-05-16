@@ -7,7 +7,7 @@ tags: [fragments, errata, meta]
 series_name:
 description: First fragment — a short note to verify the fragments section builds correctly.
 featured: false
-draft: false
+draft: true
 exclude: false
 preview_enabled: true
 graph_enabled: true
