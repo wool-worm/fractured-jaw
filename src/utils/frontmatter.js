@@ -5,8 +5,18 @@
 // so you notice you forgot, but the build still succeeds.
 
 const REQUIRED = ["title", "date_published"];
-const RECOMMENDED = ["author", "description"];
+const RECOMMENDED_DEFAULT = ["author", "description"];
+// Series parents are aggregators, not authored entries. They group posts;
+// the individual posts carry the author bylines. Description still matters
+// because it appears in the series-card on the /series/ landing.
+const RECOMMENDED_FOR_SERIES = ["description"];
 const RECOMMENDED_FOR_MEDIA = ["rating"];
+
+function recommendedFieldsFor(inputPath) {
+  if (!inputPath) return RECOMMENDED_DEFAULT;
+  if (inputPath.includes("/series/")) return RECOMMENDED_FOR_SERIES;
+  return RECOMMENDED_DEFAULT;
+}
 
 // Check a single Eleventy collection item. Returns { errors, warnings }.
 function inspect(item) {
@@ -19,7 +29,7 @@ function inspect(item) {
       errors.push(`missing required frontmatter "${field}"`);
     }
   }
-  for (const field of RECOMMENDED) {
+  for (const field of recommendedFieldsFor(item.inputPath)) {
     if (isMissing(data[field])) {
       warnings.push(`missing recommended frontmatter "${field}"`);
     }

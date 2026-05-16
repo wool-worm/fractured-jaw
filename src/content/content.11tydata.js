@@ -88,15 +88,29 @@ function parseFrontmatterImage(raw) {
 
 // Compute a `{ url, alt }` pair from `data.image`, reporting any issue
 // against the host page's input path + draft/excluded flags.
+//
+// Memoized by `data.page.inputPath` because Eleventy runs each
+// `eleventyComputed.*` function independently and reassigns the computed
+// value back onto `data` between calls. Without the cache, the second
+// computed prop (image_alt) would read the URL string produced by the
+// first (image) and try to parse THAT as a wikilink, falsely flagging
+// every page with an image as a "bare-string" violation.
+const resolveCache = new Map();
 function resolveFrontmatterImage(data) {
+  const cacheKey = (data.page && data.page.inputPath) || null;
+  if (cacheKey && resolveCache.has(cacheKey)) {
+    return resolveCache.get(cacheKey);
+  }
+
   const parsed = parseFrontmatterImage(data.image);
-  const file = (data.page && data.page.inputPath) || "(unknown source)";
+  const file = cacheKey || "(unknown source)";
   const isDraft = data.draft === true;
   const isExcluded = data.exclude === true;
 
-  if (parsed.kind === "empty") return { url: null, alt: "" };
-
-  if (parsed.kind === "bareString") {
+  let result;
+  if (parsed.kind === "empty") {
+    result = { url: null, alt: "" };
+  } else if (parsed.kind === "bareString") {
     reportIssue({
       kind: "image-frontmatter",
       file,
@@ -105,10 +119,8 @@ function resolveFrontmatterImage(data) {
       isDraft,
       isExcluded,
     });
-    return { url: null, alt: "" };
-  }
-
-  if (parsed.kind === "deadWikilink") {
+    result = { url: null, alt: "" };
+  } else if (parsed.kind === "deadWikilink") {
     reportIssue({
       kind: "image-frontmatter",
       file,
@@ -117,10 +129,13 @@ function resolveFrontmatterImage(data) {
       isDraft,
       isExcluded,
     });
-    return { url: null, alt: "" };
+    result = { url: null, alt: "" };
+  } else {
+    result = { url: parsed.url, alt: parsed.alt };
   }
 
-  return { url: parsed.url, alt: parsed.alt };
+  if (cacheKey) resolveCache.set(cacheKey, result);
+  return result;
 }
 
 const LAYOUT_BY_SECTION = {
