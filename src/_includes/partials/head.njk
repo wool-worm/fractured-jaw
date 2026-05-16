@@ -24,7 +24,7 @@
 <meta property="og:image" content="{{ _ogImage }}">
 
 {# Twitter card #}
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="{{ card_type or site.defaultCardType }}">
 <meta name="twitter:title" content="{{ title or site.title }}">
 <meta name="twitter:description" content="{{ description or site.description }}">
 <meta name="twitter:image" content="{{ _ogImage }}">
