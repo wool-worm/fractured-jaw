@@ -102,6 +102,66 @@ main {
   border-right: none;
 }
 
+/* ── Mobile nav toggle (hamburger) ──────────────────────────────────────── */
+/* Hidden at desktop widths via display:none. The 720px media query at the
+   bottom of this file flips it to display:flex and collapses .site-nav
+   into a dropdown panel. Brutalist three-bar glyph rendered in CSS (no
+   SVG), bars morph to an X when aria-expanded="true". */
+.site-nav-toggle {
+  display: none;
+  margin-left: auto;
+  align-self: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  background: var(--void-soft);
+  border: 1px solid var(--brass-deep);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.site-nav-toggle:hover,
+.site-nav-toggle:focus-visible {
+  background: var(--void-mid);
+  border-color: var(--sodium-soft);
+}
+
+.site-nav-toggle:hover .site-nav-toggle-bar,
+.site-nav-toggle:focus-visible .site-nav-toggle-bar {
+  background: var(--sodium);
+}
+
+.site-nav-toggle-bar {
+  position: absolute;
+  left: 0.4rem;
+  right: 0.4rem;
+  height: 2px;
+  background: var(--bone-dim);
+  transition: background 0.1s, transform 0.15s ease-out, top 0.15s ease-out, opacity 0.1s;
+}
+
+.site-nav-toggle-bar:nth-child(1) { top: 0.55rem; }
+.site-nav-toggle-bar:nth-child(2) { top: 1.05rem; }
+.site-nav-toggle-bar:nth-child(3) { top: 1.55rem; }
+
+/* Open state: bars converge to the middle row and rotate into an X.
+   Middle bar fades out; the outer two cross. */
+.site-nav-toggle[aria-expanded="true"] .site-nav-toggle-bar:nth-child(1) {
+  top: 1.05rem;
+  transform: rotate(45deg);
+}
+
+.site-nav-toggle[aria-expanded="true"] .site-nav-toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+
+.site-nav-toggle[aria-expanded="true"] .site-nav-toggle-bar:nth-child(3) {
+  top: 1.05rem;
+  transform: rotate(-45deg);
+}
+
 /* ── Footer ─────────────────────────────────────────────────────────────── */
 .site-footer {
   margin-top: auto;
@@ -184,19 +244,120 @@ main {
   font-size: 1.0125rem;
 }
 
-/* ── Responsive header collapse ─────────────────────────────────────────── */
-@media (max-width: 600px) {
+/* ── Responsive: nav drops to second row in the 721–1100 zone ───────────── */
+/* Between 720 and 1100px there isn't enough horizontal room for the
+   inline nav row alongside the masthead — the items would wrap into a
+   tall vertical stack and bloat the header height. Drop the nav to a
+   full-width second row instead so items stay on a single horizontal
+   line. Hamburger button stays hidden in this zone (handled below 720px).
+   Achieved with flex-wrap on the header + flex: 0 0 100% on the nav,
+   which forces the nav onto its own line below the skull + masthead. */
+@media (max-width: 1200px) and (min-width: 721px) {
   .site-header {
-    flex-direction: column;
-    gap: var(--sp-sm);
-    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: var(--sp-xs);
+  }
+
+  .site-nav {
+    flex: 0 0 100%;
+    align-self: stretch;
+    width: 100%;
+    border-top: 1px solid var(--bone-faint);
+    padding-top: var(--sp-xs);
   }
 
   .site-nav ul {
     flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+/* ── Responsive: collapse nav into hamburger panel ──────────────────────── */
+/* Below 720px (matches the widget hide-breakpoint for radio + graph), the
+   inline nav row would wrap badly and the masthead crowds the items.
+   Swap to a hamburger button + absolute-positioned dropdown panel that
+   drops below the header. The panel's open/close is driven by data-open
+   on .site-nav, toggled by the script in /assets/js/nav-toggle.js. */
+@media (max-width: 720px) {
+  .site-header {
+    /* Keep the row layout but tighten the gap so skull + masthead +
+       hamburger fit without the masthead pushing the hamburger off-screen.
+       align-items: center keeps the hamburger vertically centered against
+       the skull sprite rather than baseline-aligned with the masthead. */
+    gap: var(--sp-sm);
+    align-items: center;
+  }
+
+  /* Shrink the masthead clamp's floor so the title fits alongside the
+     skull and hamburger at narrow widths. Above 720px the original
+     clamp(1.4rem, 4vw, 2.2rem) continues to apply. */
+  .site-title {
+    font-size: clamp(0.95rem, 4.5vw, 1.6rem);
+  }
+
+  .site-nav-toggle {
+    display: block;
+  }
+
+  /* Collapsed nav — hidden until [data-open="true"], then drops below the
+     header as a full-width panel. position:absolute escapes the header
+     flex row; left:0/right:0 spans full width; z-index:19 sits just
+     under the header's z-index:20 so the header border still draws
+     above the panel. */
+  .site-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 19;
+    flex: 0 0 auto;
+    align-self: auto;
+    background: var(--void);
+    border-bottom: 2px solid var(--brass-deep);
+    box-shadow: 0 4px 0 -1px var(--brass-faint);
+    display: none;
+  }
+
+  .site-nav[data-open="true"] {
+    display: block;
+  }
+
+  .site-nav ul {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0;
+    padding: var(--sp-xs) 0;
+  }
+
+  .site-nav li {
+    width: 100%;
   }
 
   .site-nav a {
-    padding: 0.2rem 0.5rem;
+    display: block;
+    width: 100%;
+    padding: var(--sp-sm) var(--sp-md);
+    border-right: none;
+    border-bottom: 1px solid var(--bone-faint);
+  }
+
+  .site-nav li:last-child a,
+  .site-nav-search .search-icon-button {
+    border-bottom: none;
+  }
+
+  /* Search row inside the dropdown: stretch the existing icon-button
+     full-width and align the glyph left so it sits with the text links
+     instead of floating in a centered chip. */
+  .site-nav-search {
+    width: 100%;
+  }
+
+  .site-nav-search .search-icon-button {
+    width: 100%;
+    justify-content: flex-start;
+    padding: var(--sp-sm) var(--sp-md);
+    border-right: none;
+    border-top: 1px solid var(--bone-faint);
   }
 }
