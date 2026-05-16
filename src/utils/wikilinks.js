@@ -90,6 +90,36 @@ function vaultPathExists(vaultPath, contentRoot) {
   return exists;
 }
 
+// Check whether the wikilink TARGET file carries `draft: true` or
+// `exclude: true` in its frontmatter. A published host post linking at an
+// excluded target would render a live <a> in dev (drafts visible) but the
+// URL would 404 in production. Strictly a YAML-head scan — we don't want
+// to instantiate a full markdown parser per target.
+const targetExcludedCache = new Map();
+function vaultPathTargetIsExcluded(vaultPath, contentRoot) {
+  const cacheKey = `${contentRoot}::${vaultPath}`;
+  if (targetExcludedCache.has(cacheKey)) return targetExcludedCache.get(cacheKey);
+  const abs = path.join(contentRoot, `${vaultPath}.md`);
+  let excluded = false;
+  try {
+    const content = fs.readFileSync(abs, "utf8");
+    const head = content.match(/^---\s*\r?\n([\s\S]*?)\r?\n---/);
+    if (head) {
+      // Match the frontmatter line for `draft:` or `exclude:` evaluating to
+      // a truthy literal. We accept `true`, `True`, or `yes` (the same set
+      // YAML parses as boolean true). Anything else, including quoted
+      // strings like "true", is treated as not-excluded — matches the rest
+      // of the codebase, which checks strict `=== true`.
+      const truthy = /^\s*(draft|exclude)\s*:\s*(true|True|yes)\s*$/m;
+      excluded = truthy.test(head[1]);
+    }
+  } catch (e) {
+    excluded = false;
+  }
+  targetExcludedCache.set(cacheKey, excluded);
+  return excluded;
+}
+
 // Check whether an attachment file exists on disk. Vault path is in the
 // form "_attachments/blog/post/img.png" (or the URL-side "attachments/...").
 // The actual file always lives under src/content/_attachments/ regardless
@@ -205,17 +235,49 @@ function emitContentLink(state, inner, contentRoot) {
 
   if (!url || !exists) {
     const ctx = envContext(state);
+    let reason;
+    if (!url) {
+      // Special-case: writer probably meant an image embed but forgot the
+      // leading `!`. The `_?attachments/` prefix is never a valid section
+      // for a content link.
+      if (/^_?attachments\//.test(vaultPath)) {
+        reason = "looks like an image embed missing the leading '!'. Use ![[_attachments/...]] to render as an image";
+      } else {
+        reason = "unknown section or malformed path";
+      }
+    } else {
+      reason = "no matching .md file in src/content/";
+    }
     reportIssue({
       kind: "wikilink",
       file: ctx.file,
       offending: `[[${inner}]]`,
-      reason: !url ? "unknown section or malformed path" : "no matching .md file in src/content/",
+      reason,
       isDraft: ctx.isDraft,
       isExcluded: ctx.isExcluded,
     });
     const token = state.push("text", "", 0);
     token.content = alias;
     return;
+  }
+
+  // Target file exists on disk — but if it's draft or excluded, it won't
+  // ship in production, so a live <a> here would 404 once deployed. The
+  // reporter still treats host draft/exclude as warn-only, matching the
+  // existing rule.
+  if (vaultPathTargetIsExcluded(vaultPath, contentRoot)) {
+    const ctx = envContext(state);
+    reportIssue({
+      kind: "wikilink",
+      file: ctx.file,
+      offending: `[[${inner}]]`,
+      reason: "target is draft or excluded; the URL will 404 in production",
+      isDraft: ctx.isDraft,
+      isExcluded: ctx.isExcluded,
+    });
+    // Fall through to render as a live link anyway — in dev the target
+    // page IS reachable, so the link works. In prod, the reporter has
+    // already thrown for non-draft hosts and the build halts.
   }
 
   const open = state.push("link_open", "a", 1);
@@ -289,3 +351,4 @@ function plugin(md, options = {}) {
 module.exports = plugin;
 module.exports.parseWikilink = parseWikilink;
 module.exports.vaultPathExists = vaultPathExists;
+module.exports.vaultPathTargetIsExcluded = vaultPathTargetIsExcluded;
