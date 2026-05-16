@@ -16,6 +16,7 @@ const {
 } = require("./src/utils/frontmatter");
 const wikilinkPlugin = require("./src/utils/wikilinks");
 const { parseSeriesField } = require("./src/utils/series");
+const { reportIssue, flush: flushBuildReport } = require("./src/utils/build-report");
 
 const CONTENT_ROOT = "src/content";
 const SERIES_GLOB = "src/content/series/**/*.md";
@@ -26,6 +27,18 @@ const CONTENT_GLOBS = CONTENT_SECTIONS.map(
 );
 
 module.exports = function (eleventyConfig) {
+  // ---------- Build-issue aggregation ----------
+
+  // Every reportIssue() call across the build that resolves to fatal
+  // severity gets collected in src/utils/build-report.js's
+  // pendingFatalErrors. After Eleventy finishes its render pass, we
+  // flush — throwing a single aggregated Error with every blocking
+  // issue from this build so the writer can fix them all in one pass
+  // rather than fix-build-fix-build cycling on the first one.
+  // Files are still written to _site/ before flush throws; that's
+  // harmless because the npm script exits non-zero and CI gates on it.
+  eleventyConfig.on("eleventy.after", () => flushBuildReport());
+
   // ---------- Markdown ----------
 
   // Extend Eleventy's bundled markdown-it instance with our wikilink plugin
@@ -94,13 +107,13 @@ module.exports = function (eleventyConfig) {
   });
 
   // Resolve `series_name` frontmatter to the parent's URL (or null when
-  // empty/missing/plain-string/dead-pointer). Filter form so post-meta
-  // can use it inline.
+  // empty/missing/bare-string/dead-pointer). Filter form so post-meta
+  // can use it inline. Validation reporting happens once per build inside
+  // the `seriesEntries` collection below; this filter stays silent so we
+  // don't double-report.
   eleventyConfig.addFilter("seriesNameToUrl", (value) => {
     const parsed = parseSeriesField(value, CONTENT_ROOT);
-    if (parsed.kind === "wikilink" && parsed.url && parsed.exists) {
-      return parsed.url;
-    }
+    if (parsed.kind === "wikilink") return parsed.url;
     return null;
   });
 
@@ -297,26 +310,37 @@ module.exports = function (eleventyConfig) {
       const parsed = parseSeriesField(post.data.series_name, CONTENT_ROOT);
       if (parsed.kind === "empty") continue;
 
-      if (parsed.kind === "plainString") {
-        console.warn(
-          `[fractured-jaw] ${post.inputPath}: series_name is a plain string ` +
-          `("${parsed.value}"). Use a wikilink like ` +
-          `[[series/<Name>|alias]] so the post can be grouped under a ` +
-          `series parent file.`
-        );
+      const ctx = {
+        file: post.inputPath,
+        isDraft: post.data.draft === true,
+        isExcluded: post.data.exclude === true,
+      };
+
+      if (parsed.kind === "bareString") {
+        reportIssue({
+          kind: "series-name",
+          file: ctx.file,
+          offending: `series_name: ${parsed.offending}`,
+          reason: "must be a wikilink (series_name: \"[[series/<Name>|alias]]\"); bare strings are not allowed",
+          isDraft: ctx.isDraft,
+          isExcluded: ctx.isExcluded,
+        });
         continue;
       }
 
-      // kind === "wikilink"
-      if (!parsed.url || !parsed.exists) {
-        console.warn(
-          `[fractured-jaw] ${post.inputPath}: series_name points at a ` +
-          `missing series parent (${parsed.vaultPath}). Create ` +
-          `src/content/${parsed.vaultPath}.md or fix the wikilink.`
-        );
+      if (parsed.kind === "deadWikilink") {
+        reportIssue({
+          kind: "series-name",
+          file: ctx.file,
+          offending: `series_name: [[${parsed.vaultPath}]]`,
+          reason: parsed.reason,
+          isDraft: ctx.isDraft,
+          isExcluded: ctx.isExcluded,
+        });
         continue;
       }
 
+      // kind === "wikilink": resolved and target file exists
       if (!byUrl.has(parsed.url)) byUrl.set(parsed.url, []);
       byUrl.get(parsed.url).push(post);
     }

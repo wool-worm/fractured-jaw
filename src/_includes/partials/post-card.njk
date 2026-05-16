@@ -8,7 +8,7 @@
   <article>
     {% if post.data.image %}
       <a href="{{ post.url }}" class="post-card-image-link" tabindex="-1" aria-hidden="true">
-        <img src="{{ post.data.image }}" alt="" class="post-card-image" loading="lazy">
+        <img src="{{ post.data.image }}" alt="{{ post.data.image_alt or '' }}" class="post-card-image" loading="lazy">
       </a>
     {% endif %}
     {% if post.data.section and post.data.section != "pages" %}
