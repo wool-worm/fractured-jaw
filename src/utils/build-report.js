@@ -40,8 +40,11 @@ const isProduction = () => process.env.ELEVENTY_ENV === "production";
 // builds (or explicitly by flush()).
 const seen = new Set();
 
-// Collected fatal-severity messages, flushed once at end of build.
-const pendingFatalErrors = [];
+// Count of fatal-severity issues collected this build. Only the count is
+// needed: each issue is already printed individually via console.warn
+// when reportIssue records it. flush() throws a short summary that fails
+// the build; the detail lives in the warning stream above.
+let pendingFatalCount = 0;
 
 // kind:       short category label, e.g. "wikilink", "image-embed",
 //             "image-frontmatter", "series-name", "missing-frontmatter",
@@ -77,32 +80,38 @@ function reportIssue({
     isFatal = isProduction() && !isDraft && !isExcluded;
   }
 
-  if (isFatal) pendingFatalErrors.push(message);
+  if (isFatal) pendingFatalCount++;
   console.warn(message);
 }
 
-// Throw an aggregated error if any fatal-severity issues were collected
-// during the build. Called from `eleventy.after` in .eleventy.js. No-op
-// when there are no pending errors.
+// Throw a short aggregated error if any fatal-severity issues were
+// collected during the build. Called from `eleventy.after` in
+// .eleventy.js. No-op when there are no pending errors.
+//
+// Intentionally short: every issue was already printed to stderr by the
+// reportIssue() call that recorded it. Eleventy's error reporter prints
+// the thrown Error's .message + .stack at both the template-write stage
+// AND the CLI fatal stage (so anything in the message body shows up
+// four times). The detail belongs in the warning stream above; this
+// throw is just the gate that fails the build.
 function flush() {
-  if (pendingFatalErrors.length === 0) return;
-  const count = pendingFatalErrors.length;
-  const banner = `\n[fractured-jaw] ${count} build error${count === 1 ? "" : "s"} blocked this build:\n`;
-  const body = pendingFatalErrors
-    .map((m, i) => `\n--- error ${i + 1}/${count} ---\n${m}`)
-    .join("\n");
-  const aggregated = `${banner}${body}\n\nFix the issues above (or mark the offending posts draft: true / exclude: true where appropriate) and rerun the build.`;
+  if (pendingFatalCount === 0) return;
+  const count = pendingFatalCount;
+  const summary =
+    `${count} build error${count === 1 ? "" : "s"} blocked this build ` +
+    `(see [fractured-jaw] warnings above). Fix the issues, or mark ` +
+    `offending posts draft: true / exclude: true, then rerun.`;
   // Reset for any subsequent build call in the same process (e.g. tests).
-  pendingFatalErrors.length = 0;
+  pendingFatalCount = 0;
   seen.clear();
-  throw new Error(aggregated);
+  throw new Error(summary);
 }
 
 // Helpful for tests / scripts that want to reset state between runs
 // without spinning a fresh process.
 function _resetForTests() {
   seen.clear();
-  pendingFatalErrors.length = 0;
+  pendingFatalCount = 0;
 }
 
 module.exports = { reportIssue, flush, _resetForTests };
