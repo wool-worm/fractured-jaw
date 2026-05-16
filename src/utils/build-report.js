@@ -22,6 +22,12 @@
 //     to the same URL, or a post missing its title. Reported in dev too
 //     so the writer sees it before they ship.
 //
+//   "warn-only":
+//     Print in dev as a heads-up. Silent in prod and never fatal. For
+//     advisory checks like recommended-but-not-required frontmatter
+//     (e.g. missing description). Prod logs stay focused on issues
+//     that actually block the build.
+//
 // Fatal errors are NOT thrown immediately. They are collected in
 // `pendingFatalErrors` and aggregated. `.eleventy.js` registers an
 // `eleventy.after` event that calls `flush()`, which throws a single
@@ -80,17 +86,18 @@ function reportIssue({
   } else if (severity === "fatal-in-prod") {
     isFatal = inProd && !isDraft && !isExcluded;
   }
+  // "warn-only" is never fatal.
 
   if (isFatal) pendingFatalCount++;
 
   // Print rules:
   //   dev mode  → surface every issue (writer wants the full picture
-  //               while iterating, including draft-only problems they'll
-  //               need to fix before promoting).
+  //               while iterating, including draft-only and advisory
+  //               problems they'll need to address before promoting).
   //   prod mode → only surface the issues that ACTUALLY gate the build.
-  //               Draft-suppressed warnings are noise in prod (drafts
-  //               don't ship), and we don't want them mixed in with the
-  //               real failure list.
+  //               Draft-suppressed warnings and advisory warn-only
+  //               messages are noise in prod and shouldn't be mixed in
+  //               with the real failure list.
   if (!inProd || isFatal) {
     console.warn(message);
   }

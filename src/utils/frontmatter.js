@@ -39,14 +39,14 @@ function inspect(item) {
   }
   for (const field of recommendedFieldsFor(item.inputPath)) {
     if (isMissing(data[field])) {
-      warnings.push(`missing recommended frontmatter "${field}"`);
+      warnings.push({ field });
     }
   }
   // Media reviews benefit from a rating, but it's optional.
   if (item.inputPath && item.inputPath.includes("/media/")) {
     for (const field of RECOMMENDED_FOR_MEDIA) {
       if (isMissing(data[field])) {
-        warnings.push(`missing recommended media frontmatter "${field}"`);
+        warnings.push({ field, mediaOnly: true });
       }
     }
   }
@@ -77,7 +77,14 @@ function validateCollection(items, sectionName) {
       });
     }
     for (const w of warnings) {
-      console.warn(`[fractured-jaw] ${item.inputPath}: ${w}`);
+      const scope = w.mediaOnly ? "recommended media" : "recommended";
+      reportIssue({
+        kind: "missing-frontmatter",
+        file: item.inputPath,
+        offending: w.field,
+        reason: `${scope} frontmatter "${w.field}" is missing or empty (advisory only, not required)`,
+        severity: "warn-only",
+      });
     }
   }
 }
