@@ -49,6 +49,7 @@
 const fs = require("fs");
 const path = require("path");
 const { vaultPathToUrl, vaultPathToAttachmentUrl, VAULT_ATTACHMENT_DIR } = require("./permalink");
+const { reportIssue } = require("./wikilink-report");
 
 const OPEN = 0x5b; // [
 const BANG = 0x21; // !
@@ -56,10 +57,29 @@ const BANG = 0x21; // !
 // Module-level cache: vault path → boolean (file exists). Cleared per build
 // is unnecessary — Eleventy spawns a fresh Node process for each build, and
 // the dev server invalidates between rebuilds via require cache. fs.existsSync
-// is fast enough that this cache is more about keeping logs tidy (warn once
-// per dead link per build) than about performance.
+// is fast enough that this cache is just there to avoid hammering the disk
+// during a single build with many references to the same target.
 const existsCache = new Map();
-const warnedThisBuild = new Set();
+
+// Pull host-page context off the markdown-it `state.env` Eleventy supplies.
+// We need the input path (to attribute errors), plus draft/exclude flags so
+// the reporter can suppress prod errors for posts that won't ship anyway.
+//
+// Eleventy 3.x exposes the full data cascade AS the markdown-it env object
+// (not nested under env.data). `env.page` is a property carrying inputPath,
+// url, etc. `env.draft` / `env.exclude` are the frontmatter flags. The
+// `page.data` fallback is a defensive catch in case Eleventy ever moves
+// where the cascade lives.
+function envContext(state) {
+  const env = (state && state.env) || {};
+  const page = env.page || {};
+  const data = (page.data && typeof page.data === "object") ? page.data : env;
+  return {
+    file: page.inputPath || env.inputPath || "(unknown source)",
+    isDraft: data.draft === true,
+    isExcluded: data.exclude === true,
+  };
+}
 
 function vaultPathExists(vaultPath, contentRoot) {
   const cacheKey = `${contentRoot}::${vaultPath}`;
@@ -184,13 +204,15 @@ function emitContentLink(state, inner, contentRoot) {
   const exists = url ? vaultPathExists(vaultPath, contentRoot) : false;
 
   if (!url || !exists) {
-    const where = (state.env && state.env.page && state.env.page.inputPath) || "(unknown source)";
-    const warnKey = `link::${where}::${vaultPath}`;
-    if (!warnedThisBuild.has(warnKey)) {
-      const reason = !url ? "unknown section or malformed path" : "no matching .md file in src/content/";
-      console.warn(`[fractured-jaw] dead wikilink in ${where}: [[${inner}]] — ${reason}`);
-      warnedThisBuild.add(warnKey);
-    }
+    const ctx = envContext(state);
+    reportIssue({
+      kind: "wikilink",
+      file: ctx.file,
+      offending: `[[${inner}]]`,
+      reason: !url ? "unknown section or malformed path" : "no matching .md file in src/content/",
+      isDraft: ctx.isDraft,
+      isExcluded: ctx.isExcluded,
+    });
     const token = state.push("text", "", 0);
     token.content = alias;
     return;
@@ -212,17 +234,19 @@ function emitImageEmbed(state, inner, contentRoot) {
   const exists = url ? attachmentExists(vaultPath, contentRoot) : false;
 
   if (!url || !exists) {
-    const where = (state.env && state.env.page && state.env.page.inputPath) || "(unknown source)";
-    const warnKey = `image::${where}::${vaultPath}`;
-    if (!warnedThisBuild.has(warnKey)) {
-      const reason = !url
+    const ctx = envContext(state);
+    reportIssue({
+      kind: "image-embed",
+      file: ctx.file,
+      offending: `![[${inner}]]`,
+      reason: !url
         ? "path must start with _attachments/ (or attachments/)"
-        : `no file at src/content/_attachments/${vaultPath.replace(/^\/+/, "").replace(/^(?:_?attachments)\//, "")}`;
-      console.warn(`[fractured-jaw] dead image embed in ${where}: ![[${inner}]] — ${reason}`);
-      warnedThisBuild.add(warnKey);
-    }
-    // Render a visible placeholder rather than swallowing the embed silently —
-    // a broken image in dev is a stronger signal than a missing one.
+        : `no file at src/content/_attachments/${vaultPath.replace(/^\/+/, "").replace(/^(?:_?attachments)\//, "")}`,
+      isDraft: ctx.isDraft,
+      isExcluded: ctx.isExcluded,
+    });
+    // Render a visible placeholder rather than swallowing the embed silently.
+    // A broken image in dev is a stronger signal than a missing one.
     const token = state.push("html_inline", "", 0);
     token.content = `<!-- broken image embed: ${state.md.utils.escapeHtml(inner)} -->`;
     return;

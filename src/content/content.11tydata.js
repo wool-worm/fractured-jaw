@@ -13,9 +13,14 @@
 //      A file with permalink:false is not written to disk; combined with
 //      eleventyExcludeFromCollections:true it disappears from the build entirely.
 
-const { computePermalink, extractSection, vaultPathToAttachmentUrl } = require("../utils/permalink");
+const fs = require("fs");
+const path = require("path");
+const { computePermalink, extractSection, vaultPathToAttachmentUrl, VAULT_ATTACHMENT_DIR } = require("../utils/permalink");
+const { reportIssue } = require("../utils/wikilink-report");
 
 const isProduction = process.env.ELEVENTY_ENV === "production";
+
+const CONTENT_ROOT = "src/content";
 
 // Match a single wikilink expression as the entire string: "[[...]]".
 // Tolerates surrounding whitespace and an optional `!` prefix (Obsidian
@@ -23,32 +28,99 @@ const isProduction = process.env.ELEVENTY_ENV === "production";
 // in the frontmatter `image:` slot because we always render it as an <img>).
 const FRONTMATTER_IMAGE_WIKILINK_RE = /^\s*!?\[\[([^\]\n]+?)\]\]\s*$/;
 
-// Resolve the frontmatter `image:` field to a URL string the templates can
-// drop into `src="..."` without thinking. Accepts three shapes:
-//   - Obsidian-style fully scoped wikilink: "[[_attachments/blog/foo/cover.jpg]]"
-//     → "/attachments/blog/foo/cover.jpg"
-//   - Plain string already resembling a URL: "/attachments/...", "https://...",
-//     or any other absolute/relative URL — passed through unchanged so
-//     hand-placed external image URLs still work.
-//   - Empty / null / unparseable → null (templates already guard with
-//     `{% if image %}`).
-function resolveFrontmatterImage(value) {
-  if (value === undefined || value === null || value === "") return null;
-  if (typeof value !== "string") return value;
-  const trimmed = value.trim();
-  if (!trimmed) return null;
+// Cache attachment-existence lookups. Same dynamic as in wikilinks.js: just
+// keeps the disk quiet when many posts reference the same image.
+const attachmentExistsCache = new Map();
+function attachmentExists(vaultPath) {
+  if (attachmentExistsCache.has(vaultPath)) return attachmentExistsCache.get(vaultPath);
+  const stripped = vaultPath.replace(/^\/+/, "").replace(/^(?:_?attachments)\//, "");
+  const abs = path.join(CONTENT_ROOT, VAULT_ATTACHMENT_DIR, stripped);
+  const exists = fs.existsSync(abs);
+  attachmentExistsCache.set(vaultPath, exists);
+  return exists;
+}
+
+// Parse the frontmatter `image:` field. Returns one of:
+//   { kind: "empty" }                                — field absent / blank
+//   { kind: "wikilink", url, alt }                   — resolved + file exists
+//   { kind: "deadWikilink", offending, reason }      — wikilink form, but
+//                                                       unknown section or
+//                                                       missing file on disk
+//   { kind: "bareString", offending }                — not a wikilink at all
+//
+// The reporter sits outside this function so the caller can attach host-page
+// context (file path, draft / excluded flags) before deciding warn vs. error.
+function parseFrontmatterImage(raw) {
+  if (raw === undefined || raw === null) return { kind: "empty" };
+  if (typeof raw !== "string") return { kind: "bareString", offending: String(raw) };
+  const trimmed = raw.trim();
+  if (!trimmed) return { kind: "empty" };
 
   const match = trimmed.match(FRONTMATTER_IMAGE_WIKILINK_RE);
-  if (match) {
-    // Strip any caption|size segments — they make no sense in the
-    // frontmatter slot (post cards and OG tags don't take captions).
-    const vaultPath = match[1].split("|")[0].trim();
-    const url = vaultPathToAttachmentUrl(vaultPath);
-    if (url) return url;
-    return null;
+  if (!match) {
+    return { kind: "bareString", offending: trimmed };
   }
-  // Plain string: trust the writer.
-  return trimmed;
+
+  // First pipe is caption (alt); second is size. Frontmatter doesn't use
+  // size, but we tolerate it being present and ignore the segment.
+  const parts = match[1].split("|");
+  const vaultPath = parts[0].trim();
+  const alt = parts.length >= 2 ? parts[1].trim() : "";
+  const url = vaultPathToAttachmentUrl(vaultPath);
+
+  if (!url) {
+    return {
+      kind: "deadWikilink",
+      offending: trimmed,
+      reason: "path must start with _attachments/ (or attachments/)",
+    };
+  }
+  if (!attachmentExists(vaultPath)) {
+    const stripped = vaultPath.replace(/^\/+/, "").replace(/^(?:_?attachments)\//, "");
+    return {
+      kind: "deadWikilink",
+      offending: trimmed,
+      reason: `no file at src/content/_attachments/${stripped}`,
+    };
+  }
+  return { kind: "wikilink", url, alt };
+}
+
+// Compute a `{ url, alt }` pair from `data.image`, reporting any issue
+// against the host page's input path + draft/excluded flags.
+function resolveFrontmatterImage(data) {
+  const parsed = parseFrontmatterImage(data.image);
+  const file = (data.page && data.page.inputPath) || "(unknown source)";
+  const isDraft = data.draft === true;
+  const isExcluded = data.exclude === true;
+
+  if (parsed.kind === "empty") return { url: null, alt: "" };
+
+  if (parsed.kind === "bareString") {
+    reportIssue({
+      kind: "image-frontmatter",
+      file,
+      offending: `image: ${parsed.offending}`,
+      reason: "must be a wikilink (image: \"[[_attachments/<section>/<slug>/<file>|alt text]]\"); bare strings are not allowed",
+      isDraft,
+      isExcluded,
+    });
+    return { url: null, alt: "" };
+  }
+
+  if (parsed.kind === "deadWikilink") {
+    reportIssue({
+      kind: "image-frontmatter",
+      file,
+      offending: `image: ${parsed.offending}`,
+      reason: parsed.reason,
+      isDraft,
+      isExcluded,
+    });
+    return { url: null, alt: "" };
+  }
+
+  return { url: parsed.url, alt: parsed.alt };
 }
 
 const LAYOUT_BY_SECTION = {
@@ -110,10 +182,13 @@ module.exports = {
       if (section === "pages" || section === "series") return "top";
       return "content";
     },
-    // Resolve the frontmatter `image:` field once, before any template reads
-    // it. Templates ([head.njk], [post-card.njk], [series-card.njk],
-    // [series-page.njk]) keep treating `{{ image }}` as a URL string —
-    // wikilink form, plain URL, or empty all flow through this single point.
-    image: (data) => resolveFrontmatterImage(data.image),
+    // Resolve the frontmatter `image:` field once, before any template
+    // reads it. Strict-form: must be a wikilink (`[[_attachments/...|alt]]`)
+    // pointing at a real file on disk. Bare strings (URLs, paths) warn in
+    // dev and error in prod via [src/utils/wikilink-report.js]. Caption
+    // after the pipe is exposed as `image_alt` for templates that want
+    // alt text without re-parsing.
+    image: (data) => resolveFrontmatterImage(data).url,
+    image_alt: (data) => resolveFrontmatterImage(data).alt,
   },
 };

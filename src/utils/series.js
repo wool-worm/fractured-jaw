@@ -1,26 +1,26 @@
 // Parsing for the `series_name` frontmatter field.
 //
-// Accepted shape (post-redesign):
-//   series_name: "[[series/Transmissions|Transmissions]]"
+// Strict form (the only allowed shape):
+//   series_name: "[[series/<Name>|alias]]"
 //
-// The string must be a wikilink pointing at a file under src/content/series/.
-// We resolve it through the same path → URL transform used by inline
-// wikilinks (see utils/permalink.js + utils/wikilinks.js) so series
-// membership and inline links stay in lockstep.
+// Anything else (plain string, missing parent, unknown section) is reported
+// through the unified wikilink-report (warn in dev, error in prod for any
+// non-draft/non-excluded post). The reporter is invoked by the caller in
+// .eleventy.js so it can attach host-page draft/exclude flags before
+// deciding warn vs. error.
 //
 // Return shapes (use `kind` to discriminate):
-//   { kind: "empty" }              — field missing or whitespace only
-//   { kind: "plainString", value } — set but not a wikilink (warn at build)
-//   { kind: "wikilink", vaultPath, alias, url, exists }
-//                                    parsed wikilink. `exists` is false if
-//                                    the target .md isn't on disk.
+//   { kind: "empty" }                         field missing or whitespace
+//   { kind: "bareString", offending }         set but not a wikilink
+//   { kind: "deadWikilink", vaultPath, reason } wikilink form, no parent file
+//   { kind: "wikilink", vaultPath, alias, url } parsed + resolved + exists
 
 const { parseWikilink, vaultPathExists } = require("./wikilinks");
 const { vaultPathToUrl } = require("./permalink");
 
-// Match a single wikilink expression as the entire string: "[[...]]".
-// Tolerates surrounding whitespace. Does not match if there's extra text
-// before/after the brackets (we want strict-form so typos surface).
+// Match a single wikilink as the entire string. Tolerates surrounding
+// whitespace. Strict-form by design (no extra text before / after the
+// brackets).
 const WIKILINK_RE = /^\s*\[\[([^\]\n]+?)\]\]\s*$/;
 
 function parseSeriesField(raw, contentRoot) {
@@ -30,14 +30,27 @@ function parseSeriesField(raw, contentRoot) {
 
   const match = trimmed.match(WIKILINK_RE);
   if (!match) {
-    return { kind: "plainString", value: trimmed };
+    return { kind: "bareString", offending: trimmed };
   }
 
   const { vaultPath, alias } = parseWikilink(match[1]);
   const url = vaultPathToUrl(vaultPath);
-  const exists = url ? vaultPathExists(vaultPath, contentRoot) : false;
+  if (!url) {
+    return {
+      kind: "deadWikilink",
+      vaultPath,
+      reason: "unknown section or malformed path (expected series/<Name>)",
+    };
+  }
+  if (!vaultPathExists(vaultPath, contentRoot)) {
+    return {
+      kind: "deadWikilink",
+      vaultPath,
+      reason: `no file at src/content/${vaultPath}.md`,
+    };
+  }
 
-  return { kind: "wikilink", vaultPath, alias, url, exists };
+  return { kind: "wikilink", vaultPath, alias, url };
 }
 
 module.exports = { parseSeriesField };
