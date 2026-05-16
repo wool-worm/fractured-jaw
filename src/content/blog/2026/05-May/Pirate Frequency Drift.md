@@ -1,8 +1,9 @@
 ---
 title: Pirate Frequency Drift
 date_published: 2026-05-09T10:00:00
-date_updated: 2026-05-16T16:37:57
-author: "[[authors/wool-worm|wool-worm]]"
+date_updated: 2026-05-16T16:50:22
+author:
+  - "[[authors/wool-worm|wool-worm]]"
 tags:
   - field-notes
   - signals
