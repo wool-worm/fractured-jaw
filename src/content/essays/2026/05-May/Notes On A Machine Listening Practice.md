@@ -1,7 +1,7 @@
 ---
 title: Notes On A Machine Listening Practice
 date_published: 2026-05-11T14:00:00
-date_updated: 2026-05-16T12:20:37
+date_updated: 2026-05-16T13:46:00
 author: wool-worm
 tags: [field-notes, theory, machine-listening, hauntology]
 series_name: "[[series/Field Notes|Field Notes]]"
@@ -14,6 +14,7 @@ graph_enabled: true
 image: "[[_attachments/blog/sample-standalone-blog/image.png|Pirate Radio]]"
 reading_time: 1 min
 ---
+### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
 
 Machine listening, in the sense I'm using here, is not what the discipline calls it. The discipline means automated audio recognition: classifiers, embeddings, fingerprints. I mean something closer to the practice of attending to a channel through a device that isn't quite under your control. A scanner that locks on what it locks on. A receiver that holds frequencies you didn't tune to.
 

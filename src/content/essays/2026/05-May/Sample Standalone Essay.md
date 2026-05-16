@@ -1,7 +1,7 @@
 ---
 title: Sample Standalone Essay
 date_published: 2026-05-14T15:00:00
-date_updated: 2026-05-16T12:24:13
+date_updated: 2026-05-16T13:45:55
 author: wool-worm
 tags: [theory, hauntology]
 series_name:
@@ -14,6 +14,7 @@ graph_enabled: true
 image: "[[_attachments/essays/notes-on-a-machine-listening-practice/image.png|Zen]]"
 reading_time: 1 min
 ---
+### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
 
 ![[_attachments/essays/notes-on-a-machine-listening-practice/image.png|Monastery|500]]
 

@@ -14,6 +14,7 @@ graph_enabled: true
 image: "[[_attachments/blog/pirate-frequency-drift/image.png]]"
 reading_time: 1 min
 ---
+### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
 
 Started watching the lower half of the band again this week. The same unlicensed station I logged in winter is back, but drifting: it's a few hundred hertz off where it used to live. Equipment failure on their end, intentional reshuffle, or just the weather. Hard to tell.
 
