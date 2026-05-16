@@ -1,6 +1,6 @@
 ---
 title: blog
-description: Long-form stream-of-consciousness posts.
+description:
 layout: layouts/section.njk
 page_type: section
 section_name: blog

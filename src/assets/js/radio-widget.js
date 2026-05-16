@@ -1019,7 +1019,7 @@
   }
 
   // Fractured Jaw Radio script segments. One emitter, one source file
-  // (src/content/_local/radio/fractured-jaw-radio.md), one channel.
+  // (src/content/_data/fractured-jaw-radio.md), one channel.
   // Segments are separated by `---` in the source; each one plays as a
   // separate utterance with a short pause between, longer pause at the
   // end of the loop.
@@ -1099,7 +1099,7 @@
 
   // ── Voice engine: lock ──────────────────────────────────────────────────
   // Reads cipher digit groups from /radio-cipher.json (built from
-  // src/content/_local/radio/radio-source.md; multiple passages
+  // src/content/_data/radio-source.md; multiple passages
   // supported via `---` separator). Round-robin: the Nth lock channel
   // in band-then-index order broadcasts passage (N mod passages.length).
   // Each channel reads its assigned passage from the start, looping.

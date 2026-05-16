@@ -1,6 +1,6 @@
 ---
 title: essays
-description: Self-contained pieces.
+description:
 layout: layouts/section.njk
 page_type: section
 section_name: essays

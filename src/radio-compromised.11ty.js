@@ -1,9 +1,9 @@
 // Eleventy JavaScript template — emits /radio-compromised.json at build
 // time. Mirrors radio-cipher.11ty.js but for the `compromised` channels.
 //
-// The source file at src/content/_local/radio/radio-compromised.md
-// contains one or more termination-message templates separated by `---`
-// on its own line. Each template is a plain string with placeholders:
+// The source file at src/content/_data/radio-compromised.md contains
+// one or more termination-message templates separated by `---` on its
+// own line. Each template is a plain string with placeholders:
 //
 //   {CODE}       — substituted with a 3-digit number (100-999), fixed per channel
 //   {SECTION}    — substituted with N + letter, e.g. "12c", fixed per channel
@@ -16,7 +16,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const SOURCE_PATH = path.join(__dirname, "content", "_local", "radio", "radio-compromised.md");
+const SOURCE_PATH = path.join(__dirname, "content", "_data", "radio-compromised.md");
 
 const FALLBACK_TEMPLATE =
   "This station's operations have been terminated due to violation of " +

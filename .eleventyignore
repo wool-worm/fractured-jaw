@@ -5,5 +5,10 @@ src/content/.trash/
 # Author-side workspace: templates, guides, snippets that aren't site content
 src/content/_local/
 
+# Raw source files read directly by .11ty.js emitters (radio scripts).
+# Tracked in git so production builds see them, but excluded from the
+# content pipeline so they don't render as standalone pages.
+src/content/_data/
+
 # Build output (in case it ever lives inside src/)
 src/_site/

@@ -1,13 +1,13 @@
 // Eleventy JavaScript template — emits /radio-cipher.json at build time.
 //
 // Feeds the `lock` channels of the pirate-radio widget. The source text
-// lives at src/content/_local/radio/radio-source.md, which is gitignored
-// (see .gitignore and .eleventyignore) — author-only, never ships. This
-// emitter reads it if present, splits on `---` lines into individual
-// passages, encodes each via A1Z26 (a=01..z=26, space=00, everything
-// else skipped), chunks into 5-digit groups, and emits one digit-group
-// array per passage. Public artifact contains digits only; the plaintext
-// source never enters the published site.
+// lives at src/content/_data/radio-source.md (tracked in git but
+// excluded from Eleventy's content pipeline via .eleventyignore). The
+// plaintext never ships as plaintext: this emitter splits on `---`
+// lines into individual passages, encodes each via A1Z26 (a=01..z=26,
+// space=00, everything else skipped), chunks into 5-digit groups, and
+// emits one digit-group array per passage. The public artifact
+// contains digits only.
 //
 // Channel assignment is round-robin: scanning bands ALPHA→DELTA and
 // index 0x00→0x3F, the Nth lock channel encountered plays passage
@@ -15,14 +15,14 @@
 // band-then-index order — write passages in the order you want them
 // aired across the dial.
 //
-// If the source file is absent (e.g. on a fresh checkout where _local/
-// has not yet been populated), a baked-in fallback passage is used so
-// the lock channels still broadcast something atmospheric.
+// If the source file is absent (e.g. on a partial checkout) a baked-in
+// fallback passage is used so the lock channels still broadcast
+// something atmospheric.
 
 const fs = require("fs");
 const path = require("path");
 
-const SOURCE_PATH = path.join(__dirname, "content", "_local", "radio", "radio-source.md");
+const SOURCE_PATH = path.join(__dirname, "content", "_data", "radio-source.md");
 
 const FALLBACK_SOURCE =
   "transmission acknowledged hold position the signal is stable repeat the signal is stable";

@@ -1,6 +1,6 @@
 ---
 title: authors
-description: Every author, every post.
+description:
 layout: layouts/authors-index.njk
 graph_enabled: false
 preview_enabled: false
