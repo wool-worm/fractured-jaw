@@ -192,8 +192,16 @@ body.is-encryption-failure .site-nav::after {
 }
 
 /* ── 5. Deconstructed masthead — machine god incarnation ────────────────── */
+/* The clamp floor is intentionally small (0.85rem ≈ 13.6px) so the title
+   can shrink on narrow phones to fit alongside the skull logo (64px,
+   flex-shrink:0) and the hamburger button (2.2rem) without pushing them
+   off-screen. `.site-title` itself has white-space:nowrap + flex-shrink:0
+   in layout.css; without a small enough font, those would force the
+   header wider than the viewport and trigger horizontal page scroll.
+   The 2.3rem ceiling preserves the desktop feel — clamps in at ~1050px
+   viewport. */
 .site-title {
-  font-size: clamp(1.4rem, 3.5vw, 2.3rem);
+  font-size: clamp(0.85rem, 3.5vw, 2.3rem);
   position: relative;
   display: inline-block;
   text-shadow: none;

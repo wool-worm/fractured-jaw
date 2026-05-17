@@ -288,12 +288,11 @@ main {
     align-items: center;
   }
 
-  /* Shrink the masthead clamp's floor so the title fits alongside the
-     skull and hamburger at narrow widths. Above 720px the original
-     clamp(1.4rem, 4vw, 2.2rem) continues to apply. */
-  .site-title {
-    font-size: clamp(0.95rem, 4.5vw, 1.6rem);
-  }
+  /* Masthead font-size for mobile is handled in cult.css via a single
+     clamp() that covers every width — clamp(0.85rem, 3.5vw, 2.3rem).
+     Adding a width-conditional override here would be dead code: cult.css
+     is imported after layout.css, so its base `.site-title` rule beats
+     anything we'd set in this media query. */
 
   .site-nav-toggle {
     display: block;
