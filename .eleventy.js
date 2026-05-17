@@ -64,10 +64,16 @@ module.exports = function (eleventyConfig) {
     return dt && dt.isValid ? dt.toFormat(format) : "";
   });
 
-  // ISO 8601 string for <time datetime="..."> attributes and JSON output.
+  // ISO 8601 string for <time datetime="..."> attributes and article time
+  // meta. Forced to UTC so the emitted offset is always "Z" — local-zone
+  // emission would leak the build machine's timezone (a geolocation hint)
+  // into every rendered page. The Atom feed renderer does the same thing
+  // via its own toIsoDate helper; this keeps HTML output consistent. GHA
+  // runners already build in UTC, so this mostly matters for local builds
+  // viewed through the dev server.
   eleventyConfig.addFilter("isoDate", (value) => {
     const dt = toDateTime(value);
-    return dt && dt.isValid ? dt.toISO() : "";
+    return dt && dt.isValid ? dt.toUTC().toISO() : "";
   });
 
   // Current year (used in footer copyright).
@@ -83,14 +89,6 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addFilter("take", (value, n) =>
     Array.isArray(value) ? value.slice(0, n) : value
   );
-
-  // Normalize a scalar-or-array into an array. Used by post-meta.njk so the
-  // `author` field can be either a string ("wool-worm") or a string[]
-  // (co-authored posts) without branching in the template.
-  eleventyConfig.addFilter("asList", (value) => {
-    if (value === null || value === undefined || value === "") return [];
-    return Array.isArray(value) ? value : [value];
-  });
 
   // Promote a possibly-relative URL to an absolute one by prefixing site.url.
   // Used in head.njk for og:image (Open Graph rejects relative paths). Passes
