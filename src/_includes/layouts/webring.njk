@@ -1,0 +1,43 @@
+---
+layout: layouts/base.njk
+---
+{# Webring landing (/webring/). Renders neighbors from the global
+   `webring` data (src/_data/webring.js → src/content/_data/webring.md).
+   Each entry is a small card with name, optional description, and an
+   outbound link. Empty-state copy stays in-world. Visual shape mirrors
+   layouts/series-index.njk so the page reads as part of the same
+   section-page family. #}
+
+<section class="section-page section-webring">
+  <header class="section-header">
+    <h1 class="section-title">{{ title or "Webring" }}</h1>
+    {% if description %}
+      <p class="section-description">{{ description }}</p>
+    {% endif %}
+    {% if content %}
+      <div class="section-intro">{{ content | safe }}</div>
+    {% endif %}
+  </header>
+
+  {% if webring.neighbors and webring.neighbors.length %}
+    <ul class="webring-grid">
+      {% for n in webring.neighbors %}
+        <li class="webring-card">
+          <article>
+            <h2 class="webring-card-title">
+              <a href="{{ n.url }}" rel="external noopener">{{ n.name }}</a>
+            </h2>
+            {% if n.description %}
+              <p class="webring-card-description">{{ n.description }}</p>
+            {% endif %}
+            <p class="webring-card-url">
+              <a href="{{ n.url }}" rel="external noopener">{{ n.url }}</a>
+            </p>
+          </article>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="section-empty">No neighbors on the wire yet. The dial is open.</p>
+  {% endif %}
+</section>
