@@ -53,12 +53,14 @@ src/
     essays/              Self-contained pieces
     fragments/           Short notes
     media/               Reviews
-    pages/               Top-level pages (/, /about/, section landings, ...)
+    pages/               Top-level pages (/, /about/, section landings, /webring/, ...)
     series/              Series parents (group posts across sections)
+    authors/             Author files (display name, bio body, per-author feed)
     _attachments/        Images, routed by the Obsidian attachment-scrubber plugin
+    _data/               Radio voice-channel + webring source markdown (tracked, but excluded from Eleventy's content pipeline)
     _local/              Author scratch + documentation (gitignored)
     .obsidian/           Vault config (gitignored; syncs via Obsidian Sync)
-  utils/                 permalink, slugify, frontmatter, wikilinks, series, atom-feed
+  utils/                 permalink, slugify, frontmatter, wikilinks, series, authors, atom-feed
   preview-index.11ty.js  Generates /preview-index.json (wikilink hover previews)
   graph-data.11ty.js     Generates /graph-data.json (graph widget + backlinks)
   search-index.11ty.js   Generates /search-index.json (in-page search)
@@ -70,8 +72,9 @@ src/
   fractured-jaw-radio.11ty.js Generates /fractured-jaw-radio.json
   feed.11ty.js           Atom feed emitter (master + per-section + series-aggregate)
   feed-series.11ty.js    Per-series Atom feeds
+  feed-author.11ty.js    Per-author Atom feeds
   search.njk             /search/ results page
-  author.njk             Per-author pages
+  404.njk                /404.html page (GitHub Pages 404 surface)
   tag.njk                Per-tag pages
 .github/workflows/       GitHub Pages deploy workflow
 _site/                   Build output (gitignored)
@@ -89,16 +92,16 @@ Wikilinks are fully scoped:
 [[blog/2026/05-May/My Great Post|alias text]]
 ```
 
-The vault path (before the pipe) is resolved to the public URL; the alias is what readers see. Body wikilinks, frontmatter `image:`, and `series_name:` all use the same syntax. Build-time validation catches dead or malformed wikilinks.
+The vault path (before the pipe) is resolved to the public URL; the alias is what readers see. Body wikilinks plus frontmatter `image:`, `series_name:`, and `author:` all use the same syntax. Build-time validation catches dead or malformed wikilinks; in production, dead links and bare-string frontmatter fail the build.
 
 Frontmatter (all sections):
 
 | Field             | Notes                                                       |
 |-------------------|-------------------------------------------------------------|
 | `title`           | Required. Post title.                                       |
-| `date_published`  | Required. ISO 8601 with timezone offset.                    |
+| `date_published`  | Required. ISO 8601. Emitted as UTC to keep build-machine timezone out of rendered output. |
 | `date_updated`    | Maintained by an Obsidian plugin.                           |
-| `author`          | String or string[] for co-authored posts.                   |
+| `author`          | Wikilink to `[[authors/<Name>\|<Name>]]`. Array for co-authored posts. Strict-validated. |
 | `tags`            | List of tags. Lowercased + slug-normalized for URLs.        |
 | `description`     | <50 words. Drives social-card description + previews.       |
 | `featured`        | Boolean. `true` puts the post on the homepage featured row. |
@@ -114,28 +117,30 @@ Frontmatter (all sections):
 ## Branching + deploy
 
 Two long-lived branches:
-- `main` is production. `fractured-jaw.com` serves whatever is on `main`. Pushes to `main` trigger the GitHub Actions deploy.
-- `dev` is the always-ahead draft branch where feature work lands first.
+- `main` is production. `fractured-jaw.com` serves whatever is on `main`. Pushes to `main` trigger the GitHub Actions build + deploy.
+- `dev` is the always-ahead draft branch where feature work lands first. Pushes to `dev` (including feature-branch merges) trigger a build-only check, so dev health is visible without touching production.
 
 Flow: `feature/<name>` -> `dev` -> PR -> `main` -> deploy.
 
-PRs to `main` run a build check without deploying; merging the PR is what fires the actual deploy.
+PRs into either branch run a build check without deploying; merging a PR into `main` is what fires the actual deploy.
 
 ## Features
 
 - Wikilinks (fully scoped, with build-time validation) and on-hover wikilink previews
 - Tags, per-tag pages, tag index
-- Authors, per-author pages, author index
+- Authors as a first-class section (each author has a real file with bio body, per-author Atom feed, and wikilink-only `author:` frontmatter)
 - Series (first-class section; parent files have full frontmatter, posts opt in via `series_name:`)
 - Graph widget (in-page local graph) + dedicated `/network_nodes/` full graph
-- Atom feeds: master, per-section (blog, essays, fragments, media), series-aggregate, per-series
+- Atom feeds: master, per-section (blog, essays, fragments, media), series-aggregate, per-series, per-author
 - DIY in-page search (build-emitted index, client-side ranking; no remote service)
 - Pirate-radio scanner widget (six signal types + pinned FJR channel; haunted stations)
 - Systems-status panel widget (real-data stats + encryption state machine)
 - Responsive staircase (1400 / 1200 / 1100 / 1000 / 720) with JS-driven widget fold
 - Inline image attachments via Obsidian `![[_attachments/...]]` syntax with EXIF stripping done vault-side
 - Brutalist styling: void / brass / blood / sodium palette, layered masthead glitch, scanline, sawtooth section dividers
-- SEO surface: sitemap, Open Graph + Twitter cards, default skull OG image, robots.txt + ai.txt
+- Brutalist 404 page at `/404.html`
+- Webring scaffolding (`/webring/` page reads a vault-side data file)
+- SEO surface: sitemap, Open Graph + Twitter cards (with image dimensions and article-time meta), default skull OG image, robots.txt + ai.txt, Google + Bing Search Console verified
 - Skip-to-content link, reduced-motion handling, semantic HTML throughout
 
 ## Licensing
