@@ -1,111 +1,164 @@
 /* Print stylesheet.
  *
- * Imported last from site.css so every rule here can use bare selectors
- * to override the dark / brutalist on-screen palette. The print surface
- * is ink-on-paper: white background, near-black text, no widgets, no
- * scanline, no glitch ghost layers. Brutalist typography survives —
- * heavy display titles and structured sectioning read well in print.
+ * Imported last from site.css so the @media print rules below override
+ * everything else when the print medium is active. On-screen surface is
+ * unchanged.
+ *
+ * The brutalist on-screen palette is built on dark backgrounds, glitch
+ * animations, clip-path masthead slicing, and fixed overlays. None of
+ * that translates to paper, and most of it actively breaks print
+ * rendering (animations stuck at opacity 0, clip-paths hiding content,
+ * dark text on a dark background defaulting to invisible). This file
+ * resets all of that aggressively, then applies a small set of ink-on-
+ * paper rules.
  *
  * Goals:
- *   - One readable copy of the post / page on paper.
+ *   - One readable copy of the post on paper.
  *   - No widgets, no nav, no animated decoration.
- *   - Show the URL after every link so the reader can chase references
- *     off-paper.
+ *   - URLs printed after every external link so the page stays
+ *     navigable off-paper.
  *   - Avoid awkward page breaks inside figures and headings.
  */
 
 @media print {
 
-  /* ---------- Page palette ---------- */
+  /* ---------- Universal reset ----------
+   *
+   * Strip every property that the on-screen palette uses to hide,
+   * displace, or recolor content. Intentionally heavy-handed: any
+   * single missed property leaves a brutalist artifact stuck in print
+   * (an opacity:0 frame of an animation, a clip-path slice, a dark
+   * color matching the assumed-dark background).
+   */
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    clip-path: none !important;
+    opacity: 1 !important;
+    background-image: none !important;
+  }
 
+  /* ---------- Page palette ----------
+   *
+   * Ink on paper. html + body get explicit white + near-black; the
+   * universal `background-image: none` above kills the body's scanline
+   * gradient. Body pseudo-elements (the vignette overlay and the
+   * signal-corrupt bar) are display: none'd since they have no print
+   * meaning.
+   */
   html, body {
     background: #fff !important;
     color: #111 !important;
   }
-
   body {
     font-family: var(--font-post-body, "Times New Roman", serif);
     font-size: 11pt;
     line-height: 1.45;
   }
-
-  /* ---------- Hide non-content surfaces ---------- */
-
-  /* Skip-to-content link (only visible on keyboard focus in screen, never in print) */
-  .skip-link,
-  /* Broadcast ticker + masthead glitch ghost layers */
-  .broadcast-banner,
-  .site-title > span ~ span,
-  /* Site nav (header) */
-  .site-nav,
-  .site-nav-toggle,
-  .site-logo-mark,
-  /* Footer ticker + credit row */
-  .site-footer .footer-glitch,
-  /* All three pinned widgets */
-  #graph-widget, .graph-widget,
-  #radio-widget, .radio-widget,
-  #systems-widget, .systems-widget,
-  /* Search modal (never visible at print time anyway) */
-  #search-modal,
-  /* Resume overlays etc. */
-  #radio-widget-resume,
-  /* Failure banner inside systems widget */
-  .failure-banner {
+  body::before,
+  body::after {
     display: none !important;
   }
 
-  /* Keep the visible masthead title text but flatten the deconstructed layers
-     to one solid copy. The site-title has four overlapping spans for the
-     screen glitch; let only the first carry the visible glyphs. */
+  /* ---------- Force ink color on every text-bearing surface ----------
+   *
+   * Tedious but necessary. The on-screen sheets set explicit colors via
+   * many class selectors with higher specificity than a generic `body`
+   * rule. Listing the surfaces that carry text ensures none default to
+   * a near-white palette color against the now-white print background.
+   */
+  h1, h2, h3, h4, h5, h6,
+  p, li, dd, dt,
+  blockquote, code, pre, figcaption,
+  a, a:link, a:visited,
+  .site-title,
+  .page-title, .page-content, .page-header, .page-intro,
+  .post-title, .post-description, .post-content, .post-meta, .post-card,
+  .section-title, .section-description, .section-intro, .section-header, .section-page,
+  .series-card-title, .series-card-description, .series-card-count, .series-intro,
+  .webring-card-title, .webring-card-description, .webring-card-url,
+  .author-name, .author-link,
+  .post-card-title, .post-card-description, .post-card-meta, .post-card-section,
+  .tag-list, .tag-list a,
+  .post-card-tags a, .series-card-tags a, .series-tags a,
+  .footer-credit, .author-cloud-name, .author-cloud-count {
+    color: #111 !important;
+  }
+
+  /* ---------- Hide non-content surfaces ---------- */
+
+  .skip-link,
+  .broadcast-banner,
+  .site-title > span ~ span,
+  .site-nav,
+  .site-nav-toggle,
+  .site-logo-mark,
+  .site-footer .footer-glitch,
+  #graph-widget, .graph-widget,
+  #radio-widget, .radio-widget,
+  #systems-widget, .systems-widget,
+  #search-modal,
+  #radio-widget-resume,
+  .systems-failure-banner,
+  .failure-banner,
+  .feed-block {
+    display: none !important;
+  }
+
+  /* Keep the visible masthead title text but flatten the deconstructed
+     layers to one solid copy. The site-title has four overlapping spans
+     for the screen glitch; the first carries the visible glyphs. */
   .site-title {
     font-size: 18pt;
-    animation: none !important;
-    filter: none !important;
-    text-shadow: none !important;
+    position: static !important;
     color: #111 !important;
   }
   .site-title > span:first-child {
     position: static !important;
-    display: inline-block;
+    display: inline !important;
   }
 
-  /* Suppress every animation. Print is static; animations don't translate
-     and may cause printer drivers to render mid-frame state. */
-  *, *::before, *::after {
-    animation: none !important;
-    transition: none !important;
-    text-shadow: none !important;
-  }
-
-  /* ---------- Typography ---------- */
+  /* ---------- Headings ---------- */
 
   h1, h2, h3, h4, h5, h6 {
-    color: #111 !important;
-    filter: none !important;
     page-break-after: avoid;
     break-after: avoid;
+    font-family: var(--font-title, Georgia, serif);
   }
-
   h1 { font-size: 22pt; margin-top: 0; }
   h2 { font-size: 16pt; }
   h3 { font-size: 13pt; }
 
+  /* ---------- Body prose ---------- */
+
+  .post-content,
+  .page-content,
+  .series-intro,
+  .section-intro {
+    font-size: 11pt;
+    line-height: 1.5;
+    max-width: none !important;
+  }
+
   p, li, dd {
-    color: #111 !important;
     orphans: 3;
     widows: 3;
   }
 
+  /* ---------- Links + URL appendage ---------- */
+
   a, a:link, a:visited {
-    color: #111 !important;
     text-decoration: underline;
     border-bottom: none !important;
   }
 
-  /* Show the URL after every external link so the printed page is still
-     navigable. Skip in-page anchors (#foo) and `mailto:` links since their
-     resolved form is noisy. */
+  /* Show the URL after every external link so the printed page stays
+     navigable. Skip in-page anchors and `mailto:` for noise reasons. */
   a[href^="http"]::after,
   a[href^="/"]::after {
     content: " (" attr(href) ")";
@@ -114,38 +167,28 @@
     word-break: break-all;
   }
 
-  /* Wikilinks already render as anchors; the rule above covers them. */
-
-  /* ---------- Post body ---------- */
-
-  .post-content,
-  .page-content,
-  .series-intro {
-    font-size: 11pt;
-    line-height: 1.5;
-    color: #111 !important;
-    max-width: none;
-  }
+  /* ---------- Blockquote, code, pre ---------- */
 
   blockquote {
     border-left: 2pt solid #888;
     margin-left: 0;
     padding-left: 0.6em;
     color: #333 !important;
+    font-style: italic;
   }
 
   code, pre {
     background: #f5f5f5 !important;
     color: #111 !important;
     font-size: 10pt;
+    font-family: monospace;
   }
-
   pre {
     border: 0.5pt solid #aaa;
     padding: 0.5em;
     page-break-inside: avoid;
     break-inside: avoid;
-    white-space: pre-wrap; /* don't overflow the page width */
+    white-space: pre-wrap;
   }
 
   /* ---------- Figures + images ---------- */
@@ -155,18 +198,14 @@
     break-inside: avoid;
     max-width: 100% !important;
   }
-
-  figure {
-    margin: 0.8em 0;
-  }
-
+  figure { margin: 0.8em 0; }
   figcaption {
     font-size: 9pt;
     color: #555 !important;
     font-style: italic;
   }
 
-  /* ---------- Post meta block ---------- */
+  /* ---------- Post-meta block ---------- */
 
   .post-meta {
     border-top: 0.5pt solid #aaa;
@@ -174,15 +213,13 @@
     padding: 0.4em 0;
     margin: 1em 0;
     font-size: 9pt;
-    color: #333 !important;
   }
-
   .post-meta dt {
-    color: #666 !important;
     font-weight: bold;
+    color: #666 !important;
   }
 
-  /* Tag chips don't need their boxed treatment in print */
+  /* Tag chips flatten to plain inline elements */
   .tag-list li a,
   .post-card-tags li a,
   .series-tags li a {
@@ -192,24 +229,18 @@
     color: #555 !important;
   }
 
-  /* ---------- Listing pages (sections / tag / author) ---------- */
+  /* ---------- Listing pages flatten card chrome ---------- */
 
-  /* These render fine; just flatten card chrome to plain blocks. */
   .post-card,
   .series-card,
   .webring-card,
   .section-card {
     background: transparent !important;
     border: none !important;
-    border-left: none !important;
     page-break-inside: avoid;
     break-inside: avoid;
   }
-
-  .post-list,
-  .section-post-list,
-  .series-grid,
-  .webring-grid {
+  .post-list, .section-post-list, .series-grid, .webring-grid {
     list-style: none;
     padding-left: 0;
   }
@@ -219,11 +250,10 @@
   @page {
     margin: 0.75in;
   }
-
   main {
-    max-width: none;
-    padding: 0;
-    margin: 0;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
 }
