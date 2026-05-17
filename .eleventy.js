@@ -84,14 +84,6 @@ module.exports = function (eleventyConfig) {
     Array.isArray(value) ? value.slice(0, n) : value
   );
 
-  // Normalize a scalar-or-array into an array. Used by post-meta.njk so the
-  // `author` field can be either a string ("wool-worm") or a string[]
-  // (co-authored posts) without branching in the template.
-  eleventyConfig.addFilter("asList", (value) => {
-    if (value === null || value === undefined || value === "") return [];
-    return Array.isArray(value) ? value : [value];
-  });
-
   // Promote a possibly-relative URL to an absolute one by prefixing site.url.
   // Used in head.njk for og:image (Open Graph rejects relative paths). Passes
   // through any value that already starts with http:// or https://.
