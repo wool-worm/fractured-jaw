@@ -486,6 +486,93 @@
   color: var(--sodium);
 }
 
+/* ── Webring grid (/webring/ landing) ───────────────────────────────────── */
+/* Borrows the series-card visual shape — same grid, same card frame — with
+   a tighter card body since neighbors don't carry images or tag chips. */
+.webring-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-md);
+  margin-top: var(--sp-md);
+}
+
+@media (max-width: 900px) {
+  .webring-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .webring-grid { grid-template-columns: 1fr; }
+}
+
+.webring-card {
+  background: var(--void-soft);
+  border: 1px solid var(--bone-faint);
+  border-left: 3px solid var(--brass-deep);
+  transition: border-left-color 0.12s, background 0.12s;
+  display: flex;
+  flex-direction: column;
+}
+
+.webring-card:hover {
+  background: var(--void-mid);
+  border-left-color: var(--sodium);
+}
+
+.webring-card article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-xs);
+  padding: var(--sp-md);
+  flex: 1;
+}
+
+.webring-card-title {
+  font-family: var(--font-title);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+}
+
+.webring-card-title a {
+  color: var(--bone);
+  border-bottom: none;
+}
+
+.webring-card-title a:hover {
+  color: var(--sodium);
+  text-shadow: 0.1rem 0.05rem 0 var(--blood), -0.05rem -0.1rem 0 var(--brass-deep);
+}
+
+.webring-card-description {
+  font-family: var(--font-post-body);
+  font-size: 0.85rem;
+  color: var(--bone-dim);
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.webring-card-url {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  text-transform: lowercase;
+  letter-spacing: 0.08em;
+  color: var(--brass-deep);
+  margin: var(--sp-xs) 0 0;
+  padding-top: var(--sp-xs);
+  border-top: 1px solid var(--bone-faint);
+  word-break: break-all;
+}
+
+.webring-card-url a {
+  color: var(--brass-deep);
+  border-bottom: none;
+}
+
+.webring-card-url a:hover {
+  color: var(--sodium);
+}
+
 /* ── Individual post layout ─────────────────────────────────────────────── */
 .post-content {
   margin-top: var(--sp-lg);
