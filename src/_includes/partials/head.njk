@@ -19,21 +19,48 @@
    lives in _data/site.js so every page has a preview even when frontmatter
    omits `image:`. #}
 {% set _ogImage = (image or site.defaultImage) | absoluteUrl(site.url) %}
+{# True when this page falls back to the site-wide default image. We emit
+   image dimensions only in that case because we know defaultImage's pixel
+   size statically; per-post images aren't probed at build time. #}
+{% set _isDefaultImage = not image %}
+{# Section-bearing pages (blog/essays/fragments/media + series + authors)
+   are treated as articles for og:type and article:* meta. The pages/
+   section and section-landings are "website" type. #}
+{% set _isArticle = section and section != "pages" %}
 
 {# Open Graph (used by Discord, Slack, Mastodon, Facebook, etc. when links are shared) #}
 <meta property="og:title" content="{{ title or site.title }}">
 <meta property="og:description" content="{{ description or site.description }}">
-<meta property="og:type" content="{% if section and section != 'pages' %}article{% else %}website{% endif %}">
+<meta property="og:type" content="{% if _isArticle %}article{% else %}website{% endif %}">
 <meta property="og:url" content="{{ site.url }}{{ page.url }}">
 <meta property="og:site_name" content="{{ site.title }}">
 <meta property="og:image" content="{{ _ogImage }}">
+{% if _isDefaultImage %}
+<meta property="og:image:width" content="{{ site.defaultImageWidth }}">
+<meta property="og:image:height" content="{{ site.defaultImageHeight }}">
+{% endif %}
 {% if image_alt %}<meta property="og:image:alt" content="{{ image_alt }}">{% endif %}
+
+{# Article-time meta. Spec-defined Open Graph properties for article-type
+   pages; some social scrapers and feed readers display freshness based on
+   these. Only emitted for pages with a content section (excludes pages/
+   and section landings). #}
+{% if _isArticle and date_published %}
+<meta property="article:published_time" content="{{ date_published | isoDate }}">
+{% endif %}
+{% if _isArticle and date_updated %}
+<meta property="article:modified_time" content="{{ date_updated | isoDate }}">
+{% endif %}
 
 {# Twitter card #}
 <meta name="twitter:card" content="{{ card_type or site.defaultCardType }}">
 <meta name="twitter:title" content="{{ title or site.title }}">
 <meta name="twitter:description" content="{{ description or site.description }}">
 <meta name="twitter:image" content="{{ _ogImage }}">
+{% if _isDefaultImage %}
+<meta name="twitter:image:width" content="{{ site.defaultImageWidth }}">
+<meta name="twitter:image:height" content="{{ site.defaultImageHeight }}">
+{% endif %}
 {% if image_alt %}<meta name="twitter:image:alt" content="{{ image_alt }}">{% endif %}
 
 <link rel="canonical" href="{{ site.url }}{{ page.url }}">
