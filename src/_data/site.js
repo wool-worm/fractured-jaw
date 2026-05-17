@@ -14,6 +14,14 @@ module.exports = {
   // Path is site-absolute; head.njk prefixes site.url to produce a fully
   // qualified URL (Open Graph requires absolute URLs).
   defaultImage: "/assets/images/og-default.png",
+  // Pixel dimensions of defaultImage. Emitted as og:image:width / og:image:height
+  // (and the twitter:image equivalents) when the page falls back to
+  // defaultImage. Helps social scrapers render previews without round-tripping
+  // the image first. Per-post images don't emit dimensions because we don't
+  // probe them at build time — accept the small degradation rather than add
+  // an image-size dependency.
+  defaultImageWidth: 1024,
+  defaultImageHeight: 1024,
   // Twitter card type for the default image. "summary" = square (1:1),
   // "summary_large_image" = wide (2:1, ~1200x630). Match this to the
   // aspect ratio of defaultImage. Posts can override per-page via
