@@ -64,10 +64,16 @@ module.exports = function (eleventyConfig) {
     return dt && dt.isValid ? dt.toFormat(format) : "";
   });
 
-  // ISO 8601 string for <time datetime="..."> attributes and JSON output.
+  // ISO 8601 string for <time datetime="..."> attributes and article time
+  // meta. Forced to UTC so the emitted offset is always "Z" — local-zone
+  // emission would leak the build machine's timezone (a geolocation hint)
+  // into every rendered page. The Atom feed renderer does the same thing
+  // via its own toIsoDate helper; this keeps HTML output consistent. GHA
+  // runners already build in UTC, so this mostly matters for local builds
+  // viewed through the dev server.
   eleventyConfig.addFilter("isoDate", (value) => {
     const dt = toDateTime(value);
-    return dt && dt.isValid ? dt.toISO() : "";
+    return dt && dt.isValid ? dt.toUTC().toISO() : "";
   });
 
   // Current year (used in footer copyright).
