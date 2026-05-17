@@ -1,0 +1,229 @@
+/* Print stylesheet.
+ *
+ * Imported last from site.css so every rule here can use bare selectors
+ * to override the dark / brutalist on-screen palette. The print surface
+ * is ink-on-paper: white background, near-black text, no widgets, no
+ * scanline, no glitch ghost layers. Brutalist typography survives —
+ * heavy display titles and structured sectioning read well in print.
+ *
+ * Goals:
+ *   - One readable copy of the post / page on paper.
+ *   - No widgets, no nav, no animated decoration.
+ *   - Show the URL after every link so the reader can chase references
+ *     off-paper.
+ *   - Avoid awkward page breaks inside figures and headings.
+ */
+
+@media print {
+
+  /* ---------- Page palette ---------- */
+
+  html, body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  body {
+    font-family: var(--font-post-body, "Times New Roman", serif);
+    font-size: 11pt;
+    line-height: 1.45;
+  }
+
+  /* ---------- Hide non-content surfaces ---------- */
+
+  /* Skip-to-content link (only visible on keyboard focus in screen, never in print) */
+  .skip-link,
+  /* Broadcast ticker + masthead glitch ghost layers */
+  .broadcast-banner,
+  .site-title > span ~ span,
+  /* Site nav (header) */
+  .site-nav,
+  .site-nav-toggle,
+  .site-logo-mark,
+  /* Footer ticker + credit row */
+  .site-footer .footer-glitch,
+  /* All three pinned widgets */
+  #graph-widget, .graph-widget,
+  #radio-widget, .radio-widget,
+  #systems-widget, .systems-widget,
+  /* Search modal (never visible at print time anyway) */
+  #search-modal,
+  /* Resume overlays etc. */
+  #radio-widget-resume,
+  /* Failure banner inside systems widget */
+  .failure-banner {
+    display: none !important;
+  }
+
+  /* Keep the visible masthead title text but flatten the deconstructed layers
+     to one solid copy. The site-title has four overlapping spans for the
+     screen glitch; let only the first carry the visible glyphs. */
+  .site-title {
+    font-size: 18pt;
+    animation: none !important;
+    filter: none !important;
+    text-shadow: none !important;
+    color: #111 !important;
+  }
+  .site-title > span:first-child {
+    position: static !important;
+    display: inline-block;
+  }
+
+  /* Suppress every animation. Print is static; animations don't translate
+     and may cause printer drivers to render mid-frame state. */
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    text-shadow: none !important;
+  }
+
+  /* ---------- Typography ---------- */
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #111 !important;
+    filter: none !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  h1 { font-size: 22pt; margin-top: 0; }
+  h2 { font-size: 16pt; }
+  h3 { font-size: 13pt; }
+
+  p, li, dd {
+    color: #111 !important;
+    orphans: 3;
+    widows: 3;
+  }
+
+  a, a:link, a:visited {
+    color: #111 !important;
+    text-decoration: underline;
+    border-bottom: none !important;
+  }
+
+  /* Show the URL after every external link so the printed page is still
+     navigable. Skip in-page anchors (#foo) and `mailto:` links since their
+     resolved form is noisy. */
+  a[href^="http"]::after,
+  a[href^="/"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #555;
+    word-break: break-all;
+  }
+
+  /* Wikilinks already render as anchors; the rule above covers them. */
+
+  /* ---------- Post body ---------- */
+
+  .post-content,
+  .page-content,
+  .series-intro {
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #111 !important;
+    max-width: none;
+  }
+
+  blockquote {
+    border-left: 2pt solid #888;
+    margin-left: 0;
+    padding-left: 0.6em;
+    color: #333 !important;
+  }
+
+  code, pre {
+    background: #f5f5f5 !important;
+    color: #111 !important;
+    font-size: 10pt;
+  }
+
+  pre {
+    border: 0.5pt solid #aaa;
+    padding: 0.5em;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    white-space: pre-wrap; /* don't overflow the page width */
+  }
+
+  /* ---------- Figures + images ---------- */
+
+  figure, img, .image-embed {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    max-width: 100% !important;
+  }
+
+  figure {
+    margin: 0.8em 0;
+  }
+
+  figcaption {
+    font-size: 9pt;
+    color: #555 !important;
+    font-style: italic;
+  }
+
+  /* ---------- Post meta block ---------- */
+
+  .post-meta {
+    border-top: 0.5pt solid #aaa;
+    border-bottom: 0.5pt solid #aaa;
+    padding: 0.4em 0;
+    margin: 1em 0;
+    font-size: 9pt;
+    color: #333 !important;
+  }
+
+  .post-meta dt {
+    color: #666 !important;
+    font-weight: bold;
+  }
+
+  /* Tag chips don't need their boxed treatment in print */
+  .tag-list li a,
+  .post-card-tags li a,
+  .series-tags li a {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 0.3em 0 0 !important;
+    color: #555 !important;
+  }
+
+  /* ---------- Listing pages (sections / tag / author) ---------- */
+
+  /* These render fine; just flatten card chrome to plain blocks. */
+  .post-card,
+  .series-card,
+  .webring-card,
+  .section-card {
+    background: transparent !important;
+    border: none !important;
+    border-left: none !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .post-list,
+  .section-post-list,
+  .series-grid,
+  .webring-grid {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  /* ---------- Page geometry ---------- */
+
+  @page {
+    margin: 0.75in;
+  }
+
+  main {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+}
