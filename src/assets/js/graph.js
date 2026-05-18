@@ -52,6 +52,15 @@
   var mouseDown = null;
   var rafHandle = null;
 
+  // Wheel-driven zoom. Scales the canvas around its center. Hit tests run
+  // in world coordinates, so getPos() un-projects screen → world before
+  // calling nodeAt(). Labels render OUTSIDE the scale transform so their
+  // font stays a consistent screen size.
+  var zoom = 1;
+  var ZOOM_MIN = 0.3;
+  var ZOOM_MAX = 4;
+  var ZOOM_STEP = 1.1;
+
   function resize() {
     // Scale to the device pixel ratio so the lines stay crisp on hi-dpi
     // displays. We render in CSS pixels but the backing buffer is larger.
@@ -173,6 +182,18 @@
     var visibleIds = new Set(visible.map(function (n) { return n.id; }));
     var edges = activeEdges();
 
+    // Edges + nodes inside the scale-around-center transform so wheel
+    // zoom magnifies everything around the canvas center. Labels are
+    // drawn after restore() so they stay readable at any zoom.
+    var cx = w / 2;
+    var cy = h / 2;
+    ctx.save();
+    if (zoom !== 1) {
+      ctx.translate(cx, cy);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-cx, -cy);
+    }
+
     // Edges first, so nodes draw on top.
     ctx.strokeStyle = "#3d3322";
     ctx.lineWidth = 1;
@@ -201,15 +222,21 @@
       ctx.stroke();
     }
 
-    // Labels — show all when the graph is small, otherwise just the
-    // hovered node so we don't carpet the canvas with text.
+    ctx.restore();
+
+    // Labels rendered in screen space (post-restore) so the 11px font
+    // stays legible at every zoom level. Project each node's world
+    // coords back to screen coords for placement. The "showAll" cutoff
+    // keeps the canvas from being carpeted in text on large graphs.
     ctx.fillStyle = "#c9a961";
     ctx.font = "11px monospace";
     var showAll = visible.length < 30;
     for (var l = 0; l < visible.length; l++) {
       var node = visible[l];
       if (showAll || node === hoverNode) {
-        ctx.fillText(node.title, node.x + 10, node.y + 4);
+        var lx = cx + (node.x - cx) * zoom + 10;
+        var ly = cy + (node.y - cy) * zoom + 4;
+        ctx.fillText(node.title, lx, ly);
       }
     }
 
@@ -248,9 +275,15 @@
 
   function getPos(e) {
     var rect = canvas.getBoundingClientRect();
+    var sx = e.clientX - rect.left;
+    var sy = e.clientY - rect.top;
+    // Un-project screen → world so hit tests + drag positions use the
+    // same coordinate space as the simulation.
+    var cx = canvas.clientWidth / 2;
+    var cy = canvas.clientHeight / 2;
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: cx + (sx - cx) / zoom,
+      y: cy + (sy - cy) / zoom,
     };
   }
 
@@ -323,6 +356,14 @@
       hoverNode = null;
       canvas.classList.remove("is-grabbing");
     });
+
+    // Wheel zoom. preventDefault() requires the listener to be non-passive
+    // (modern browsers default wheel listeners to passive for scroll perf).
+    canvas.addEventListener("wheel", function (e) {
+      e.preventDefault();
+      var factor = e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
+      zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom * factor));
+    }, { passive: false });
 
     var buttons = document.querySelectorAll(".graph-controls button[data-mode]");
     for (var i = 0; i < buttons.length; i++) {

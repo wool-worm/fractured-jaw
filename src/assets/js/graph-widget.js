@@ -82,6 +82,15 @@
   var hoverNode = null;
   var mode = "links";         // edge mode toggle: "links" | "tags"
 
+  // User-controlled zoom. Wheel events scale the canvas around its center.
+  // Hit tests in nodeAt() run against world coordinates, so getPos()
+  // un-projects the mouse before calling nodeAt(). The hover label
+  // renders OUTSIDE the scale transform so its size stays consistent.
+  var zoom = 1;
+  var ZOOM_MIN = 0.4;
+  var ZOOM_MAX = 3;
+  var ZOOM_STEP = 1.1;
+
   function resize() {
     var dpr = window.devicePixelRatio || 1;
     canvas.width = canvas.clientWidth * dpr;
@@ -340,6 +349,18 @@
     var visibleIds = new Set(visible.map(function (n) { return n.id; }));
     var edges = activeEdges();
 
+    // Edges + nodes draw inside the scale-around-center transform so
+    // the user's wheel zoom magnifies them around the canvas center.
+    // Save/restore keeps the transform local to this function.
+    var cx = w / 2;
+    var cy = h / 2;
+    ctx.save();
+    if (zoom !== 1) {
+      ctx.translate(cx, cy);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-cx, -cy);
+    }
+
     ctx.strokeStyle = "#3d3322";
     ctx.lineWidth = 1;
     for (var i = 0; i < edges.length; i++) {
@@ -366,10 +387,17 @@
       ctx.stroke();
     }
 
+    ctx.restore();
+
+    // Render the hover label AFTER ctx.restore() so its font size stays
+    // at 10px in screen space regardless of zoom. Project the node's
+    // world coords back to screen coords for placement.
     if (hoverNode) {
+      var labelX = cx + (hoverNode.x - cx) * zoom + 9;
+      var labelY = cy + (hoverNode.y - cy) * zoom + 3;
       ctx.fillStyle = "#c9a961";
       ctx.font = "10px monospace";
-      ctx.fillText(hoverNode.title || "", hoverNode.x + 9, hoverNode.y + 3);
+      ctx.fillText(hoverNode.title || "", labelX, labelY);
     }
   }
 
@@ -381,9 +409,15 @@
 
   function getPos(e) {
     var rect = canvas.getBoundingClientRect();
+    var sx = e.clientX - rect.left;
+    var sy = e.clientY - rect.top;
+    // Un-project screen coords back to world coords so hit tests run in
+    // the same coordinate space the simulation uses.
+    var cx = canvas.clientWidth / 2;
+    var cy = canvas.clientHeight / 2;
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: cx + (sx - cx) / zoom,
+      y: cy + (sy - cy) / zoom,
     };
   }
 
@@ -503,6 +537,13 @@
     canvas.addEventListener("mouseleave", function () {
       hoverNode = null;
     });
+    // Wheel zoom. preventDefault() requires the listener be non-passive
+    // (modern browsers default wheel listeners to passive for scroll perf).
+    canvas.addEventListener("wheel", function (e) {
+      e.preventDefault();
+      var factor = e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
+      zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom * factor));
+    }, { passive: false });
     canvas.addEventListener("click", function (e) {
       var pos = getPos(e);
       var n = nodeAt(pos.x, pos.y);

@@ -115,8 +115,10 @@
   position: fixed;
   top: 1rem;
   right: 1rem;
-  width: 220px;
-  height: 240px;
+  /* Sized ~7% larger than the original 220x240 to give the local-graph
+     view more room to breathe at the new zoom-enabled state. */
+  width: 235px;
+  height: 257px;
   background: var(--void-soft);
   border: 1px solid var(--brass-deep);
   z-index: 50;

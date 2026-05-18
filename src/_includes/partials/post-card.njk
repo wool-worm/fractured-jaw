@@ -36,7 +36,7 @@
         {%- endfor %}
       {% endif %}
       {% if post.data.rating %}
-        &middot; <span class="post-card-rating">{{ post.data.rating }}</span>
+        &middot; <span class="post-card-rating" aria-label="rating: {{ post.data.rating }}">{{ post.data.rating | starRating }}</span>
       {% endif %}
       {% if post.data.reading_time %}
         &middot; {{ post.data.reading_time }}

@@ -31,6 +31,12 @@
   max-height: 240px;
   object-fit: cover;
   border: 1px solid var(--bone-faint);
+  /* The card's ::before pseudo-element renders an "INTERCEPTED_TRANSMISSION"
+     stamp at top: var(--sp-sm) / right: var(--sp-sm). Without a top margin
+     here the stamp's text row visually overlaps the top edge of the image.
+     0.6rem clears the stamp's ascender + line-height with a small breathing
+     gap. See .post-card::before in cult.css. */
+  margin-top: 0.6rem;
   margin-bottom: var(--sp-sm);
 }
 
@@ -88,6 +94,16 @@
 .post-card-rating {
   color: var(--brass);
   letter-spacing: 0.05em;
+}
+
+/* Star glyphs (★ ☆) rendered by the starRating filter. Sodium fill + brass
+   empties keeps the rating row legible against the dark palette without
+   pulling focus from the title. */
+.post-meta-rating,
+.post-card-rating {
+  font-family: var(--font-body);
+  color: var(--sodium);
+  letter-spacing: 0.08em;
 }
 
 .post-card-tags {
