@@ -90,6 +90,33 @@ module.exports = function (eleventyConfig) {
     Array.isArray(value) ? value.slice(0, n) : value
   );
 
+  // Render a media review rating as filled + empty stars. Used by
+  // post-meta.njk and post-card.njk for /media/ posts. Accepts:
+  //   - a bare number (e.g. 4) — treated as out of 5
+  //   - a fraction string (e.g. "8/10") — preserves the denominator
+  //   - anything else (letter grade like "B+") — returned as-is
+  // Rounds to the nearest whole star. Empty input returns empty string.
+  eleventyConfig.addFilter("starRating", (value) => {
+    if (value === null || value === undefined || value === "") return "";
+    const STAR_FILLED = "★"; // ★
+    const STAR_EMPTY  = "☆"; // ☆
+    const toStars = (filled, total) => {
+      const f = Math.max(0, Math.min(total, Math.round(filled)));
+      return STAR_FILLED.repeat(f) + STAR_EMPTY.repeat(total - f);
+    };
+    if (typeof value === "number") return toStars(value, 5);
+    const str = String(value).trim();
+    const fraction = str.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+)$/);
+    if (fraction) {
+      return toStars(parseFloat(fraction[1]), parseInt(fraction[2], 10));
+    }
+    const asNum = parseFloat(str);
+    if (!isNaN(asNum) && /^-?\d+(\.\d+)?$/.test(str)) {
+      return toStars(asNum, 5);
+    }
+    return str;
+  });
+
   // Promote a possibly-relative URL to an absolute one by prefixing site.url.
   // Used in head.njk for og:image (Open Graph rejects relative paths). Passes
   // through any value that already starts with http:// or https://.

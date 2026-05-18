@@ -50,14 +50,35 @@
 
 .graph-controls button {
   margin-right: 0.25rem;
-  padding: 0.125rem 0.5rem;
+  /* Explicit height + min-width keeps every button the same size
+     regardless of glyph metrics. Without this the "+" tracks taller
+     than "−" (it has ascenders), and the dice glyph (⚄) ends up tiny
+     in many fonts. */
+  height: 1.5rem;
+  min-width: 1.8rem;
+  padding: 0 0.4rem;
   border: 1px solid var(--brass-faint);
   background: var(--void-soft);
   color: var(--brass);
   font-family: var(--font-body);
   font-size: 0.75rem;
+  line-height: 1;
   cursor: pointer;
-  transition: background 0.1s, color 0.1s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+/* Icon-only buttons (zoom + and −, reset ⊙, scramble ⚄). Bump glyph
+   size so symbols are legible inside the same button frame as the
+   text buttons. */
+.graph-controls button[data-zoom],
+.graph-controls button[data-action] {
+  font-size: 1rem;
+  font-family: var(--font-display, monospace);
+  min-width: 1.6rem;
 }
 
 .graph-controls button:hover {
@@ -70,6 +91,16 @@
   background: var(--brass-deep);
   color: var(--void);
   border-color: var(--brass);
+}
+
+.graph-controls-divider {
+  /* Reset the .graph-controls span rules (uppercase label) for the
+     vertical-bar separator. */
+  text-transform: none !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0 !important;
+  color: var(--brass-faint) !important;
+  margin: 0 0.25rem !important;
 }
 
 .graph-legend {
@@ -96,6 +127,38 @@
   margin-right: 0.3rem;
 }
 
+/* Legend rows are clickable toggles. Default treatment is a plain row
+   that visually matches the previous <div> rendering, but with hover +
+   pressed states so the user knows it's interactive. aria-pressed="false"
+   = section is hidden from the graph. */
+.graph-legend .legend-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.1s, opacity 0.1s;
+}
+
+.graph-legend .legend-toggle:hover {
+  color: var(--sodium);
+}
+
+.graph-legend .legend-toggle[aria-pressed="false"] {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.graph-legend .legend-toggle[aria-pressed="false"] .swatch {
+  opacity: 0.5;
+}
+
 .graph-empty {
   position: absolute;
   inset: 0;
@@ -115,8 +178,10 @@
   position: fixed;
   top: 1rem;
   right: 1rem;
-  width: 220px;
-  height: 240px;
+  /* Sized ~7% larger than the original 220x240 to give the local-graph
+     view more room to breathe at the new zoom-enabled state. */
+  width: 235px;
+  height: 257px;
   background: var(--void-soft);
   border: 1px solid var(--brass-deep);
   z-index: 50;
