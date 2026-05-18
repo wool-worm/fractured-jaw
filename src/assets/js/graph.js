@@ -30,6 +30,21 @@
   var HOVER_RADIUS = 9;
   var CLICK_THRESHOLD = 5;    // pixels of cursor movement under which a mouseup is treated as a click
 
+  // Label truncation: titles longer than this many characters get shortened
+  // with an ellipsis suffix. 32 chars at 11px monospace ≈ 220px wide.
+  var MAX_TITLE_CHARS = 32;
+  // Pixel buffer around each label's measured bbox. A label whose bbox
+  // (plus this padding) overlaps a label already drawn this frame gets
+  // skipped. Higher value = sparser placement.
+  var LABEL_BBOX_PADDING = 4;
+
+  function truncateTitle(title) {
+    var t = String(title == null ? "" : title);
+    if (t.length <= MAX_TITLE_CHARS) return t;
+    return t.slice(0, MAX_TITLE_CHARS - 1).replace(/\s+$/, "") + "…";
+  }
+
+
   var SECTION_COLORS = {
     blog: "#0a0",
     essays: "#06c",
@@ -228,16 +243,67 @@
     // stays legible at every zoom level. Project each node's world
     // coords back to screen coords for placement. The "showAll" cutoff
     // keeps the canvas from being carpeted in text on large graphs.
-    ctx.fillStyle = "#c9a961";
+    //
+    // Collision avoidance: as each label is laid out, its measured bbox
+    // (plus LABEL_BBOX_PADDING) is added to `placedBboxes`. Subsequent
+    // labels that intersect any placed bbox are skipped. Long titles
+    // get truncated via truncateTitle() before measurement.
+    //
+    // The hover label is always drawn LAST and ignores collision so it
+    // overlays whatever's beneath. Keeps the hover target's name
+    // readable even in dense regions.
     ctx.font = "11px monospace";
+    ctx.fillStyle = "#c9a961";
     var showAll = visible.length < 30;
-    for (var l = 0; l < visible.length; l++) {
-      var node = visible[l];
-      if (showAll || node === hoverNode) {
-        var lx = cx + (node.x - cx) * zoom + 10;
-        var ly = cy + (node.y - cy) * zoom + 4;
-        ctx.fillText(node.title, lx, ly);
+    var placedBboxes = [];
+
+    function labelBbox(node) {
+      var label = truncateTitle(node.title);
+      var lx = cx + (node.x - cx) * zoom + 10;
+      var ly = cy + (node.y - cy) * zoom + 4;
+      var w = ctx.measureText(label).width;
+      // ly is the baseline; the visible glyph extends ~9px above and
+      // ~3px below that line for the 11px monospace font.
+      return {
+        x: lx - LABEL_BBOX_PADDING,
+        y: ly - 9 - LABEL_BBOX_PADDING,
+        w: w + LABEL_BBOX_PADDING * 2,
+        h: 13 + LABEL_BBOX_PADDING * 2,
+        drawX: lx,
+        drawY: ly,
+        text: label,
+      };
+    }
+
+    function bboxesOverlap(a, b) {
+      return !(a.x + a.w < b.x || b.x + b.w < a.x ||
+               a.y + a.h < b.y || b.y + b.h < a.y);
+    }
+
+    if (showAll) {
+      for (var l = 0; l < visible.length; l++) {
+        var node = visible[l];
+        if (node === hoverNode) continue; // drawn last, unconditionally
+        var bbox = labelBbox(node);
+        var collides = false;
+        for (var p = 0; p < placedBboxes.length; p++) {
+          if (bboxesOverlap(bbox, placedBboxes[p])) {
+            collides = true;
+            break;
+          }
+        }
+        if (collides) continue;
+        ctx.fillText(bbox.text, bbox.drawX, bbox.drawY);
+        placedBboxes.push(bbox);
       }
+    }
+
+    if (hoverNode) {
+      var hbb = labelBbox(hoverNode);
+      // Slightly brighter so the hovered name stands out from any
+      // earlier labels it might be drawn over.
+      ctx.fillStyle = "#f5c66e";
+      ctx.fillText(hbb.text, hbb.drawX, hbb.drawY);
     }
 
     updateEmptyState(edges, visibleIds);

@@ -91,6 +91,15 @@
   var ZOOM_MAX = 3;
   var ZOOM_STEP = 1.1;
 
+  // Truncate long titles in the hover label so they don't overflow the
+  // small widget canvas. Mirrors the helper in graph.js.
+  var MAX_TITLE_CHARS = 28;
+  function truncateTitle(title) {
+    var t = String(title == null ? "" : title);
+    if (t.length <= MAX_TITLE_CHARS) return t;
+    return t.slice(0, MAX_TITLE_CHARS - 1).replace(/\s+$/, "") + "…";
+  }
+
   function resize() {
     var dpr = window.devicePixelRatio || 1;
     canvas.width = canvas.clientWidth * dpr;
@@ -397,7 +406,7 @@
       var labelY = cy + (hoverNode.y - cy) * zoom + 3;
       ctx.fillStyle = "#c9a961";
       ctx.font = "10px monospace";
-      ctx.fillText(hoverNode.title || "", labelX, labelY);
+      ctx.fillText(truncateTitle(hoverNode.title), labelX, labelY);
     }
   }
 
