@@ -54,6 +54,10 @@
     fragments: "#c0c",
     media: "#c80",
     pages: "#888",
+    // Match graph.js — series + authors are navigation-hub sections
+    // distinct from the four content sections.
+    series: "#0bc",
+    authors: "#fc0",
   };
   var TAG_COLOR = "#f80";
   var CURRENT_COLOR = "#000";

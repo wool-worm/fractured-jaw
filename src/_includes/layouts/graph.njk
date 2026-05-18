@@ -17,16 +17,23 @@ layout: layouts/base.njk
 </header>
 
 <div class="graph-shell">
-  <div class="graph-controls" role="group" aria-label="Graph mode">
+  <div class="graph-controls" role="group" aria-label="Graph mode and zoom">
     <span>mode:</span>
     <button type="button" data-mode="links" aria-pressed="true">links</button>
     <button type="button" data-mode="tags" aria-pressed="false">tags</button>
+    <span class="graph-controls-divider" aria-hidden="true">│</span>
+    <span>zoom:</span>
+    <button type="button" data-zoom="in" aria-label="zoom in">+</button>
+    <button type="button" data-zoom="out" aria-label="zoom out">−</button>
+    <button type="button" data-zoom="reset" aria-label="reset zoom">⊙</button>
   </div>
   <div class="graph-legend" id="graph-legend" aria-hidden="true">
     <div><span class="swatch" style="background:#0a0;"></span>blog</div>
     <div><span class="swatch" style="background:#06c;"></span>essays</div>
     <div><span class="swatch" style="background:#c0c;"></span>fragments</div>
     <div><span class="swatch" style="background:#c80;"></span>media</div>
+    <div><span class="swatch" style="background:#0bc;"></span>series</div>
+    <div><span class="swatch" style="background:#fc0;"></span>authors</div>
     <div><span class="swatch" style="background:#888;"></span>page</div>
     <div class="legend-tag" hidden><span class="swatch" style="background:#f80;"></span>tag</div>
   </div>

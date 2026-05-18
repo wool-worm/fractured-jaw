@@ -51,6 +51,12 @@
     fragments: "#c0c",
     media: "#c80",
     pages: "#888",
+    // Series + authors are navigation-hub sections (not content posts) but
+    // still appear as nodes when graph_enabled is on. Pick colors distinct
+    // from the four content sections so they read as their own category in
+    // the legend.
+    series: "#0bc",   // teal — series as woven threads
+    authors: "#fc0",  // gold — author voices
   };
   var TAG_COLOR = "#f80";
 
@@ -435,6 +441,24 @@
     for (var i = 0; i < buttons.length; i++) {
       buttons[i].addEventListener("click", function (ev) {
         setMode(ev.currentTarget.dataset.mode);
+      });
+    }
+
+    // Zoom buttons share the same step + clamp as the wheel handler.
+    // "reset" snaps back to 1x. The draw loop already runs on
+    // requestAnimationFrame so no explicit redraw is needed after a
+    // zoom change.
+    var zoomButtons = document.querySelectorAll(".graph-controls button[data-zoom]");
+    for (var z = 0; z < zoomButtons.length; z++) {
+      zoomButtons[z].addEventListener("click", function (ev) {
+        var dir = ev.currentTarget.dataset.zoom;
+        if (dir === "in") {
+          zoom = Math.min(ZOOM_MAX, zoom * ZOOM_STEP);
+        } else if (dir === "out") {
+          zoom = Math.max(ZOOM_MIN, zoom / ZOOM_STEP);
+        } else if (dir === "reset") {
+          zoom = 1;
+        }
       });
     }
 
