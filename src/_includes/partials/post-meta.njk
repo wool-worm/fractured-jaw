@@ -32,7 +32,7 @@
 
   {% if rating %}
     <dt>Rating</dt>
-    <dd>{{ rating }}</dd>
+    <dd class="post-meta-rating" aria-label="rating: {{ rating }}">{{ rating | starRating }}</dd>
   {% endif %}
 
   {% set seriesUrl = series_name | seriesNameToUrl %}

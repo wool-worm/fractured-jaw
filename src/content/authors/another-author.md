@@ -6,7 +6,7 @@ description: Guest contributor. Drops fragments and the occasional review.
 draft: false
 exclude: false
 preview_enabled: false
-graph_enabled: false
+graph_enabled: true
 image:
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER

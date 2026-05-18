@@ -21,8 +21,12 @@
   var DATA_URL = "/graph-data.json";
 
   // Tuning — adjust these if the layout feels too crowded or too loose.
-  var REPULSION = 1200;       // node-to-node push strength
-  var EDGE_LENGTH = 90;       // resting length of an edge spring
+  // Repulsion + edge length scaled ~15% above the original 1200 / 90 so
+  // nodes settle with more breathing room (less label-on-label overlap
+  // and more diagram readability). Keep the two in proportion when
+  // adjusting again: bumping just one warps the cluster shape.
+  var REPULSION = 1380;       // node-to-node push strength
+  var EDGE_LENGTH = 104;      // resting length of an edge spring
   var EDGE_STIFFNESS = 0.04;  // spring constant
   var GRAVITY = 0.004;        // pull toward canvas center
   var DAMPING = 0.82;         // velocity decay per tick (higher = looser)
@@ -30,12 +34,33 @@
   var HOVER_RADIUS = 9;
   var CLICK_THRESHOLD = 5;    // pixels of cursor movement under which a mouseup is treated as a click
 
+  // Label truncation: titles longer than this many characters get shortened
+  // with an ellipsis suffix. 32 chars at 11px monospace ≈ 220px wide.
+  var MAX_TITLE_CHARS = 32;
+  // Pixel buffer around each label's measured bbox. A label whose bbox
+  // (plus this padding) overlaps a label already drawn this frame gets
+  // skipped. Higher value = sparser placement.
+  var LABEL_BBOX_PADDING = 4;
+
+  function truncateTitle(title) {
+    var t = String(title == null ? "" : title);
+    if (t.length <= MAX_TITLE_CHARS) return t;
+    return t.slice(0, MAX_TITLE_CHARS - 1).replace(/\s+$/, "") + "…";
+  }
+
+
   var SECTION_COLORS = {
     blog: "#0a0",
     essays: "#06c",
     fragments: "#c0c",
     media: "#c80",
     pages: "#888",
+    // Series + authors are navigation-hub sections (not content posts) but
+    // still appear as nodes when graph_enabled is on. Pick colors distinct
+    // from the four content sections so they read as their own category in
+    // the legend.
+    series: "#0bc",   // teal — series as woven threads
+    authors: "#fc0",  // gold — author voices
   };
   var TAG_COLOR = "#f80";
 
@@ -51,6 +76,31 @@
   var dragging = null;
   var mouseDown = null;
   var rafHandle = null;
+
+  // Wheel-driven zoom + click-drag panning. Both apply as a single
+  // transform around the canvas center:
+  //   translate(cx + panX, cy + panY) → scale(zoom) → translate(-cx, -cy)
+  // Hit tests run in world coordinates, so getPos() un-projects
+  // screen → world accounting for both pan and zoom. Labels render
+  // OUTSIDE the transform so their font stays a consistent screen size.
+  var zoom = 1;
+  var ZOOM_MIN = 0.3;
+  var ZOOM_MAX = 4;
+  var ZOOM_STEP = 1.1;
+  var panX = 0;
+  var panY = 0;
+  // Click-drag pan state. Active when a mousedown lands on empty canvas
+  // (not on a node). panStart captures the screen-coord origin + the
+  // pan offset at gesture start so mousemove can compute the delta.
+  var panning = false;
+  var panStart = null;
+
+  // Legend filter state. Sections in this set are excluded from
+  // activeNodes() — both rendering AND the simulation, so removing
+  // sections re-balances the layout. Tag-mode toggles the synthetic
+  // "tag" key (matched against node.type === "tag", not by section
+  // name).
+  var disabledSections = new Set();
 
   function resize() {
     // Scale to the device pixel ratio so the lines stay crisp on hi-dpi
@@ -93,8 +143,16 @@
   }
 
   function activeNodes() {
-    if (mode === "links") return nodes.filter(function (n) { return n.type === "page"; });
-    return nodes;
+    var base = (mode === "links")
+      ? nodes.filter(function (n) { return n.type === "page"; })
+      : nodes;
+    if (disabledSections.size === 0) return base;
+    return base.filter(function (n) {
+      // Tag nodes don't have a section; they live under the synthetic
+      // "tag" key so the legend's tag toggle controls them in tag mode.
+      var key = n.type === "tag" ? "tag" : n.section;
+      return !disabledSections.has(key);
+    });
   }
 
   function activeNodeSet() {
@@ -173,6 +231,17 @@
     var visibleIds = new Set(visible.map(function (n) { return n.id; }));
     var edges = activeEdges();
 
+    // Edges + nodes inside the pan + zoom transform. Labels are drawn
+    // after restore() so they stay readable at any zoom level.
+    var cx = w / 2;
+    var cy = h / 2;
+    ctx.save();
+    if (zoom !== 1 || panX !== 0 || panY !== 0) {
+      ctx.translate(cx + panX, cy + panY);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-cx, -cy);
+    }
+
     // Edges first, so nodes draw on top.
     ctx.strokeStyle = "#3d3322";
     ctx.lineWidth = 1;
@@ -201,16 +270,74 @@
       ctx.stroke();
     }
 
-    // Labels — show all when the graph is small, otherwise just the
-    // hovered node so we don't carpet the canvas with text.
-    ctx.fillStyle = "#c9a961";
+    ctx.restore();
+
+    // Labels rendered in screen space (post-restore) so the 11px font
+    // stays legible at every zoom level. Project each node's world
+    // coords back to screen coords for placement. The "showAll" cutoff
+    // keeps the canvas from being carpeted in text on large graphs.
+    //
+    // Collision avoidance: as each label is laid out, its measured bbox
+    // (plus LABEL_BBOX_PADDING) is added to `placedBboxes`. Subsequent
+    // labels that intersect any placed bbox are skipped. Long titles
+    // get truncated via truncateTitle() before measurement.
+    //
+    // The hover label is always drawn LAST and ignores collision so it
+    // overlays whatever's beneath. Keeps the hover target's name
+    // readable even in dense regions.
     ctx.font = "11px monospace";
+    ctx.fillStyle = "#c9a961";
     var showAll = visible.length < 30;
-    for (var l = 0; l < visible.length; l++) {
-      var node = visible[l];
-      if (showAll || node === hoverNode) {
-        ctx.fillText(node.title, node.x + 10, node.y + 4);
+    var placedBboxes = [];
+
+    function labelBbox(node) {
+      var label = truncateTitle(node.title);
+      // Project world → screen, accounting for pan as well as zoom.
+      var lx = cx + (node.x - cx) * zoom + panX + 10;
+      var ly = cy + (node.y - cy) * zoom + panY + 4;
+      var w = ctx.measureText(label).width;
+      // ly is the baseline; the visible glyph extends ~9px above and
+      // ~3px below that line for the 11px monospace font.
+      return {
+        x: lx - LABEL_BBOX_PADDING,
+        y: ly - 9 - LABEL_BBOX_PADDING,
+        w: w + LABEL_BBOX_PADDING * 2,
+        h: 13 + LABEL_BBOX_PADDING * 2,
+        drawX: lx,
+        drawY: ly,
+        text: label,
+      };
+    }
+
+    function bboxesOverlap(a, b) {
+      return !(a.x + a.w < b.x || b.x + b.w < a.x ||
+               a.y + a.h < b.y || b.y + b.h < a.y);
+    }
+
+    if (showAll) {
+      for (var l = 0; l < visible.length; l++) {
+        var node = visible[l];
+        if (node === hoverNode) continue; // drawn last, unconditionally
+        var bbox = labelBbox(node);
+        var collides = false;
+        for (var p = 0; p < placedBboxes.length; p++) {
+          if (bboxesOverlap(bbox, placedBboxes[p])) {
+            collides = true;
+            break;
+          }
+        }
+        if (collides) continue;
+        ctx.fillText(bbox.text, bbox.drawX, bbox.drawY);
+        placedBboxes.push(bbox);
       }
+    }
+
+    if (hoverNode) {
+      var hbb = labelBbox(hoverNode);
+      // Slightly brighter so the hovered name stands out from any
+      // earlier labels it might be drawn over.
+      ctx.fillStyle = "#f5c66e";
+      ctx.fillText(hbb.text, hbb.drawX, hbb.drawY);
     }
 
     updateEmptyState(edges, visibleIds);
@@ -248,9 +375,17 @@
 
   function getPos(e) {
     var rect = canvas.getBoundingClientRect();
+    var sx = e.clientX - rect.left;
+    var sy = e.clientY - rect.top;
+    // Un-project screen → world. The full transform is:
+    //   translate(cx + panX, cy + panY) → scale(zoom) → translate(-cx, -cy)
+    // so the inverse from screen back to world is:
+    //   worldX = cx + (sx - cx - panX) / zoom
+    var cx = canvas.clientWidth / 2;
+    var cy = canvas.clientHeight / 2;
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: cx + (sx - cx - panX) / zoom,
+      y: cy + (sy - cy - panY) / zoom,
     };
   }
 
@@ -286,6 +421,13 @@
       if (n) {
         dragging = n;
         canvas.classList.add("is-grabbing");
+      } else {
+        // Empty canvas → start a pan gesture. Capture the screen-coord
+        // origin and the pan offset at gesture start so mousemove can
+        // compute deltas in screen space (independent of zoom).
+        panning = true;
+        panStart = { mx: e.clientX, my: e.clientY, panX: panX, panY: panY };
+        canvas.classList.add("is-grabbing");
       }
     });
 
@@ -296,6 +438,9 @@
         dragging.y = pos.y;
         dragging.vx = 0;
         dragging.vy = 0;
+      } else if (panning) {
+        panX = panStart.panX + (e.clientX - panStart.mx);
+        panY = panStart.panY + (e.clientY - panStart.my);
       } else {
         hoverNode = nodeAt(pos.x, pos.y);
         canvas.style.cursor = hoverNode ? "pointer" : "grab";
@@ -314,6 +459,8 @@
       }
       dragging = null;
       mouseDown = null;
+      panning = false;
+      panStart = null;
       canvas.classList.remove("is-grabbing");
     });
 
@@ -321,13 +468,88 @@
       dragging = null;
       mouseDown = null;
       hoverNode = null;
+      panning = false;
+      panStart = null;
       canvas.classList.remove("is-grabbing");
     });
+
+    // Wheel zoom. preventDefault() requires the listener to be non-passive
+    // (modern browsers default wheel listeners to passive for scroll perf).
+    canvas.addEventListener("wheel", function (e) {
+      e.preventDefault();
+      var factor = e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
+      zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom * factor));
+    }, { passive: false });
 
     var buttons = document.querySelectorAll(".graph-controls button[data-mode]");
     for (var i = 0; i < buttons.length; i++) {
       buttons[i].addEventListener("click", function (ev) {
         setMode(ev.currentTarget.dataset.mode);
+      });
+    }
+
+    // Zoom buttons share the same step + clamp as the wheel handler.
+    // "reset" snaps zoom back to 1x AND clears any pan offset so the
+    // graph re-centers. The draw loop already runs on
+    // requestAnimationFrame so no explicit redraw is needed.
+    var zoomButtons = document.querySelectorAll(".graph-controls button[data-zoom]");
+    for (var z = 0; z < zoomButtons.length; z++) {
+      zoomButtons[z].addEventListener("click", function (ev) {
+        var dir = ev.currentTarget.dataset.zoom;
+        if (dir === "in") {
+          zoom = Math.min(ZOOM_MAX, zoom * ZOOM_STEP);
+        } else if (dir === "out") {
+          zoom = Math.max(ZOOM_MIN, zoom / ZOOM_STEP);
+        } else if (dir === "reset") {
+          zoom = 1;
+          panX = 0;
+          panY = 0;
+        }
+      });
+    }
+
+    // Legend toggles. Clicking a legend row flips a section between
+    // visible and hidden — affecting both rendering AND the
+    // simulation (filtered nodes are dropped from activeNodes() so
+    // they don't exert force on what remains). aria-pressed mirrors
+    // the section's enabled state for screen readers and for the CSS
+    // style hooks.
+    var legendButtons = document.querySelectorAll(".graph-legend .legend-toggle");
+    for (var lb = 0; lb < legendButtons.length; lb++) {
+      legendButtons[lb].addEventListener("click", function (ev) {
+        var btn = ev.currentTarget;
+        var section = btn.dataset.section;
+        if (!section) return;
+        if (disabledSections.has(section)) {
+          disabledSections.delete(section);
+          btn.setAttribute("aria-pressed", "true");
+        } else {
+          disabledSections.add(section);
+          btn.setAttribute("aria-pressed", "false");
+        }
+      });
+    }
+
+    // Scramble button — re-randomizes every node's position inside the
+    // same band the initial layout uses, and zeros velocities. The force
+    // simulation immediately starts pulling the new chaos back into
+    // shape; useful when the current settled layout has overlaps or
+    // awkward clusters and you want to roll the dice on a different one.
+    var actionButtons = document.querySelectorAll(".graph-controls button[data-action]");
+    for (var a = 0; a < actionButtons.length; a++) {
+      actionButtons[a].addEventListener("click", function (ev) {
+        var action = ev.currentTarget.dataset.action;
+        if (action === "scramble") {
+          var w = canvas.clientWidth;
+          var h = canvas.clientHeight;
+          var spread = Math.min(w, h) * 0.5;
+          for (var i = 0; i < nodes.length; i++) {
+            nodes[i].x = w / 2 + (Math.random() - 0.5) * spread;
+            nodes[i].y = h / 2 + (Math.random() - 0.5) * spread;
+            nodes[i].vx = 0;
+            nodes[i].vy = 0;
+          }
+        }
       });
     }
 
