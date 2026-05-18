@@ -73,14 +73,23 @@
   var mouseDown = null;
   var rafHandle = null;
 
-  // Wheel-driven zoom. Scales the canvas around its center. Hit tests run
-  // in world coordinates, so getPos() un-projects screen → world before
-  // calling nodeAt(). Labels render OUTSIDE the scale transform so their
-  // font stays a consistent screen size.
+  // Wheel-driven zoom + click-drag panning. Both apply as a single
+  // transform around the canvas center:
+  //   translate(cx + panX, cy + panY) → scale(zoom) → translate(-cx, -cy)
+  // Hit tests run in world coordinates, so getPos() un-projects
+  // screen → world accounting for both pan and zoom. Labels render
+  // OUTSIDE the transform so their font stays a consistent screen size.
   var zoom = 1;
   var ZOOM_MIN = 0.3;
   var ZOOM_MAX = 4;
   var ZOOM_STEP = 1.1;
+  var panX = 0;
+  var panY = 0;
+  // Click-drag pan state. Active when a mousedown lands on empty canvas
+  // (not on a node). panStart captures the screen-coord origin + the
+  // pan offset at gesture start so mousemove can compute the delta.
+  var panning = false;
+  var panStart = null;
 
   function resize() {
     // Scale to the device pixel ratio so the lines stay crisp on hi-dpi
@@ -203,14 +212,13 @@
     var visibleIds = new Set(visible.map(function (n) { return n.id; }));
     var edges = activeEdges();
 
-    // Edges + nodes inside the scale-around-center transform so wheel
-    // zoom magnifies everything around the canvas center. Labels are
-    // drawn after restore() so they stay readable at any zoom.
+    // Edges + nodes inside the pan + zoom transform. Labels are drawn
+    // after restore() so they stay readable at any zoom level.
     var cx = w / 2;
     var cy = h / 2;
     ctx.save();
-    if (zoom !== 1) {
-      ctx.translate(cx, cy);
+    if (zoom !== 1 || panX !== 0 || panY !== 0) {
+      ctx.translate(cx + panX, cy + panY);
       ctx.scale(zoom, zoom);
       ctx.translate(-cx, -cy);
     }
@@ -265,8 +273,9 @@
 
     function labelBbox(node) {
       var label = truncateTitle(node.title);
-      var lx = cx + (node.x - cx) * zoom + 10;
-      var ly = cy + (node.y - cy) * zoom + 4;
+      // Project world → screen, accounting for pan as well as zoom.
+      var lx = cx + (node.x - cx) * zoom + panX + 10;
+      var ly = cy + (node.y - cy) * zoom + panY + 4;
       var w = ctx.measureText(label).width;
       // ly is the baseline; the visible glyph extends ~9px above and
       // ~3px below that line for the 11px monospace font.
@@ -349,13 +358,15 @@
     var rect = canvas.getBoundingClientRect();
     var sx = e.clientX - rect.left;
     var sy = e.clientY - rect.top;
-    // Un-project screen → world so hit tests + drag positions use the
-    // same coordinate space as the simulation.
+    // Un-project screen → world. The full transform is:
+    //   translate(cx + panX, cy + panY) → scale(zoom) → translate(-cx, -cy)
+    // so the inverse from screen back to world is:
+    //   worldX = cx + (sx - cx - panX) / zoom
     var cx = canvas.clientWidth / 2;
     var cy = canvas.clientHeight / 2;
     return {
-      x: cx + (sx - cx) / zoom,
-      y: cy + (sy - cy) / zoom,
+      x: cx + (sx - cx - panX) / zoom,
+      y: cy + (sy - cy - panY) / zoom,
     };
   }
 
@@ -391,6 +402,13 @@
       if (n) {
         dragging = n;
         canvas.classList.add("is-grabbing");
+      } else {
+        // Empty canvas → start a pan gesture. Capture the screen-coord
+        // origin and the pan offset at gesture start so mousemove can
+        // compute deltas in screen space (independent of zoom).
+        panning = true;
+        panStart = { mx: e.clientX, my: e.clientY, panX: panX, panY: panY };
+        canvas.classList.add("is-grabbing");
       }
     });
 
@@ -401,6 +419,9 @@
         dragging.y = pos.y;
         dragging.vx = 0;
         dragging.vy = 0;
+      } else if (panning) {
+        panX = panStart.panX + (e.clientX - panStart.mx);
+        panY = panStart.panY + (e.clientY - panStart.my);
       } else {
         hoverNode = nodeAt(pos.x, pos.y);
         canvas.style.cursor = hoverNode ? "pointer" : "grab";
@@ -419,6 +440,8 @@
       }
       dragging = null;
       mouseDown = null;
+      panning = false;
+      panStart = null;
       canvas.classList.remove("is-grabbing");
     });
 
@@ -426,6 +449,8 @@
       dragging = null;
       mouseDown = null;
       hoverNode = null;
+      panning = false;
+      panStart = null;
       canvas.classList.remove("is-grabbing");
     });
 
@@ -445,9 +470,9 @@
     }
 
     // Zoom buttons share the same step + clamp as the wheel handler.
-    // "reset" snaps back to 1x. The draw loop already runs on
-    // requestAnimationFrame so no explicit redraw is needed after a
-    // zoom change.
+    // "reset" snaps zoom back to 1x AND clears any pan offset so the
+    // graph re-centers. The draw loop already runs on
+    // requestAnimationFrame so no explicit redraw is needed.
     var zoomButtons = document.querySelectorAll(".graph-controls button[data-zoom]");
     for (var z = 0; z < zoomButtons.length; z++) {
       zoomButtons[z].addEventListener("click", function (ev) {
@@ -458,6 +483,31 @@
           zoom = Math.max(ZOOM_MIN, zoom / ZOOM_STEP);
         } else if (dir === "reset") {
           zoom = 1;
+          panX = 0;
+          panY = 0;
+        }
+      });
+    }
+
+    // Scramble button — re-randomizes every node's position inside the
+    // same band the initial layout uses, and zeros velocities. The force
+    // simulation immediately starts pulling the new chaos back into
+    // shape; useful when the current settled layout has overlaps or
+    // awkward clusters and you want to roll the dice on a different one.
+    var actionButtons = document.querySelectorAll(".graph-controls button[data-action]");
+    for (var a = 0; a < actionButtons.length; a++) {
+      actionButtons[a].addEventListener("click", function (ev) {
+        var action = ev.currentTarget.dataset.action;
+        if (action === "scramble") {
+          var w = canvas.clientWidth;
+          var h = canvas.clientHeight;
+          var spread = Math.min(w, h) * 0.5;
+          for (var i = 0; i < nodes.length; i++) {
+            nodes[i].x = w / 2 + (Math.random() - 0.5) * spread;
+            nodes[i].y = h / 2 + (Math.random() - 0.5) * spread;
+            nodes[i].vx = 0;
+            nodes[i].vy = 0;
+          }
         }
       });
     }

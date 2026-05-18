@@ -13,6 +13,9 @@
 const fs = require("fs");
 const slugify = require("./utils/slugify");
 const { vaultPathToUrl } = require("./utils/permalink");
+const { parseAuthorField } = require("./utils/authors");
+
+const CONTENT_ROOT = "src/content";
 
 // Capture [[...]] but skip ![[...]] (image embed syntax — reserved for
 // a later Obsidian-attachment phase). Lookbehind is supported in every
@@ -79,6 +82,31 @@ class GraphData {
         if (!targetUrl || targetUrl === item.url) continue;
         if (!knownUrls.has(targetUrl)) continue;
         linkEdges.push({ source: item.url, target: targetUrl });
+      }
+    }
+
+    // Author edges synthesized from frontmatter. The wikilink scanner above
+    // only reads body content (`[[...]]`), so an `author:` frontmatter
+    // wikilink wouldn't otherwise produce an edge — leaving author records
+    // floating unconnected in the graph. Walk each item's `author:` value
+    // through parseAuthorField (handles single + array shapes, validator
+    // already reported any malformed entries elsewhere) and add a
+    // post → author edge for every resolved entry.
+    for (const item of items) {
+      if (!item.url) continue;
+      if (item.data.graph_enabled === false) continue;
+      // Author files don't carry an `author:` field (circular), and series
+      // parents have it as bookkeeping only — neither should produce
+      // outgoing author edges from themselves.
+      if (item.data.section === "authors") continue;
+      if (item.data.section === "series") continue;
+
+      const parsed = parseAuthorField(item.data.author, CONTENT_ROOT);
+      if (parsed.kind !== "list") continue;
+      for (const entry of parsed.entries) {
+        if (entry.kind !== "wikilink") continue;
+        if (!knownUrls.has(entry.url)) continue;
+        linkEdges.push({ source: item.url, target: entry.url });
       }
     }
 

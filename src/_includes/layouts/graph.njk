@@ -25,7 +25,9 @@ layout: layouts/base.njk
     <span>zoom:</span>
     <button type="button" data-zoom="in" aria-label="zoom in">+</button>
     <button type="button" data-zoom="out" aria-label="zoom out">−</button>
-    <button type="button" data-zoom="reset" aria-label="reset zoom">⊙</button>
+    <button type="button" data-zoom="reset" aria-label="reset zoom + pan">⊙</button>
+    <span class="graph-controls-divider" aria-hidden="true">│</span>
+    <button type="button" data-action="scramble" aria-label="scramble node positions">⚄</button>
   </div>
   <div class="graph-legend" id="graph-legend" aria-hidden="true">
     <div><span class="swatch" style="background:#0a0;"></span>blog</div>
