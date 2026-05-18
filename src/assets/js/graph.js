@@ -91,6 +91,13 @@
   var panning = false;
   var panStart = null;
 
+  // Legend filter state. Sections in this set are excluded from
+  // activeNodes() — both rendering AND the simulation, so removing
+  // sections re-balances the layout. Tag-mode toggles the synthetic
+  // "tag" key (matched against node.type === "tag", not by section
+  // name).
+  var disabledSections = new Set();
+
   function resize() {
     // Scale to the device pixel ratio so the lines stay crisp on hi-dpi
     // displays. We render in CSS pixels but the backing buffer is larger.
@@ -132,8 +139,16 @@
   }
 
   function activeNodes() {
-    if (mode === "links") return nodes.filter(function (n) { return n.type === "page"; });
-    return nodes;
+    var base = (mode === "links")
+      ? nodes.filter(function (n) { return n.type === "page"; })
+      : nodes;
+    if (disabledSections.size === 0) return base;
+    return base.filter(function (n) {
+      // Tag nodes don't have a section; they live under the synthetic
+      // "tag" key so the legend's tag toggle controls them in tag mode.
+      var key = n.type === "tag" ? "tag" : n.section;
+      return !disabledSections.has(key);
+    });
   }
 
   function activeNodeSet() {
@@ -485,6 +500,28 @@
           zoom = 1;
           panX = 0;
           panY = 0;
+        }
+      });
+    }
+
+    // Legend toggles. Clicking a legend row flips a section between
+    // visible and hidden — affecting both rendering AND the
+    // simulation (filtered nodes are dropped from activeNodes() so
+    // they don't exert force on what remains). aria-pressed mirrors
+    // the section's enabled state for screen readers and for the CSS
+    // style hooks.
+    var legendButtons = document.querySelectorAll(".graph-legend .legend-toggle");
+    for (var lb = 0; lb < legendButtons.length; lb++) {
+      legendButtons[lb].addEventListener("click", function (ev) {
+        var btn = ev.currentTarget;
+        var section = btn.dataset.section;
+        if (!section) return;
+        if (disabledSections.has(section)) {
+          disabledSections.delete(section);
+          btn.setAttribute("aria-pressed", "true");
+        } else {
+          disabledSections.add(section);
+          btn.setAttribute("aria-pressed", "false");
         }
       });
     }

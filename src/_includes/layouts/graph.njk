@@ -29,15 +29,15 @@ layout: layouts/base.njk
     <span class="graph-controls-divider" aria-hidden="true">│</span>
     <button type="button" data-action="scramble" aria-label="scramble node positions">⚄</button>
   </div>
-  <div class="graph-legend" id="graph-legend" aria-hidden="true">
-    <div><span class="swatch" style="background:#0a0;"></span>blog</div>
-    <div><span class="swatch" style="background:#06c;"></span>essays</div>
-    <div><span class="swatch" style="background:#c0c;"></span>fragments</div>
-    <div><span class="swatch" style="background:#c80;"></span>media</div>
-    <div><span class="swatch" style="background:#0bc;"></span>series</div>
-    <div><span class="swatch" style="background:#fc0;"></span>authors</div>
-    <div><span class="swatch" style="background:#888;"></span>page</div>
-    <div class="legend-tag" hidden><span class="swatch" style="background:#f80;"></span>tag</div>
+  <div class="graph-legend" id="graph-legend" role="group" aria-label="Filter node types">
+    <button type="button" class="legend-toggle" data-section="blog"      aria-pressed="true"><span class="swatch" style="background:#0a0;"></span>blog</button>
+    <button type="button" class="legend-toggle" data-section="essays"    aria-pressed="true"><span class="swatch" style="background:#06c;"></span>essays</button>
+    <button type="button" class="legend-toggle" data-section="fragments" aria-pressed="true"><span class="swatch" style="background:#c0c;"></span>fragments</button>
+    <button type="button" class="legend-toggle" data-section="media"     aria-pressed="true"><span class="swatch" style="background:#c80;"></span>media</button>
+    <button type="button" class="legend-toggle" data-section="series"    aria-pressed="true"><span class="swatch" style="background:#0bc;"></span>series</button>
+    <button type="button" class="legend-toggle" data-section="authors"   aria-pressed="true"><span class="swatch" style="background:#fc0;"></span>authors</button>
+    <button type="button" class="legend-toggle" data-section="pages"     aria-pressed="true"><span class="swatch" style="background:#888;"></span>page</button>
+    <button type="button" class="legend-toggle legend-tag" data-section="tag" aria-pressed="true" hidden><span class="swatch" style="background:#f80;"></span>tag</button>
   </div>
   <canvas id="graph-canvas"></canvas>
   <div class="graph-empty" id="graph-empty" hidden>no edges in this mode yet</div>
