@@ -21,8 +21,12 @@
   var DATA_URL = "/graph-data.json";
 
   // Tuning — adjust these if the layout feels too crowded or too loose.
-  var REPULSION = 1200;       // node-to-node push strength
-  var EDGE_LENGTH = 90;       // resting length of an edge spring
+  // Repulsion + edge length scaled ~15% above the original 1200 / 90 so
+  // nodes settle with more breathing room (less label-on-label overlap
+  // and more diagram readability). Keep the two in proportion when
+  // adjusting again: bumping just one warps the cluster shape.
+  var REPULSION = 1380;       // node-to-node push strength
+  var EDGE_LENGTH = 104;      // resting length of an edge spring
   var EDGE_STIFFNESS = 0.04;  // spring constant
   var GRAVITY = 0.004;        // pull toward canvas center
   var DAMPING = 0.82;         // velocity decay per tick (higher = looser)
