@@ -95,6 +95,17 @@
   var ZOOM_MAX = 3;
   var ZOOM_STEP = 1.1;
 
+  // Click-drag pan state. Mirrors graph.js — empty-canvas drag pans the
+  // view in screen space; a click without drag-movement navigates if it
+  // landed on a node. panStart tracks whether the gesture exceeded the
+  // CLICK_THRESHOLD so a real click is distinguished from a small drag.
+  var panX = 0;
+  var panY = 0;
+  var panning = false;
+  var panStart = null;
+  var pressNode = null;
+  var CLICK_THRESHOLD = 4;
+
   // Truncate long titles in the hover label so they don't overflow the
   // small widget canvas. Mirrors the helper in graph.js.
   var MAX_TITLE_CHARS = 28;
@@ -362,14 +373,13 @@
     var visibleIds = new Set(visible.map(function (n) { return n.id; }));
     var edges = activeEdges();
 
-    // Edges + nodes draw inside the scale-around-center transform so
-    // the user's wheel zoom magnifies them around the canvas center.
+    // Edges + nodes draw inside the pan + zoom transform.
     // Save/restore keeps the transform local to this function.
     var cx = w / 2;
     var cy = h / 2;
     ctx.save();
-    if (zoom !== 1) {
-      ctx.translate(cx, cy);
+    if (zoom !== 1 || panX !== 0 || panY !== 0) {
+      ctx.translate(cx + panX, cy + panY);
       ctx.scale(zoom, zoom);
       ctx.translate(-cx, -cy);
     }
@@ -404,10 +414,10 @@
 
     // Render the hover label AFTER ctx.restore() so its font size stays
     // at 10px in screen space regardless of zoom. Project the node's
-    // world coords back to screen coords for placement.
+    // world coords back to screen coords accounting for both pan + zoom.
     if (hoverNode) {
-      var labelX = cx + (hoverNode.x - cx) * zoom + 9;
-      var labelY = cy + (hoverNode.y - cy) * zoom + 3;
+      var labelX = cx + (hoverNode.x - cx) * zoom + panX + 9;
+      var labelY = cy + (hoverNode.y - cy) * zoom + panY + 3;
       ctx.fillStyle = "#c9a961";
       ctx.font = "10px monospace";
       ctx.fillText(truncateTitle(hoverNode.title), labelX, labelY);
@@ -424,13 +434,14 @@
     var rect = canvas.getBoundingClientRect();
     var sx = e.clientX - rect.left;
     var sy = e.clientY - rect.top;
-    // Un-project screen coords back to world coords so hit tests run in
-    // the same coordinate space the simulation uses.
+    // Un-project screen → world. Inverse of the pan + zoom transform
+    // applied in draw():
+    //   translate(cx + panX, cy + panY) → scale(zoom) → translate(-cx, -cy)
     var cx = canvas.clientWidth / 2;
     var cy = canvas.clientHeight / 2;
     return {
-      x: cx + (sx - cx) / zoom,
-      y: cy + (sy - cy) / zoom,
+      x: cx + (sx - cx - panX) / zoom,
+      y: cy + (sy - cy - panY) / zoom,
     };
   }
 
@@ -542,14 +553,56 @@
   }
 
   function setupListeners() {
+    canvas.addEventListener("mousedown", function (e) {
+      var pos = getPos(e);
+      pressNode = nodeAt(pos.x, pos.y);
+      panning = true;
+      panStart = {
+        mx: e.clientX,
+        my: e.clientY,
+        panX: panX,
+        panY: panY,
+        moved: false,
+      };
+      canvas.style.cursor = "grabbing";
+    });
+
     canvas.addEventListener("mousemove", function (e) {
+      if (panning && panStart) {
+        var dx = e.clientX - panStart.mx;
+        var dy = e.clientY - panStart.my;
+        if (!panStart.moved && Math.sqrt(dx * dx + dy * dy) > CLICK_THRESHOLD) {
+          panStart.moved = true;
+        }
+        if (panStart.moved) {
+          panX = panStart.panX + dx;
+          panY = panStart.panY + dy;
+        }
+        return;
+      }
       var pos = getPos(e);
       hoverNode = nodeAt(pos.x, pos.y);
       canvas.style.cursor = hoverNode && hoverNode.id !== pinnedId ? "pointer" : "default";
     });
+
+    canvas.addEventListener("mouseup", function () {
+      if (panning && panStart && !panStart.moved && pressNode && pressNode.url && pressNode.id !== pinnedId) {
+        window.location.href = pressNode.url;
+      }
+      panning = false;
+      panStart = null;
+      pressNode = null;
+      canvas.style.cursor = hoverNode && hoverNode.id !== pinnedId ? "pointer" : "default";
+    });
+
     canvas.addEventListener("mouseleave", function () {
       hoverNode = null;
+      panning = false;
+      panStart = null;
+      pressNode = null;
+      canvas.style.cursor = "default";
     });
+
     // Wheel zoom. preventDefault() requires the listener be non-passive
     // (modern browsers default wheel listeners to passive for scroll perf).
     canvas.addEventListener("wheel", function (e) {
@@ -557,13 +610,6 @@
       var factor = e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
       zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom * factor));
     }, { passive: false });
-    canvas.addEventListener("click", function (e) {
-      var pos = getPos(e);
-      var n = nodeAt(pos.x, pos.y);
-      if (n && n.url && n.id !== pinnedId) {
-        window.location.href = n.url;
-      }
-    });
 
     var buttons = shell.querySelectorAll(".graph-widget-toggle button[data-mode]");
     for (var i = 0; i < buttons.length; i++) {
