@@ -4,7 +4,7 @@
 // permalink below has to win.
 //
 // Subscribers to /authors/<slug>/feed.xml get every post whose `author`
-// frontmatter resolves to that author, newest first.
+// frontmatter resolves to that author,  newest first. 
 
 const { renderAtomFeed } = require("./utils/atom-feed");
 const { indexAuthorsByUrl } = require("./utils/authors");
