@@ -1,22 +1,22 @@
 ---
 title: Sample Standalone Essay
 date_published: 2026-05-14T15:00:00
-date_updated: 2026-05-16T13:45:55
+date_updated: 2026-05-20T20:50:04
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [theory, hauntology]
 series_name:
-description: A standalone essay. Cold-written. Not part of any series; useful as a layout reference for one-off long-form pieces.
+description: A standalone essay.
 featured: false
 draft: false
 exclude: false
 preview_enabled: true
 graph_enabled: true
-image: "[[_attachments/essays/notes-on-a-machine-listening-practice/image.png|Zen]]"
+image: "[[_attachments/essays/essay-example/image.png|Zen]]"
 reading_time: 2 min
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
 
-![[_attachments/essays/notes-on-a-machine-listening-practice/image.png|Monastery|500]]
+![[_attachments/essays/essay-example/image.png|Monastery|500]]
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse euismod gravida lacus ac vulputate. Nam scelerisque tellus vitae congue pharetra. Sed luctus erat vitae fermentum malesuada. Phasellus non tincidunt ligula, dapibus maximus ex. Duis feugiat vehicula lacinia. Donec sed pretium urna, sed varius dui. Duis interdum nunc fringilla blandit faucibus. Sed at tortor ut lectus pretium laoreet at non erat. Ut orci justo, lobortis id hendrerit nec, vestibulum elementum risus. Cras maximus congue est, vel sagittis magna finibus sed. Donec ligula nisi, feugiat eu ipsum a, gravida molestie dui. Duis semper leo id justo lobortis mattis. Pellentesque laoreet nisi at commodo convallis. Donec nunc dolor, varius sit amet ante a, faucibus interdum ligula.
 
