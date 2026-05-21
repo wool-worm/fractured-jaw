@@ -209,9 +209,13 @@ main {
 }
 
 /* ── Page headers (shared by section, tag, page layouts) ────────────────── */
+/* max-width 88ch is 3ch wider than .post-content's 85ch (--col-max), so the
+   header sits visually flush with the post body but the title's right edge
+   stays clear of the fixed graph widget at 1101+ viewports. */
 .page-header,
 .section-header,
 .post-header {
+  max-width: 88ch;
   margin-bottom: var(--sp-lg);
   padding-bottom: var(--sp-md);
   border-bottom: var(--border-std);
@@ -227,6 +231,14 @@ main {
   letter-spacing: 0.03em;
   text-shadow: var(--bitshadow);
   margin-bottom: var(--sp-sm);
+}
+
+/* Post-title scales slower than the grouped rule above so long post titles
+   (e.g. "SAMPLE STANDALONE FRAGMENT") stay narrow enough to fit inside
+   .post-header's 88ch constraint and don't push past the unfolded graph
+   widget. Page + section titles keep the original 4vw rate. */
+.post-title {
+  font-size: clamp(1.5rem, 3vw, 2.6rem);
 }
 
 .post-description,
