@@ -60,7 +60,9 @@
     authors: "#fc0",
   };
   var TAG_COLOR = "#f80";
-  var CURRENT_COLOR = "#000";
+  // Bone-white "you are here" anchor. Originally black, which was
+  // invisible against the dark widget background on content pages.
+  var CURRENT_COLOR = "#fff";
 
   // Page-type → header label. Snake_case matches the cyberpunk aesthetic.
   var LABELS = {
@@ -575,8 +577,13 @@
           panStart.moved = true;
         }
         if (panStart.moved) {
-          panX = panStart.panX + dx;
-          panY = panStart.panY + dy;
+          // Clamp pan so the canvas center can never leave the viewport.
+          // Without bounds, the user can drag the entire graph out of the
+          // small widget and lose access to it (no reset button here).
+          var maxPanX = canvas.clientWidth / 2;
+          var maxPanY = canvas.clientHeight / 2;
+          panX = Math.max(-maxPanX, Math.min(maxPanX, panStart.panX + dx));
+          panY = Math.max(-maxPanY, Math.min(maxPanY, panStart.panY + dy));
         }
         return;
       }

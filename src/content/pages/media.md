@@ -8,4 +8,4 @@ graph_enabled: false
 preview_enabled: false
 ---
 
-Reviews of records, films, books, or any other cultural artifact interesting enough to talk about. Ratings are free-form and made with the full subjective liberty of the author in question.
+Reviews of records, films, books, or any other cultural artifacts interesting enough to talk about. Ratings are free-form and made with the full subjective liberty of the author in question.
