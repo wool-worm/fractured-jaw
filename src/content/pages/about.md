@@ -4,12 +4,18 @@ description:
 graph_enabled: false
 preview_enabled: false
 ---
-Fractured Jaw is a collaborative zine and blog published anonymously. Taking inspiration from an imagined dystopic future where pirate radio stations act as hubs of resistance, Fractured Jaw hopes to offer some of the same in our own dystopic times. We explore themes of politics, media commentary, cultural criticism, environmental issues–anything else that is on our minds–and place an unashamedly left bent on these issues. 
+# What
 
-You’ve seen it. We’ve seen it too. The internet has become a cold place, corporatized and devoid of character. Not here. The psycho-and-necro-politics of neoliberal order have ushered in a great expanse of *sameness*. In this immense flattening of life, our touchpoints to humanity so lost, we have rejected the other, the strange, and in doing so, we fail to negate the self. Here, the death of coincidence, the death of situations, amounts to a denial of wonder. This place is a watering hole in this desert–a reintroduction of the weird and the wonderous into a world that has lionized utter transparency. This site will never be transparent, affirming the belief that true expression suffers in the light of identity. 
+Fractured Jaw is a collaborative zine and blog published anonymously. Taking inspiration from an imagined dystopic future where pirate radio stations serve as the sinew of collective experience, we explore themes of politics, fiction, media commentary, cultural criticism, ecology, social justice, and anything else that is on our minds. The writing here can be relevant, or irreverent, minimal, liminal, logical, or just plain entertaining. Whatever you find, and there are many ways to find it here, we promise it will be exactly what you’ve been looking for.
 
-Posts arrive intermittently. Some are [[pages/blog|blog]] posts, written with minimal editing (or forethought). Some are [[pages/essays|essays]], written cold. Some are [[pages/fragments|fragments]], shower thoughts and errata. [[pages/media|Media]] reviews and commentary cover all formats and genres, from film to books to music to games. Posts can also be published as part of a [[pages/series|series]]; these can simply be posts with similar themes, or fully episodic short stories.
+# Why
 
-Fractured Jaw is hand-built: Eleventy, Obsidian, a brutalist palette and a typography stack chosen for legibility under dark skies and blazing sodium lamps. The code is MIT licensed; the writing is CC BY-NC 4.0. AI-training crawlers GTFO via [robots.txt](/robots.txt) and [ai.txt](/ai.txt). Subscribe to the [Atom feed](/feed.xml) if you want notifications. If you want to reach out to the operators, send us a [dispatch](mailto:dispatch@fractured-jaw.com), we’re looking for webring friends currently!
+You’ve seen it and we’ve seen it too. The internet–and popular life, insofar as they are metaphors for one another–has become a cold place, corporatized and devoid of connection–in one word, flattened. The psycho-and-necro-politics of our time have ushered in a great expanse of *sameness*. In this immense flattening of life, we have rejected the other, the strange, and in doing so, we fail to negate the self. In that place, the death of coincidence, the death of situations, amounts to a denial of wonder. This place is not that one. This place is a denial of that anti-reality; a reintroduction of the weird and the wonderous into a world that has lionized transparency. 
+
+# How
+
+Posts arrive intermittently. Some are [[pages/blog|blog]] posts, written with minimal editing (or forethought). Some are [[pages/essays|essays]], prepared cold and served up hot. Some are [[pages/fragments|fragments]], shower thoughts and errata. [[pages/media|Media]] reviews and commentary cover all formats and genres, from film to books to music to games. Posts can also be published as part of a [[pages/series|series]]; these can simply be posts with similar themes, or fully episodic short stories.
+
+Fractured Jaw is hand-built: Eleventy, Obsidian, a brutalist palette and a typography stack chosen for legibility under dark skies and searing sodium lamps. The code is MIT licensed; the writing is CC BY-NC 4.0. AI-training crawlers GTFO via [robots.txt](/robots.txt) and [ai.txt](/ai.txt). Subscribe to the [Atom feed](/feed.xml) if you want notifications. If you want to reach out to the operators, send us a [dispatch](mailto:dispatch@fractured-jaw.com), we’re currently looking for contributors and webring friends!
 
 We hope you have a weird time.

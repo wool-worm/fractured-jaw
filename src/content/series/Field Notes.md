@@ -1,9 +1,9 @@
 ---
 title: Field Notes
 date_published: 2026-05-08T09:00:00
-date_updated: 2026-05-16T13:46:32
+date_updated: 2026-05-20T23:25:09
 tags: [field-notes, series, meta]
-description: A running set of broadcast logs, machine-listening sessions, and signal annotations. Entries cross sections; the thread holds.
+description: An example of a multi-part series.
 featured: false
 draft: false
 exclude: false
