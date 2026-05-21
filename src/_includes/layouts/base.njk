@@ -15,6 +15,9 @@
   <main id="main" tabindex="-1">
     {{ content | safe }}
   </main>
+  {# Mobile-only: collapse long page intros (home + section landings)
+     behind a read-more toggle. No-op above 720px or for short intros. #}
+  <script src="/assets/js/intro-fold.js" defer></script>
   {% include "partials/footer.njk" %}
   {# Local-graph widget renders on every page EXCEPT /network_nodes/ — the
      dedicated full-graph view would render the same graph twice. Whether

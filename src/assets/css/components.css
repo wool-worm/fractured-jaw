@@ -265,6 +265,58 @@
   margin-bottom: var(--sp-lg);
 }
 
+/* ── Foldable intros (mobile only) ──────────────────────────────────────── */
+/* intro-fold.js adds .intro-foldable when the viewport is <=720px AND the
+   intro's natural height exceeds the 150px threshold; it also inserts the
+   .intro-fold-toggle button. Above the breakpoint the class is removed
+   and the button hidden, so desktop layout is unchanged. */
+@media (max-width: 720px) {
+  .intro-foldable {
+    position: relative;
+    max-height: 150px;
+    overflow: hidden;
+    transition: max-height 0.35s ease-out;
+  }
+  .intro-foldable::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 4rem;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent 0%, var(--void) 95%);
+    opacity: 1;
+    transition: opacity 0.2s ease-out;
+  }
+  .intro-foldable.is-expanded {
+    max-height: 200vh;
+  }
+  .intro-foldable.is-expanded::after {
+    opacity: 0;
+  }
+
+  .intro-fold-toggle {
+    display: block;
+    margin: var(--sp-sm) 0 var(--sp-lg);
+    background: transparent;
+    border: 1px solid var(--brass-faint);
+    color: var(--brass);
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 0.35rem 1rem;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s, border-color 0.1s;
+  }
+  .intro-fold-toggle:hover,
+  .intro-fold-toggle:focus-visible {
+    background: var(--void-mid);
+    color: var(--sodium);
+    border-color: var(--sodium-soft);
+    outline: none;
+  }
+}
+
 .section-empty {
   color: var(--bone-faint);
   font-family: var(--font-body);
