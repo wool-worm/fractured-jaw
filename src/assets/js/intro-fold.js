@@ -15,7 +15,7 @@
   if (typeof document === "undefined") return;
 
   var BREAKPOINT_MAX = 720;
-  var THRESHOLD_PX = 150;
+  var THRESHOLD_PX = 100;
   var SELECTORS = ".home-intro, .section-intro";
 
   var intros = Array.prototype.slice.call(document.querySelectorAll(SELECTORS));
@@ -62,6 +62,18 @@
   }
 
   evaluate();
+
+  // Re-evaluate after web fonts settle. Monospace fonts are wider than
+  // the system fallback, so an intro that fit in 2 lines at script-run
+  // time can reflow to 4 lines once the font arrives — pushing it past
+  // the threshold. Without this, short-ish intros (like /media/) get
+  // measured against the wrong layout and never fold.
+  if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+    document.fonts.ready.then(evaluate);
+  }
+  // Belt-and-suspenders: also re-evaluate at window load (after every
+  // resource including fonts has finished). Cheap; runs once.
+  window.addEventListener("load", evaluate);
 
   var resizeTimer = null;
   window.addEventListener("resize", function () {
