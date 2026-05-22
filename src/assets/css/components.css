@@ -266,11 +266,11 @@
 }
 
 /* ── Foldable intros (mobile only) ──────────────────────────────────────── */
-/* intro-fold.js adds .intro-foldable when the viewport is <=720px AND the
+/* intro-fold.js adds .intro-foldable when the viewport is <=760px AND the
    intro's natural height exceeds the 150px threshold; it also inserts the
    .intro-fold-toggle button. Above the breakpoint the class is removed
    and the button hidden, so desktop layout is unchanged. */
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .intro-foldable {
     position: relative;
     max-height: 100px;
