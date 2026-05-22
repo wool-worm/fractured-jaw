@@ -263,8 +263,8 @@
    Click-to-peek works in the auto-fold zone too. Audio keeps playing
    when folded — only the UI hides. */
 
-/* Hide widget below 720px — matches the graph widget's breakpoint. */
-@media (max-width: 720px) {
+/* Hide widget below 760px — matches the graph widget's breakpoint. */
+@media (max-width: 760px) {
   .radio-widget {
     display: none;
   }
