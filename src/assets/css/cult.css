@@ -276,10 +276,15 @@ body.is-encryption-failure .site-nav::after {
    If the frame count ever changes, update steps(N) AND the keyframe
    target (-(N×64)px) to match. */
 .skull-logo {
+  /* --skull-size drives box dims, sprite background-size, AND the
+     skull-frames keyframe endpoint (calc(var(--skull-size) * -17)).
+     Override the variable in a media query to scale the whole skull
+     (visual + animation) without touching anything else. */
+  --skull-size: 64px;
   display: block;
-  width: 64px;
-  height: 64px;
-  background: url('/assets/images/skull-sprite.png') 0 0 / 1088px 64px no-repeat;
+  width: var(--skull-size);
+  height: var(--skull-size);
+  background: url('/assets/images/skull-sprite.png') 0 0 / calc(var(--skull-size) * 17) var(--skull-size) no-repeat;
   image-rendering: pixelated;
   /* skull-frames steps the sprite; skull-glitch overlays the masthead-style
      glitch (subtle drift + brief burst aligned with cult-slice-a's 9s
@@ -299,6 +304,18 @@ body.is-encryption-failure .site-nav::after {
     drop-shadow(2px 1px 0 var(--blood-bright))
     drop-shadow(-1px -1px 0 var(--brass))
     brightness(1.15);
+}
+
+/* Below the 760 mobile breakpoint, scale the skull with viewport width so
+   it tracks the masthead's clamp(0.85rem, 3.5vw, 2.3rem) shrink. 6vw is
+   the masthead's 3.5vw rate × the desktop skull/title ratio (~1.74), so
+   the two shrink together at the same visual cadence. Floor 24px keeps
+   the sprite legible at the smallest phone widths; ceiling 64px matches
+   the desktop size in case the media query overlaps at exactly 760. */
+@media (max-width: 760px) {
+  .skull-logo {
+    --skull-size: clamp(24px, 6vw, 64px);
+  }
 }
 
 /* ── 7. Nav: sector map aesthetic ───────────────────────────────────────── */
@@ -656,7 +673,7 @@ hr {
 /* Skull sprite — step through 17 frames horizontally. Each step holds
    for 1/17 of the animation duration (~235ms at 4s total). */
 @keyframes skull-frames {
-  to { background-position: -1088px 0; }
+  to { background-position: calc(var(--skull-size, 64px) * -17) 0; }
 }
 
 /* Skull glitch — masthead-style cadence applied to the whole sprite.
