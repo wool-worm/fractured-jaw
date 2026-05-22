@@ -317,20 +317,26 @@ body.is-encryption-failure .site-nav::after {
 }
 
 /* Below the 620 narrow breakpoint, scale masthead + skull together
-   from their full sizes. Both clamps are anchored so the ceiling is
-   reached exactly at viewport=620, eliminating any jump at the
-   breakpoint:
-     masthead: 5.94vw  × 620 = 36.83px ≈ 2.3rem (full size)
-     skull:    10.32vw × 620 = 63.98px ≈ 64px   (full size)
-   The 10.32/5.94 ratio (~1.74) matches the desktop skull/title size
-   ratio, so the two shrink at a visually matched cadence. Floors keep
-   both legible at the smallest phone widths (~280-320px). */
+   from their full sizes. Each clamp's middle term is a min() of two
+   linear slopes — the gentle slope (anchored at the 620 ceiling) and
+   a steeper slope (offset down) — so CSS picks the smaller automatically
+   at every width. The crossover (kink) lands near 540px; below that
+   the steep slope wins and shrinkage accelerates to keep the header
+   from outpacing the viewport at ~480 where the hamburger appears.
+     masthead gentle: 5.94vw  × 620 = 36.83px ≈ 2.3rem (full size)
+     masthead steep:  9vw     − 16.5px  (kicks in ~540)
+     skull gentle:    10.32vw × 620 = 63.98px ≈ 64px   (full size)
+     skull steep:     15.66vw − 28.7px  (kicks in ~540)
+   The 10.32/5.94 and 15.66/9 ratios both ≈ 1.74 (desktop skull/title
+   ratio) so the two scale visually in lockstep through the kink.
+   Tuning knobs: bump the steep multipliers (9 / 15.66) for a steeper
+   fall-off, bump the offsets (16.5 / 28.7) to push the kink later. */
 @media (max-width: 620px) {
   .site-title {
-    font-size: clamp(0.85rem, 5.94vw, 2.3rem);
+    font-size: clamp(0.85rem, min(5.94vw, calc(9vw - 16.5px)), 2.3rem);
   }
   .skull-logo {
-    --skull-size: clamp(24px, 10.32vw, 64px);
+    --skull-size: clamp(24px, min(10.32vw, calc(15.66vw - 28.7px)), 64px);
   }
 }
 
