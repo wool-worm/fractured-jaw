@@ -193,12 +193,12 @@ body.is-encryption-failure .site-nav::after {
 }
 
 /* ── 5. Deconstructed masthead — machine god incarnation ────────────────── */
-/* Title stays fixed at 2.3rem above the 760 mobile breakpoint — the
-   shrink is opted into only below 760 by the media query at the bottom
-   of this file, where the font drops to clamp(0.85rem, 4.84vw, 2.3rem)
-   in lockstep with the skull (8.4vw, same ratio as desktop). 4.84vw is
-   tuned so the clamp exactly equals 2.3rem at 760px viewport, giving a
-   seamless handoff with no jump at the breakpoint. */
+/* Title stays fixed at 2.3rem above the 620 narrow breakpoint — the
+   shrink is opted into only below 620 by the media query at the bottom
+   of this file, where the font drops to clamp(0.85rem, 5.94vw, 2.3rem)
+   in lockstep with the skull (10.32vw, same ratio as desktop). 5.94vw
+   is tuned so the clamp exactly equals 2.3rem at 620px viewport,
+   giving a seamless handoff with no jump at the breakpoint. */
 .site-title {
   font-size: 2.3rem;
   position: relative;
@@ -316,21 +316,21 @@ body.is-encryption-failure .site-nav::after {
   }
 }
 
-/* Below the 760 mobile breakpoint, scale masthead + skull together
+/* Below the 620 narrow breakpoint, scale masthead + skull together
    from their full sizes. Both clamps are anchored so the ceiling is
-   reached exactly at viewport=760, eliminating any jump at the
+   reached exactly at viewport=620, eliminating any jump at the
    breakpoint:
-     masthead: 4.84vw × 760 = 36.78px ≈ 2.3rem (full size)
-     skull:    8.4vw  × 760 = 63.84px ≈ 64px   (full size)
-   The 8.4/4.84 ratio (~1.74) matches the desktop skull/title size
+     masthead: 5.94vw  × 620 = 36.83px ≈ 2.3rem (full size)
+     skull:    10.32vw × 620 = 63.98px ≈ 64px   (full size)
+   The 10.32/5.94 ratio (~1.74) matches the desktop skull/title size
    ratio, so the two shrink at a visually matched cadence. Floors keep
    both legible at the smallest phone widths (~280-320px). */
-@media (max-width: 760px) {
+@media (max-width: 620px) {
   .site-title {
-    font-size: clamp(0.85rem, 4.84vw, 2.3rem);
+    font-size: clamp(0.85rem, 5.94vw, 2.3rem);
   }
   .skull-logo {
-    --skull-size: clamp(24px, 8.4vw, 64px);
+    --skull-size: clamp(24px, 10.32vw, 64px);
   }
 }
 
