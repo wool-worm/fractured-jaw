@@ -428,12 +428,12 @@ body.is-encryption-failure .systems-failure-banner {
    toggles .is-folded so the fold button's state (« vs ») stays in sync
    with the visual. Click-to-peek works in the auto-fold zone too. */
 
-/* ── Hide below 1000px ──────────────────────────────────────────────────── */
+/* ── Hide below 1030px ──────────────────────────────────────────────────── */
 /* Systems hides earlier than graph + radio. Even folded it would still
-   crowd the narrower content column at <1000px, so we remove it entirely
+   crowd the narrower content column at <1030px, so we remove it entirely
    here instead of leaving an edge tab. */
 
-@media (max-width: 1000px) {
+@media (max-width: 1030px) {
   .systems-widget {
     display: none;
   }

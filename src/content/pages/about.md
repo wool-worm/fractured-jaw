@@ -10,7 +10,7 @@ Fractured Jaw is a collaborative zine and blog published anonymously. Taking ins
 
 ## Why
 
-You’ve seen it and we’ve seen it too. The internet–and popular life, insofar as they are metaphors for one another–has become a cold place, corporatized and devoid of connection–in one word, flattened. The logics of the spectacle have ushered in a great expanse of sameness. There in that immense flattening of life, the other is annihilated, the strange is rejected, homogeneity and smoothness are elevated in their place. In that place, the death of coincidence, the death of situations, amounts to a denial of wonder. This place is not that one. This place is a denial of that anti-reality; a reintroduction of the weird and the wondrous into a world that has lionized transparency.
+You’ve seen it and we’ve seen it too. The internet–and popular life, insofar as they are metaphors for one another–has become a cold place, corporatized and devoid of connection–in one word, flattened. The logics of the spectacle have ushered in a great expanse of sameness. There in that immense flattening of life, the other is annihilated, the strange is rejected, homogeneity and smoothness are elevated in their place. In that place, the death of coincidence, the death of situations, amount to a denial of wonder. This place is not that one. This place is a denial of that anti-reality; a reintroduction of the weird and the wondrous into a world that has lionized transparency.
 
 ## How
 

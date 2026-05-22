@@ -209,9 +209,13 @@ main {
 }
 
 /* ── Page headers (shared by section, tag, page layouts) ────────────────── */
+/* max-width 88ch is 3ch wider than .post-content's 85ch (--col-max), so the
+   header sits visually flush with the post body but the title's right edge
+   stays clear of the fixed graph widget at 1101+ viewports. */
 .page-header,
 .section-header,
 .post-header {
+  max-width: 88ch;
   margin-bottom: var(--sp-lg);
   padding-bottom: var(--sp-md);
   border-bottom: var(--border-std);
@@ -229,6 +233,18 @@ main {
   margin-bottom: var(--sp-sm);
 }
 
+/* Post-title scales slower than the grouped rule above (3vw vs 4vw) AND
+   pins its own max-width to --col-max so it wraps at the same column as
+   the body text and never crosses the graph widget zone. The .post-header
+   max-width: 88ch above doesn't reliably constrain h1 (the ch unit is
+   font-relative and the title's display font widens the computed ch), so
+   the title carries its own rem-based limit. Page + section titles keep
+   the original 4vw rate. */
+.post-title {
+  font-size: clamp(1.5rem, 3vw, 2.6rem);
+  max-width: var(--col-max);
+}
+
 .post-description,
 .section-description,
 .page-intro {
@@ -244,15 +260,15 @@ main {
   font-size: 1.0125rem;
 }
 
-/* ── Responsive: nav drops to second row in the 721–1100 zone ───────────── */
-/* Between 720 and 1100px there isn't enough horizontal room for the
+/* ── Responsive: nav drops to second row in the 761–1200 zone ───────────── */
+/* Between 760 and 1200px there isn't enough horizontal room for the
    inline nav row alongside the masthead — the items would wrap into a
    tall vertical stack and bloat the header height. Drop the nav to a
    full-width second row instead so items stay on a single horizontal
-   line. Hamburger button stays hidden in this zone (handled below 720px).
+   line. Hamburger button stays hidden in this zone (handled below 760px).
    Achieved with flex-wrap on the header + flex: 0 0 100% on the nav,
    which forces the nav onto its own line below the skull + masthead. */
-@media (max-width: 1200px) and (min-width: 721px) {
+@media (max-width: 1200px) and (min-width: 761px) {
   .site-header {
     flex-wrap: wrap;
     row-gap: var(--sp-xs);
@@ -273,12 +289,12 @@ main {
 }
 
 /* ── Responsive: collapse nav into hamburger panel ──────────────────────── */
-/* Below 720px (matches the widget hide-breakpoint for radio + graph), the
+/* Below 760px (matches the widget hide-breakpoint for radio + graph), the
    inline nav row would wrap badly and the masthead crowds the items.
    Swap to a hamburger button + absolute-positioned dropdown panel that
    drops below the header. The panel's open/close is driven by data-open
    on .site-nav, toggled by the script in /assets/js/nav-toggle.js. */
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .site-header {
     /* Keep the row layout but tighten the gap so skull + masthead +
        hamburger fit without the masthead pushing the hamburger off-screen.

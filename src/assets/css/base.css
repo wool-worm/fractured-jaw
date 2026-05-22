@@ -109,6 +109,11 @@ p {
 .post-content h2,
 .post-content h3,
 .post-content h4 {
+  /* Match the paragraph max-width so long headings (e.g. the placeholder
+     "IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER") wrap at the
+     same column as body text instead of running into the fixed widgets
+     on the right. */
+  max-width: var(--col-max);
   margin-top: var(--sp-lg);
   margin-bottom: var(--sp-sm);
 }

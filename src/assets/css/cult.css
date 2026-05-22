@@ -193,16 +193,14 @@ body.is-encryption-failure .site-nav::after {
 }
 
 /* ── 5. Deconstructed masthead — machine god incarnation ────────────────── */
-/* The clamp floor is intentionally small (0.85rem ≈ 13.6px) so the title
-   can shrink on narrow phones to fit alongside the skull logo (64px,
-   flex-shrink:0) and the hamburger button (2.2rem) without pushing them
-   off-screen. `.site-title` itself has white-space:nowrap + flex-shrink:0
-   in layout.css; without a small enough font, those would force the
-   header wider than the viewport and trigger horizontal page scroll.
-   The 2.3rem ceiling preserves the desktop feel — clamps in at ~1050px
-   viewport. */
+/* Title stays fixed at 2.3rem above the 620 narrow breakpoint — the
+   shrink is opted into only below 620 by the media query at the bottom
+   of this file, where the font drops to clamp(0.85rem, 5.94vw, 2.3rem)
+   in lockstep with the skull (10.32vw, same ratio as desktop). 5.94vw
+   is tuned so the clamp exactly equals 2.3rem at 620px viewport,
+   giving a seamless handoff with no jump at the breakpoint. */
 .site-title {
-  font-size: clamp(0.85rem, 3.5vw, 2.3rem);
+  font-size: 2.3rem;
   position: relative;
   display: inline-block;
   text-shadow: none;
@@ -276,10 +274,15 @@ body.is-encryption-failure .site-nav::after {
    If the frame count ever changes, update steps(N) AND the keyframe
    target (-(N×64)px) to match. */
 .skull-logo {
+  /* --skull-size drives box dims, sprite background-size, AND the
+     skull-frames keyframe endpoint (calc(var(--skull-size) * -17)).
+     Override the variable in a media query to scale the whole skull
+     (visual + animation) without touching anything else. */
+  --skull-size: 64px;
   display: block;
-  width: 64px;
-  height: 64px;
-  background: url('/assets/images/skull-sprite.png') 0 0 / 1088px 64px no-repeat;
+  width: var(--skull-size);
+  height: var(--skull-size);
+  background: url('/assets/images/skull-sprite.png') 0 0 / calc(var(--skull-size) * 17) var(--skull-size) no-repeat;
   image-rendering: pixelated;
   /* skull-frames steps the sprite; skull-glitch overlays the masthead-style
      glitch (subtle drift + brief burst aligned with cult-slice-a's 9s
@@ -299,6 +302,42 @@ body.is-encryption-failure .site-nav::after {
     drop-shadow(2px 1px 0 var(--blood-bright))
     drop-shadow(-1px -1px 0 var(--brass))
     brightness(1.15);
+}
+
+/* At <=1100 the graph + radio widgets auto-fold (only a ~22px tab
+   remains pinned to the viewport-right edge) or fully hide (<=760), so
+   the 252px desktop reservation on .site-header becomes dead weight
+   and starts crushing skull + masthead into a wrap at narrow widths.
+   Collapse padding-right to match padding-left in this zone — the
+   folded tab still sits clear of the header content area. */
+@media (max-width: 1100px) {
+  .site-header {
+    padding-right: var(--sp-md);
+  }
+}
+
+/* Below the 620 narrow breakpoint, scale masthead + skull together
+   from their full sizes. Each clamp's middle term is a min() of two
+   linear slopes — the gentle slope (anchored at the 620 ceiling) and
+   a steeper slope (offset down) — so CSS picks the smaller automatically
+   at every width. The crossover (kink) lands near 540px; below that
+   the steep slope wins and shrinkage accelerates to keep the header
+   from outpacing the viewport at ~480 where the hamburger appears.
+     masthead gentle: 5.94vw  × 620 = 36.83px ≈ 2.3rem (full size)
+     masthead steep:  7.2vw   − 6.8px   (kicks in ~540)
+     skull gentle:    10.32vw × 620 = 63.98px ≈ 64px   (full size)
+     skull steep:     12.53vw − 11.92px (kicks in ~540)
+   The 10.32/5.94 and 12.53/7.2 ratios both ≈ 1.74 (desktop skull/title
+   ratio) so the two scale visually in lockstep through the kink.
+   Tuning knobs: bump the steep multipliers (7.2 / 12.53) for a steeper
+   fall-off, bump the offsets (6.8 / 11.92) to push the kink later. */
+@media (max-width: 620px) {
+  .site-title {
+    font-size: clamp(0.85rem, min(5.94vw, calc(7.2vw - 6.8px)), 2.3rem);
+  }
+  .skull-logo {
+    --skull-size: clamp(24px, min(10.32vw, calc(12.53vw - 11.92px)), 64px);
+  }
 }
 
 /* ── 7. Nav: sector map aesthetic ───────────────────────────────────────── */
@@ -656,7 +695,7 @@ hr {
 /* Skull sprite — step through 17 frames horizontally. Each step holds
    for 1/17 of the animation duration (~235ms at 4s total). */
 @keyframes skull-frames {
-  to { background-position: -1088px 0; }
+  to { background-position: calc(var(--skull-size, 64px) * -17) 0; }
 }
 
 /* Skull glitch — masthead-style cadence applied to the whole sprite.
