@@ -324,19 +324,19 @@ body.is-encryption-failure .site-nav::after {
    the steep slope wins and shrinkage accelerates to keep the header
    from outpacing the viewport at ~480 where the hamburger appears.
      masthead gentle: 5.94vw  × 620 = 36.83px ≈ 2.3rem (full size)
-     masthead steep:  6.3vw   − 1.94px  (kicks in ~540)
+     masthead steep:  7.2vw   − 6.8px   (kicks in ~540)
      skull gentle:    10.32vw × 620 = 63.98px ≈ 64px   (full size)
-     skull steep:     10.96vw − 3.47px  (kicks in ~540)
-   The 10.32/5.94 and 10.96/6.3 ratios both ≈ 1.74 (desktop skull/title
+     skull steep:     12.53vw − 11.92px (kicks in ~540)
+   The 10.32/5.94 and 12.53/7.2 ratios both ≈ 1.74 (desktop skull/title
    ratio) so the two scale visually in lockstep through the kink.
-   Tuning knobs: bump the steep multipliers (6.3 / 10.96) for a steeper
-   fall-off, bump the offsets (1.94 / 3.47) to push the kink later. */
+   Tuning knobs: bump the steep multipliers (7.2 / 12.53) for a steeper
+   fall-off, bump the offsets (6.8 / 11.92) to push the kink later. */
 @media (max-width: 620px) {
   .site-title {
-    font-size: clamp(0.85rem, min(5.94vw, calc(6.3vw - 1.94px)), 2.3rem);
+    font-size: clamp(0.85rem, min(5.94vw, calc(7.2vw - 6.8px)), 2.3rem);
   }
   .skull-logo {
-    --skull-size: clamp(24px, min(10.32vw, calc(10.96vw - 3.47px)), 64px);
+    --skull-size: clamp(24px, min(10.32vw, calc(12.53vw - 11.92px)), 64px);
   }
 }
 
