@@ -260,15 +260,15 @@ main {
   font-size: 1.0125rem;
 }
 
-/* ── Responsive: nav drops to second row in the 721–1100 zone ───────────── */
-/* Between 720 and 1100px there isn't enough horizontal room for the
+/* ── Responsive: nav drops to second row in the 761–1200 zone ───────────── */
+/* Between 760 and 1200px there isn't enough horizontal room for the
    inline nav row alongside the masthead — the items would wrap into a
    tall vertical stack and bloat the header height. Drop the nav to a
    full-width second row instead so items stay on a single horizontal
-   line. Hamburger button stays hidden in this zone (handled below 720px).
+   line. Hamburger button stays hidden in this zone (handled below 760px).
    Achieved with flex-wrap on the header + flex: 0 0 100% on the nav,
    which forces the nav onto its own line below the skull + masthead. */
-@media (max-width: 1200px) and (min-width: 721px) {
+@media (max-width: 1200px) and (min-width: 761px) {
   .site-header {
     flex-wrap: wrap;
     row-gap: var(--sp-xs);
@@ -289,12 +289,12 @@ main {
 }
 
 /* ── Responsive: collapse nav into hamburger panel ──────────────────────── */
-/* Below 720px (matches the widget hide-breakpoint for radio + graph), the
+/* Below 760px (matches the widget hide-breakpoint for radio + graph), the
    inline nav row would wrap badly and the masthead crowds the items.
    Swap to a hamburger button + absolute-positioned dropdown panel that
    drops below the header. The panel's open/close is driven by data-open
    on .site-nav, toggled by the script in /assets/js/nav-toggle.js. */
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .site-header {
     /* Keep the row layout but tighten the gap so skull + masthead +
        hamburger fit without the masthead pushing the hamburger off-screen.

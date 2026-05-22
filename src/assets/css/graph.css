@@ -303,8 +303,8 @@
    so the fold button's state (» vs «) stays in sync with the visual.
    Click-to-peek works in the auto-fold zone too. */
 
-/* Hide widget below 720px — not enough real estate */
-@media (max-width: 720px) {
+/* Hide widget below 760px — not enough real estate */
+@media (max-width: 760px) {
   .graph-widget {
     display: none;
   }
