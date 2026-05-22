@@ -193,16 +193,14 @@ body.is-encryption-failure .site-nav::after {
 }
 
 /* ── 5. Deconstructed masthead — machine god incarnation ────────────────── */
-/* The clamp floor is intentionally small (0.85rem ≈ 13.6px) so the title
-   can shrink on narrow phones to fit alongside the skull logo (64px,
-   flex-shrink:0) and the hamburger button (2.2rem) without pushing them
-   off-screen. `.site-title` itself has white-space:nowrap + flex-shrink:0
-   in layout.css; without a small enough font, those would force the
-   header wider than the viewport and trigger horizontal page scroll.
-   The 2.3rem ceiling preserves the desktop feel — clamps in at ~1050px
-   viewport. */
+/* Title stays fixed at 2.3rem above the 760 mobile breakpoint — the
+   shrink is opted into only below 760 by the media query at the bottom
+   of this file, where the font drops to clamp(0.85rem, 4.84vw, 2.3rem)
+   in lockstep with the skull (8.4vw, same ratio as desktop). 4.84vw is
+   tuned so the clamp exactly equals 2.3rem at 760px viewport, giving a
+   seamless handoff with no jump at the breakpoint. */
 .site-title {
-  font-size: clamp(0.85rem, 3.5vw, 2.3rem);
+  font-size: 2.3rem;
   position: relative;
   display: inline-block;
   text-shadow: none;
@@ -306,15 +304,21 @@ body.is-encryption-failure .site-nav::after {
     brightness(1.15);
 }
 
-/* Below the 760 mobile breakpoint, scale the skull with viewport width so
-   it tracks the masthead's clamp(0.85rem, 3.5vw, 2.3rem) shrink. 6vw is
-   the masthead's 3.5vw rate × the desktop skull/title ratio (~1.74), so
-   the two shrink together at the same visual cadence. Floor 24px keeps
-   the sprite legible at the smallest phone widths; ceiling 64px matches
-   the desktop size in case the media query overlaps at exactly 760. */
+/* Below the 760 mobile breakpoint, scale masthead + skull together
+   from their full sizes. Both clamps are anchored so the ceiling is
+   reached exactly at viewport=760, eliminating any jump at the
+   breakpoint:
+     masthead: 4.84vw × 760 = 36.78px ≈ 2.3rem (full size)
+     skull:    8.4vw  × 760 = 63.84px ≈ 64px   (full size)
+   The 8.4/4.84 ratio (~1.74) matches the desktop skull/title size
+   ratio, so the two shrink at a visually matched cadence. Floors keep
+   both legible at the smallest phone widths (~280-320px). */
 @media (max-width: 760px) {
+  .site-title {
+    font-size: clamp(0.85rem, 4.84vw, 2.3rem);
+  }
   .skull-logo {
-    --skull-size: clamp(24px, 6vw, 64px);
+    --skull-size: clamp(24px, 8.4vw, 64px);
   }
 }
 
