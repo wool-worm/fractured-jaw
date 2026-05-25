@@ -35,8 +35,40 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Capture the currently-live Atom feed BEFORE building. The Discord
+      # new-post detection diffs this snapshot against the freshly-built
+      # _site/feed.xml later in this job. Only runs on main pushes since
+      # that's the only path that announces.
+      - name: Fetch live feed snapshot
+        if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: curl -fsSL https://fractured-jaw.com/feed.xml -o previous-feed.xml
+
       - name: Build site
         run: npm run build
+
+      # Diff previous feed vs. _site/feed.xml, emit new-posts.json with
+      # title/url/description/authors/tags/published/image per new entry.
+      # Fails the workflow if previous feed parsed to zero entries (set
+      # repo variable ALLOW_EMPTY_PREVIOUS_FEED=true to bypass the guard).
+      - name: Detect new posts
+        if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        env:
+          ALLOW_EMPTY_PREVIOUS_FEED: ${{ vars.ALLOW_EMPTY_PREVIOUS_FEED }}
+        run: |
+          node .github/scripts/detect-new-posts.js \
+            previous-feed.xml \
+            _site/feed.xml \
+            _site/search-index.json \
+            new-posts.json
+
+      # Pass the new-posts payload from the build job to the deploy job.
+      - name: Upload new-posts payload
+        if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: new-posts
+          path: new-posts.json
+          retention-days: 1
 
       - name: Configure Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
@@ -45,6 +77,18 @@ jobs:
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: ./_site
+
+      # If anything failed during a real production build, surface it to
+      # the system webhook so the author sees it without polling the
+      # Actions tab. Skips PR builds and dev pushes.
+      - name: Post build failure to Discord system
+        if: failure() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        env:
+          DISCORD_WEBHOOK_SYSTEM: ${{ secrets.DISCORD_WEBHOOK_SYSTEM }}
+          DEPLOY_STATUS: build_failed
+          COMMIT_SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node .github/scripts/post-system.js
 
   deploy:
     needs: build
@@ -56,6 +100,53 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # Needed for .github/scripts/ used by the steps below. The build
+      # artifact uploaded by actions/upload-pages-artifact is consumed by
+      # actions/deploy-pages directly; this checkout is only for our
+      # Discord-posting scripts.
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+
+      # Best-effort download of the new-posts payload. continue-on-error
+      # so a degenerate build (no detection step) doesn't fail the deploy
+      # job after the actual Pages deploy succeeded.
+      - name: Download new-posts payload
+        if: steps.deployment.outcome == 'success'
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: new-posts
+
+      # Post one Discord embed per new post to the dispatches channel.
+      # continue-on-error so a Discord outage doesn't fail the workflow
+      # after the actual deploy succeeded.
+      - name: Post new posts to Discord dispatches
+        if: steps.deployment.outcome == 'success' && hashFiles('new-posts.json') != ''
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK_DISPATCHES: ${{ secrets.DISCORD_WEBHOOK_DISPATCHES }}
+        run: node .github/scripts/post-dispatches.js new-posts.json
+
+      - name: Post deploy success to Discord system
+        if: steps.deployment.outcome == 'success'
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK_SYSTEM: ${{ secrets.DISCORD_WEBHOOK_SYSTEM }}
+          DEPLOY_STATUS: ok
+          COMMIT_SHA: ${{ github.sha }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          DEPLOY_URL: ${{ steps.deployment.outputs.page_url }}
+        run: node .github/scripts/post-system.js
+
+      - name: Post deploy failure to Discord system
+        if: steps.deployment.outcome == 'failure'
+        env:
+          DISCORD_WEBHOOK_SYSTEM: ${{ secrets.DISCORD_WEBHOOK_SYSTEM }}
+          DEPLOY_STATUS: failed
+          COMMIT_SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node .github/scripts/post-system.js
