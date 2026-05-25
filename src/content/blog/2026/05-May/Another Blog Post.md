@@ -1,7 +1,7 @@
 ---
 title: Another Blog Post
 date_published: 2026-05-09T10:00:00
-date_updated: 2026-05-20T20:51:13
+date_updated: 2026-05-22T16:25:41
 author: ["[[authors/wool-worm|wool-worm]]"]
 tags: [field-notes, signals, broadcast]
 series_name: "[[series/Field Notes|Field Notes]]"
