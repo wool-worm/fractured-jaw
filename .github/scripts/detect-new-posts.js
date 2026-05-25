@@ -112,29 +112,46 @@ function parseEntry(entryBlock) {
   };
 }
 
-// search-index.json stores the raw `image:` frontmatter value, which is a
-// wikilink of the shape "[[_attachments/<section>/<slug>/<file>|alt]]" (the
-// caption is optional). We resolve it to the absolute URL Discord can fetch.
+// Look up a post's cover image URL from search-index.json and return an
+// absolute URL Discord can fetch. Handles three shapes the `image` field
+// may take, in priority order:
 //
-// The build's passthrough rule maps src/content/_attachments → attachments
-// (the leading underscore is stripped). So the wikilink target
-// "_attachments/blog/post/image.png" becomes
-// "<site.url>/attachments/blog/post/image.png".
+//   1. Already absolute ("https://..."):  returned as-is
+//   2. Resolved root-relative path ("/attachments/.../foo.png"):  current
+//      shape emitted by content.11tydata.js's `image` computed property
+//      after Eleventy resolves the wikilink. Prepend siteUrl.
+//   3. Raw wikilink ("[[_attachments/.../foo.png|alt]]"):  defensive
+//      fallback in case the search-index format ever changes back to
+//      passing the frontmatter value through verbatim. Strip the
+//      _attachments/ prefix (passthrough renames to /attachments/) and
+//      prepend siteUrl.
+//
+// Returns null when there's no image or the field doesn't match any of
+// the three known shapes.
 function imageFromSearchIndex(searchIndex, postUrl, siteUrl) {
   if (!Array.isArray(searchIndex)) return null;
   const record = searchIndex.find((r) => r && r.url === postUrl);
   if (!record || !record.image) return null;
 
   const raw = String(record.image).trim();
-  const m = /^\[\[([^\]|]+)(?:\|[^\]]*)?\]\]$/.exec(raw);
-  if (!m) return null;
-
-  let vaultPath = m[1].trim();
-  if (vaultPath.startsWith("_attachments/")) {
-    vaultPath = "attachments/" + vaultPath.slice("_attachments/".length);
-  }
   const base = String(siteUrl).replace(/\/+$/, "");
-  return `${base}/${vaultPath.replace(/^\/+/, "")}`;
+
+  if (/^https?:\/\//i.test(raw)) return raw;
+
+  if (raw.startsWith("/")) {
+    return `${base}${raw}`;
+  }
+
+  const m = /^\[\[([^\]|]+)(?:\|[^\]]*)?\]\]$/.exec(raw);
+  if (m) {
+    let vaultPath = m[1].trim();
+    if (vaultPath.startsWith("_attachments/")) {
+      vaultPath = "attachments/" + vaultPath.slice("_attachments/".length);
+    }
+    return `${base}/${vaultPath.replace(/^\/+/, "")}`;
+  }
+
+  return null;
 }
 
 function main() {
