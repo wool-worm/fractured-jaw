@@ -1,13 +1,9 @@
 ---
-title: Essay Example Copy Copy
-date_published: 2026-05-25T13:00:00
-date_updated: 2026-05-25T13:08:40
+title: Essay Example Copy Copy (One More)
+date_published: 2026-05-25T13:26:00
+date_updated: 2026-05-25T13:27:09
 author: "[[authors/wool-worm|wool-worm]]"
-tags:
-  - field-notes
-  - theory
-  - machine-listening
-  - hauntology
+tags: [field-notes, theory, machine-listening, hauntology]
 series_name: "[[series/Field Notes|Field Notes]]"
 description: Second entry.
 featured: false
