@@ -39,9 +39,20 @@ jobs:
       # new-post detection diffs this snapshot against the freshly-built
       # _site/feed.xml later in this job. Only runs on main pushes since
       # that's the only path that announces.
+      #
+      # Cloudflare (fronting fractured-jaw.com) 403s on default-UA curl
+      # from GitHub Actions runner IPs as a bot-mitigation default. Send
+      # an identifying User-Agent and an explicit Accept header so the
+      # request looks like a legitimate feed fetch rather than anonymous
+      # automation. If Cloudflare ever tightens further, the next escape
+      # hatch is a WAF allow rule on this UA string.
       - name: Fetch live feed snapshot
         if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-        run: curl -fsSL https://fractured-jaw.com/feed.xml -o previous-feed.xml
+        run: |
+          curl -fsSL \
+            -A "fractured-jaw-deploy/1.0 (+https://github.com/wool-worm/fractured-jaw)" \
+            -H "Accept: application/atom+xml, application/xml, text/xml, */*" \
+            https://fractured-jaw.com/feed.xml -o previous-feed.xml
 
       - name: Build site
         run: npm run build
