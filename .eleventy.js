@@ -481,6 +481,11 @@ module.exports = function (eleventyConfig) {
   // Rebuild on changes to utility code or static assets.
   eleventyConfig.addWatchTarget("src/utils/");
   eleventyConfig.addWatchTarget("src/assets/");
+  // CSS modules consumed by src/site-css.11ty.js. Eleventy's automatic
+  // template-dependency tracking doesn't see fs.readFileSync calls, so
+  // changes to src/_css/*.css need this explicit watch entry to re-trigger
+  // the bundle on edit.
+  eleventyConfig.addWatchTarget("src/_css/");
 
   // ---------- Directory config ----------
 
