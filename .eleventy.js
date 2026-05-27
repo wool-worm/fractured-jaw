@@ -153,14 +153,10 @@ module.exports = function (eleventyConfig) {
     };
     if (cls) imageAttributes.class = cls;
     if (objectPosition) {
-      // Strip surrounding quote characters that can sneak in when an
-      // Obsidian linter rule re-serializes YAML and double-wraps the
-      // value (e.g. frontmatter `image_focus: "center center"` ending
-      // up stored as `'"center center"'`). Without this, the inner
-      // quotes interpolate into the style attribute and produce
-      // malformed `style="object-position: "center center""`.
-      const cleanPos = String(objectPosition).replace(/^["']|["']$/g, "");
-      imageAttributes.style = `object-position: ${cleanPos}`;
+      // image_focus values are validated at frontmatter-parse time in
+      // src/content/content.11tydata.js, so anything reaching this point
+      // is already a known-good CSS object-position string.
+      imageAttributes.style = `object-position: ${objectPosition}`;
     }
 
     return Image.generateHTML(metadata, imageAttributes);

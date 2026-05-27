@@ -86,6 +86,67 @@ function parseFrontmatterImage(raw) {
   return { kind: "wikilink", url, alt };
 }
 
+// Validate the frontmatter `image_focus` field — a CSS object-position
+// value piped into the responsive image shortcode (see .eleventy.js) to
+// set the focal point of the cover-fit crop on rendered <img> tags.
+//
+// Strict form: one or two CSS keywords from {left, center, right, top,
+// bottom}, separated by spaces. Examples: "center", "center center",
+// "left top", "right bottom".
+//
+// Reject anything containing surrounding quote characters (a common
+// authoring or linter mishap that produces malformed inline style), and
+// anything outside the keyword grammar (typos, percentages, lengths).
+// Percentages/lengths CAN be supported later by widening this regex; for
+// now we keep it tight to catch typos at build time.
+//
+// Returns the trimmed valid string, or null if the field is absent or
+// the value failed validation. Templates that receive null skip the
+// object-position style attribute entirely (defaulting to center via
+// the browser's object-position initial value).
+const VALID_IMAGE_FOCUS_RE = /^(left|center|right|top|bottom)( +(left|center|right|top|bottom))?$/i;
+
+function validateImageFocus(data) {
+  const raw = data.image_focus;
+  if (raw === undefined || raw === null) return null;
+
+  const file = (data.page && data.page.inputPath) || "(unknown source)";
+  const isDraft = data.draft === true;
+  const isExcluded = data.exclude === true;
+
+  if (typeof raw !== "string") {
+    reportIssue({
+      kind: "image-focus-frontmatter",
+      file,
+      offending: `image_focus: ${JSON.stringify(raw)}`,
+      reason: "must be a string of CSS object-position keywords (e.g. center center, left top)",
+      isDraft,
+      isExcluded,
+    });
+    return null;
+  }
+
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  if (!VALID_IMAGE_FOCUS_RE.test(trimmed)) {
+    reportIssue({
+      kind: "image-focus-frontmatter",
+      file,
+      offending: `image_focus: ${raw}`,
+      reason:
+        "must be one or two CSS object-position keywords from " +
+        "{left, center, right, top, bottom} without surrounding quotes " +
+        "(e.g. center center, left top, right bottom)",
+      isDraft,
+      isExcluded,
+    });
+    return null;
+  }
+
+  return trimmed;
+}
+
 // Compute a `{ url, alt }` pair from `data.image`, reporting any issue
 // against the host page's input path + draft/excluded flags.
 //
@@ -207,5 +268,8 @@ module.exports = {
     // alt text without re-parsing.
     image: (data) => resolveFrontmatterImage(data).url,
     image_alt: (data) => resolveFrontmatterImage(data).alt,
+    // Validate + normalize `image_focus`. The shortcode (.eleventy.js)
+    // trusts this value verbatim, so any bad input must be caught here.
+    image_focus: (data) => validateImageFocus(data),
   },
 };
