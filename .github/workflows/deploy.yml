@@ -122,6 +122,29 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
 
+      # Flush Cloudflare's edge cache after a successful deploy so the new
+      # build is visible to readers immediately instead of waiting out the
+      # browser-cache TTL on every CDN node. Paired with a long Browser
+      # Cache TTL in the Cloudflare dashboard: repeat visitors get
+      # aggressively-cached assets, fresh content lands on the next request
+      # after each deploy. Token is scoped to Cache Purge on this one zone
+      # only, so worst-case leakage just means someone could purge our
+      # cache (annoying, not destructive). continue-on-error so a transient
+      # Cloudflare API blip doesn't fail the workflow after the Pages
+      # deploy itself already succeeded.
+      - name: Purge Cloudflare cache
+        if: steps.deployment.outcome == 'success'
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          curl -fsS -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}'
+
       # Best-effort download of the new-posts payload. continue-on-error
       # so a degenerate build (no detection step) doesn't fail the deploy
       # job after the actual Pages deploy succeeded.
