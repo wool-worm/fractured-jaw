@@ -10,6 +10,7 @@ layout: layouts/base.njk
     {% if description %}
       <p class="post-description">{{ description }}</p>
     {% endif %}
+    {% include "partials/post-hero-image.njk" %}
     {% include "partials/post-meta.njk" %}
   </header>
   <div class="post-content">
