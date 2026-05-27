@@ -1,0 +1,8 @@
+{# Hero image rendered above post-meta on individual post pages. Driven by
+   the same frontmatter `image:` wikilink that feeds the post-card cover;
+   `image` and `image_alt` are resolved by content.11tydata.js. #}
+{% if image %}
+  <figure class="post-hero-image">
+    <img src="{{ image }}" alt="{{ image_alt or '' }}">
+  </figure>
+{% endif %}

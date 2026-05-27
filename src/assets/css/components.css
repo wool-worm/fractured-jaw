@@ -653,6 +653,22 @@
   line-height: 1.8;
 }
 
+/* Hero image inside .post-header. Sits between the description and the
+   post-meta block. Mirrors .post-card-image styling but allows a taller
+   crop since this is the dedicated post page. */
+.post-hero-image {
+  margin: var(--sp-md) 0;
+  max-width: var(--col-max);
+}
+
+.post-hero-image img {
+  display: block;
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  border: 1px solid var(--bone-faint);
+}
+
 /* Top-level static pages (about, contributors). Same body font + size as posts. */
 .page-content {
   font-family: var(--font-post-body);
