@@ -1,7 +1,7 @@
 ---
 title: Immediacy Addiction WIP
 date_published: 2026-05-22T10:59:10
-date_updated: 2026-05-25T13:07:48
+date_updated: 2026-05-27T11:50:43
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [essay]
 series_name:
@@ -12,7 +12,7 @@ exclude: false
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/blog/sample-standalone-blog/image.png|Pirate Radio]]"
-image_focus: '"center center"'
+image_focus: center center
 reading_time: 2–3 min
 ---
 

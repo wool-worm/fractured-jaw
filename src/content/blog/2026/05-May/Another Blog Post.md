@@ -1,7 +1,7 @@
 ---
 title: Another Blog Post
 date_published: 2026-05-09T10:00:00
-date_updated: 2026-05-26T22:23:47
+date_updated: 2026-05-27T11:50:34
 author: ["[[authors/wool-worm|wool-worm]]"]
 tags: [field-notes, signals, broadcast]
 series_name: "[[series/Field Notes|Field Notes]]"
@@ -12,7 +12,7 @@ exclude: true
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/blog/another-blog-post/image.png]]"
-image_focus: '"center center"'
+image_focus: center center
 reading_time: 3 min
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
