@@ -1,14 +1,14 @@
 ---
 title: Sample Standalone Fragment
 date_published: 2026-05-15T11:00:00
-date_updated: 2026-05-20T20:48:17
+date_updated: 2026-05-26T22:24:10
 author: "[[authors/another-author|another-author]]"
 tags: [errata, hauntology]
 series_name:
 description: A short note demonstrating the fragments section without belonging to any series.
 featured: true
 draft: false
-exclude: false
+exclude: true
 preview_enabled: true
 graph_enabled: true
 image:

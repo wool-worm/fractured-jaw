@@ -1,14 +1,14 @@
 ---
 title: Essay Example
 date_published: 2026-05-11T14:00:00
-date_updated: 2026-05-20T20:49:57
+date_updated: 2026-05-26T22:24:01
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [field-notes, theory, machine-listening, hauntology]
 series_name: "[[series/Field Notes|Field Notes]]"
 description: Second entry.
 featured: false
 draft: false
-exclude: false
+exclude: true
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/blog/sample-standalone-blog/image.png|Pirate Radio]]"

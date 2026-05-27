@@ -1,14 +1,14 @@
 ---
 title: A Compilation Review
 date_published: 2026-05-16T09:00:00
-date_updated: 2026-05-16T15:24:27
+date_updated: 2026-05-26T22:24:19
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [music, review, hauntology]
 series_name:
 description: A short review of an imaginary compilation. Useful as a layout reference for the media section, including the rating field.
 featured: false
 draft: false
-exclude: false
+exclude: true
 preview_enabled: true
 graph_enabled: true
 image:

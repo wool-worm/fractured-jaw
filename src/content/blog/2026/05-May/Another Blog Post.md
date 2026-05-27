@@ -1,14 +1,14 @@
 ---
 title: Another Blog Post
 date_published: 2026-05-09T10:00:00
-date_updated: 2026-05-22T16:25:41
+date_updated: 2026-05-26T22:23:47
 author: ["[[authors/wool-worm|wool-worm]]"]
 tags: [field-notes, signals, broadcast]
 series_name: "[[series/Field Notes|Field Notes]]"
 description: First entry.
 featured: true
 draft: false
-exclude: false
+exclude: true
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/blog/another-blog-post/image.png]]"
