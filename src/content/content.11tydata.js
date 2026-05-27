@@ -83,7 +83,14 @@ function parseFrontmatterImage(raw) {
       reason: `no file at src/content/_attachments/${stripped}`,
     };
   }
-  return { kind: "wikilink", url, alt };
+  // srcPath is the input-relative path the eleventyImageTransformPlugin
+  // uses to find the source file on disk: it joins the plugin's input dir
+  // (src/) to this path. The plugin then rewrites the <img> in the final
+  // HTML to point at /img/<hash>-<width>w.<ext>. Distinct from `url`, which
+  // is the public-facing /attachments/ URL used for og:image meta tags etc.
+  const stripped = vaultPath.replace(/^\/+/, "").replace(/^(?:_?attachments)\//, "");
+  const srcPath = "/content/" + VAULT_ATTACHMENT_DIR + "/" + stripped;
+  return { kind: "wikilink", url, alt, srcPath };
 }
 
 // Validate the frontmatter `image_focus` field — a CSS object-position
@@ -170,7 +177,7 @@ function resolveFrontmatterImage(data) {
 
   let result;
   if (parsed.kind === "empty") {
-    result = { url: null, alt: "" };
+    result = { url: null, alt: "", srcPath: null };
   } else if (parsed.kind === "bareString") {
     reportIssue({
       kind: "image-frontmatter",
@@ -180,7 +187,7 @@ function resolveFrontmatterImage(data) {
       isDraft,
       isExcluded,
     });
-    result = { url: null, alt: "" };
+    result = { url: null, alt: "", srcPath: null };
   } else if (parsed.kind === "deadWikilink") {
     reportIssue({
       kind: "image-frontmatter",
@@ -190,9 +197,9 @@ function resolveFrontmatterImage(data) {
       isDraft,
       isExcluded,
     });
-    result = { url: null, alt: "" };
+    result = { url: null, alt: "", srcPath: null };
   } else {
-    result = { url: parsed.url, alt: parsed.alt };
+    result = { url: parsed.url, alt: parsed.alt, srcPath: parsed.srcPath };
   }
 
   if (cacheKey) resolveCache.set(cacheKey, result);
@@ -268,6 +275,12 @@ module.exports = {
     // alt text without re-parsing.
     image: (data) => resolveFrontmatterImage(data).url,
     image_alt: (data) => resolveFrontmatterImage(data).alt,
+    // Input-relative source path for the eleventyImageTransformPlugin.
+    // Templates pass this as <img src> so the plugin can locate the source
+    // file on disk and emit responsive <picture> markup. Distinct from
+    // `image` (the public URL) so og:image meta tags keep their absolute
+    // URL form.
+    image_src: (data) => resolveFrontmatterImage(data).srcPath,
     // Validate + normalize `image_focus`. The shortcode (.eleventy.js)
     // trusts this value verbatim, so any bad input must be caught here.
     image_focus: (data) => validateImageFocus(data),

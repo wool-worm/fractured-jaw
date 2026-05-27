@@ -1,12 +1,11 @@
 {# Hero image rendered above post-meta on individual post pages. Driven by
    the same frontmatter `image:` wikilink that feeds the post-card cover;
-   `image` and `image_alt` are resolved by content.11tydata.js;
-   `image_focus` (optional, CSS object-position syntax) tunes the crop
-   anchor for the cover-fit displayed image. The `image` shortcode (see
-   .eleventy.js) emits a <picture> with webp + jpeg variants at multiple
-   widths; sizes attribute reflects the hero's max-width of ~720px. #}
-{% if image %}
+   `image_src`, `image_alt`, and `image_focus` are computed by
+   content.11tydata.js. The eleventyImageTransformPlugin (registered in
+   .eleventy.js) rewrites this <img> to a <picture> with webp + jpeg
+   variants at multiple widths after the template renders. #}
+{% if image_src %}
   <figure class="post-hero-image">
-    {% image image, image_alt, "(max-width: 720px) 100vw, 720px", {objectPosition: image_focus} %}
+    <img src="{{ image_src }}" alt="{{ image_alt or '' }}" sizes="(max-width: 720px) 100vw, 720px"{% if image_focus %} style="object-position: {{ image_focus }}"{% endif %}>
   </figure>
 {% endif %}
