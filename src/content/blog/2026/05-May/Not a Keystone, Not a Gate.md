@@ -1,7 +1,7 @@
 ---
 title: Not a Keystone, Not a Gate
 date_published: 2026-05-26T21:17:44
-date_updated: 2026-05-27T11:46:22
+date_updated: 2026-05-27T15:28:51
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [blog, fractured-jaw, mystery, weird, flattening, on-writing]
 series_name:

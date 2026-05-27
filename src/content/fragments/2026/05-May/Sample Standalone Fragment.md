@@ -1,7 +1,7 @@
 ---
 title: Sample Standalone Fragment
 date_published: 2026-05-15T11:00:00
-date_updated: 2026-05-27T11:50:52
+date_updated: 2026-05-27T15:13:08
 author: ["[[authors/wool-worm|wool-worm]]"]
 tags: [errata, hauntology]
 series_name:

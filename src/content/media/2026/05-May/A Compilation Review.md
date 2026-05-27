@@ -1,7 +1,7 @@
 ---
 title: A Compilation Review
 date_published: 2026-05-16T09:00:00
-date_updated: 2026-05-27T11:52:16
+date_updated: 2026-05-27T15:13:18
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [music, review, hauntology]
 series_name:
