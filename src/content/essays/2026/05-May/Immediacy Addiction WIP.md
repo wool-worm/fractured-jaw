@@ -12,6 +12,7 @@ exclude: false
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/blog/sample-standalone-blog/image.png|Pirate Radio]]"
+image_focus: '"center center"'
 reading_time: 2–3 min
 ---
 

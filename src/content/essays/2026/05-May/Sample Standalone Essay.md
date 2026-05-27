@@ -12,6 +12,7 @@ exclude: true
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/essays/essay-example/image.png|Zen]]"
+image_focus: '"center center"'
 reading_time: 2 min
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER

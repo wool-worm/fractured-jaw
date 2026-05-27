@@ -12,6 +12,7 @@ exclude: true
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/blog/another-blog-post/image.png]]"
+image_focus: '"center center"'
 reading_time: 3 min
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER

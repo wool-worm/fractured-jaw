@@ -12,6 +12,7 @@ exclude: false
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/blog/not-a-keystone-not-a-gate/img.jpg|Haunted]]"
+image_focus: '"center center"'
 reading_time: 3–4 min
 ---
 

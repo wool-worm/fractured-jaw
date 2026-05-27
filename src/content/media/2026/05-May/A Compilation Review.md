@@ -12,6 +12,7 @@ exclude: true
 preview_enabled: true
 graph_enabled: true
 image:
+image_focus: '"center center"'
 reading_time: 2 min
 rating: 4
 ---
