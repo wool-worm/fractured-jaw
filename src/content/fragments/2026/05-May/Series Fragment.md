@@ -1,14 +1,14 @@
 ---
 title: Series Fragment
 date_published: 2026-05-13T16:00:00
-date_updated: 2026-05-20T20:49:23
+date_updated: 2026-05-26T22:24:14
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [field-notes, errata, signals]
 series_name: "[[series/Field Notes|Field Notes]]"
 description: Another sample fragment but this time, part of a series.
 featured: false
 draft: false
-exclude: false
+exclude: true
 preview_enabled: true
 graph_enabled: true
 image:

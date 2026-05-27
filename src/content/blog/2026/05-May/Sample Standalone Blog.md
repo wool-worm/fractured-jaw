@@ -1,14 +1,14 @@
 ---
 title: Sample Standalone Blog
 date_published: 2026-05-14T08:00:00
-date_updated: 2026-05-16T12:18:16
+date_updated: 2026-05-26T22:23:52
 author: ["[[authors/wool-worm|wool-worm]]", "[[authors/another-author|another-author]]"]
 tags: [signals, broadcast, theory]
 series_name:
 description: Co-authored standalone blog post. Not part of any series; useful as a reference for cross-byline blog formatting.
 featured: true
 draft: false
-exclude: false
+exclude: true
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/blog/sample-standalone-blog/image.png|Pirate Radio]]"

@@ -1,12 +1,12 @@
 ---
 title: Field Notes
 date_published: 2026-05-08T09:00:00
-date_updated: 2026-05-20T23:25:09
+date_updated: 2026-05-26T22:25:21
 tags: [field-notes, series, meta]
 description: An example of a multi-part series.
 featured: false
 draft: false
-exclude: false
+exclude: true
 preview_enabled: true
 graph_enabled: true
 ---

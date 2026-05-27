@@ -1,14 +1,14 @@
 ---
 title: Sample Standalone Essay
 date_published: 2026-05-14T15:00:00
-date_updated: 2026-05-20T20:50:04
+date_updated: 2026-05-26T22:24:05
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [theory, hauntology]
 series_name:
 description: A standalone essay.
 featured: false
 draft: false
-exclude: false
+exclude: true
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/essays/essay-example/image.png|Zen]]"
