@@ -35,6 +35,27 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Restore eleventy-img's generated variants between runs so deploys
+      # don't re-process every image through Sharp on every build. Output
+      # filenames in _site/img/ are content-hashed by source bytes + options,
+      # so existing variants short-circuit Sharp work for unchanged sources.
+      # The cache key is bound to the source attachment tree; any add/edit/
+      # delete under src/content/_attachments/ produces a different hash and
+      # a fresh cache entry. The restore-keys fallback ensures partial cache
+      # reuse when only a subset of images changed (the new ones get processed,
+      # everything else hits the restored cache).
+      - name: Restore eleventy-img cache
+        # TODO: SHA-pin to match the rest of the workflow's actions. Floating
+        # v4 tag used here because I can't verify the SHA for a specific
+        # release version without network access; pin to a real SHA from
+        # https://github.com/actions/cache/releases before this hits prod.
+        uses: actions/cache@v4
+        with:
+          path: _site/img
+          key: eleventy-img-${{ hashFiles('src/content/_attachments/**') }}
+          restore-keys: |
+            eleventy-img-
+
       # Capture the currently-live Atom feed BEFORE building. The Discord
       # new-post detection diffs this snapshot against the freshly-built
       # _site/feed.xml later in this job. Only runs on main pushes since
