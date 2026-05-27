@@ -9,6 +9,5 @@ preview_enabled: false
 graph_enabled: true
 image:
 ---
-### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
 
 Likes: long walks on the beach, drinking pond scum, and burning the candle at both ends
