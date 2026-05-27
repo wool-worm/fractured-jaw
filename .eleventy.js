@@ -7,6 +7,8 @@
 //     (content/<section>/YYYY/MM-MMM/<File>.md → /<section>/<slug>/).
 //   - This file: collections, filters, watch targets.
 
+const path = require("path");
+const Image = require("@11ty/eleventy-img");
 const { DateTime } = require("luxon");
 const slugify = require("./src/utils/slugify");
 const { CONTENT_SECTIONS } = require("./src/utils/permalink");
@@ -80,6 +82,84 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addShortcode("currentYear", () =>
     DateTime.now().toFormat("yyyy")
   );
+
+  // ---------- Responsive image shortcode ----------
+  //
+  // Generates resized + format-converted variants of a source image at
+  // build time and renders a <picture> element with srcset + sizes so the
+  // browser picks the right variant for the viewport. Source images live
+  // in src/content/_attachments/ (passthrough-copied to /attachments/ on
+  // the published site); output variants land in _site/img/ and are served
+  // from /img/<hash>-<width>w.<ext>.
+  //
+  // Widths cover small mobile cards through retina desktop heroes.
+  // Formats are webp (modern, ~30% smaller than jpeg) with a jpeg fallback
+  // for any client that doesn't accept image/webp. Skipping avif: encode
+  // time is significantly slower and the savings vs. webp are modest at
+  // these image sizes.
+  //
+  // Call sites pass `src` as the same URL-style path that data.image
+  // resolves to (e.g. /attachments/blog/<slug>/img.jpg). The shortcode
+  // converts that back to a disk path and feeds it to Image().
+  //
+  // Per-call options:
+  //   cls            — extra class names for the <img>
+  //   loading        — "lazy" (default) or "eager"
+  //   decoding       — "async" (default) or "sync"
+  //   objectPosition — CSS object-position value (e.g. "center top") set
+  //                    as inline style; used with object-fit: cover in
+  //                    layout CSS to control focal point of the crop
+  const IMG_OUTPUT_DIR = "_site/img/";
+  const IMG_URL_PATH = "/img/";
+  const IMG_WIDTHS = [400, 800, 1200, 1600];
+  const IMG_FORMATS = ["webp", "jpeg"];
+  const ATTACHMENTS_URL_PREFIX = "/attachments/";
+  const ATTACHMENTS_DISK_PREFIX = "src/content/_attachments/";
+
+  // Map a public URL like "/attachments/blog/<slug>/img.jpg" back to its
+  // on-disk source at "src/content/_attachments/blog/<slug>/img.jpg".
+  // Returns null if `url` doesn't look like an attachment URL we know how
+  // to resolve, so the shortcode can degrade gracefully on bad input.
+  function attachmentUrlToDiskPath(url) {
+    if (typeof url !== "string" || !url.startsWith(ATTACHMENTS_URL_PREFIX)) {
+      return null;
+    }
+    const rel = url.slice(ATTACHMENTS_URL_PREFIX.length);
+    return path.join(ATTACHMENTS_DISK_PREFIX, rel);
+  }
+
+  async function imageShortcode(src, alt, sizes, options = {}) {
+    if (!src) return "";
+    const diskPath = attachmentUrlToDiskPath(src) || src;
+    const {
+      cls = "",
+      loading = "lazy",
+      decoding = "async",
+      objectPosition = null,
+    } = options;
+
+    const metadata = await Image(diskPath, {
+      widths: IMG_WIDTHS,
+      formats: IMG_FORMATS,
+      outputDir: IMG_OUTPUT_DIR,
+      urlPath: IMG_URL_PATH,
+    });
+
+    const imageAttributes = {
+      alt: alt || "",
+      sizes,
+      loading,
+      decoding,
+    };
+    if (cls) imageAttributes.class = cls;
+    if (objectPosition) {
+      imageAttributes.style = `object-position: ${objectPosition}`;
+    }
+
+    return Image.generateHTML(metadata, imageAttributes);
+  }
+
+  eleventyConfig.addNunjucksAsyncShortcode("image", imageShortcode);
 
   // Slugify (exposed in templates so tag links can compute /tags/<slug>/).
   eleventyConfig.addFilter("slug", slugify);
