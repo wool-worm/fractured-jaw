@@ -494,9 +494,9 @@ body.is-encryption-failure .systems-failure-banner {
   flex-shrink: 0;
   margin-bottom: 0.3rem;
   padding: 0.15rem 0.35rem;
-  border: 1px solid var(--brass-deep);
+  border: 1px solid var(--ichor-bright);
   background: var(--void);
-  color: var(--brass);
+  color: var(--ichor-bright);
   font-size: 0.6rem;
   letter-spacing: 0.1em;
   text-transform: lowercase;
