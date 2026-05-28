@@ -142,8 +142,6 @@ function resolveAuthors(parsed, authorsCollection) {
       slug: lastPathSegment(entry.url),
       displayName: data.title || lastPathSegment(entry.url),
       url: entry.url,
-      image: data.image || null,
-      image_alt: data.image_alt || "",
     });
   }
   return result;

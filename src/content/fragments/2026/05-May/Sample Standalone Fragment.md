@@ -1,7 +1,7 @@
 ---
 title: Sample Standalone Fragment
 date_published: 2026-05-15T11:00:00
-date_updated: 2026-05-27T07:55:09
+date_updated: 2026-05-27T15:13:08
 author: ["[[authors/wool-worm|wool-worm]]"]
 tags: [errata, hauntology]
 series_name:
@@ -12,7 +12,7 @@ exclude: true
 preview_enabled: true
 graph_enabled: true
 image:
-image_focus: '"center center"'
+image_focus: center center
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
 

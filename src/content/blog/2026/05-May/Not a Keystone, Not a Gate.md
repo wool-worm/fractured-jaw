@@ -1,7 +1,7 @@
 ---
 title: Not a Keystone, Not a Gate
 date_published: 2026-05-26T21:17:44
-date_updated: 2026-05-26T22:23:41
+date_updated: 2026-05-27T23:58:27
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [blog, fractured-jaw, mystery, weird, flattening, on-writing]
 series_name:
@@ -12,7 +12,7 @@ exclude: false
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/blog/not-a-keystone-not-a-gate/img.jpg|Haunted]]"
-image_focus: '"center center"'
+image_focus: center center
 reading_time: 3–4 min
 ---
 

@@ -94,12 +94,11 @@
           "</h3>"
       );
     }
-    if (data.image) {
-      parts.push(
-        '<img class="wikilink-preview-image" src="' +
-          escapeHtml(data.image) +
-          '" alt="" style="display:block;max-width:100%;margin:0.25rem 0;">'
-      );
+    if (data.image_html) {
+      // data.image_html is the full <picture>...</picture> markup
+      // pre-rendered by src/preview-index.11ty.js, including inline styles
+      // so the tooltip layout works without depending on stylesheet rules.
+      parts.push(data.image_html);
     }
     if (data.description) {
       parts.push(

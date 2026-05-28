@@ -7,8 +7,8 @@ draft: false
 exclude: false
 preview_enabled: false
 graph_enabled: true
-image:
-image_focus: '"center center"'
+image: "[[_attachments/authors/wool-worm/img_circle-crop.png|wool-worm]]"
+image_focus: center center
 ---
 
 Likes: long walks on the beach, drinking pond scum, and burning the candle at both ends

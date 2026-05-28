@@ -1,7 +1,7 @@
 ---
 title: Sample Standalone Essay
 date_published: 2026-05-14T15:00:00
-date_updated: 2026-05-26T22:24:05
+date_updated: 2026-05-27T11:50:48
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [theory, hauntology]
 series_name:
@@ -12,7 +12,7 @@ exclude: true
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/essays/essay-example/image.png|Zen]]"
-image_focus: '"center center"'
+image_focus: center center
 reading_time: 2 min
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
