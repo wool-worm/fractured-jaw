@@ -105,15 +105,26 @@
      content down. */
 }
 
-/* ── Antennae table ─────────────────────────────────────────────────────── */
+/* ── Antennae grid ──────────────────────────────────────────────────────── */
+/* Four bands packed into a single 4-up row (was four stacked rows with dead
+   space between) to reclaim vertical height for the announcements log. Each
+   cell stacks the band name over its state, centered. */
+
+.systems-antennae {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.1rem 0.2rem;
+}
 
 .antenna-row {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  font-size: 0.62rem;
-  line-height: 1.5;
-  letter-spacing: 0.04em;
+  text-align: center;
+  gap: 0.05rem;
+  font-size: 0.6rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
 }
 
 .antenna-name {
@@ -121,10 +132,15 @@
   text-transform: lowercase;
 }
 
+/* Small enough that the longest state ("BROADCASTING", 12 chars) fits one
+   line in a ~55px cell; overflow-wrap is a safety net so an unexpectedly
+   wide glyph run breaks cleanly instead of overflowing into the neighbor. */
 .antenna-state {
-  font-size: 0.58rem;
-  letter-spacing: 0.08em;
+  font-size: 0.46rem;
+  letter-spacing: 0.01em;
   color: var(--bone-dim);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 /* State-specific colors. Switches when systems-widget.js updates
@@ -502,7 +518,7 @@ body.is-encryption-failure .systems-failure-banner {
 .systems-announce-log {
   flex: 1 1 auto;
   min-height: 0;
-  max-height: 150px;
+  max-height: 190px;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
