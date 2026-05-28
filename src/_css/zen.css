@@ -148,12 +148,19 @@ html.zen .section-title::before {      /* the ⬡ section glyph */
   display: none;
 }
 
-/* Authored sawtooth dividers + the static-noise <hr> keep their full height
-   (so the page doesn't reflow between modes) but swap the loud teeth/noise for
-   a single faint centered hairline drawn as a 1px background gradient. Height
-   + margins are inherited from the base/cult rules, not overridden here. */
+/* Every sawtooth-teeth divider plus the static-noise <hr> keep their full
+   height (so the page doesn't reflow between modes) but swap the loud
+   teeth/noise for a single faint centered hairline drawn as a 1px background
+   gradient. Covers: the `.sawtooth` utility class (+ its --sodium/--blood/
+   --thin variants), the static-noise <hr>, and the homepage between-section
+   dividers (.home-recent::before / .home-sections::before, which are
+   pseudo-element teeth, not .sawtooth elements). Height + margins are
+   inherited from the base rules, not overridden here. The header + footer
+   sawtooth strips are display:none'd separately above. */
 html.zen .sawtooth,
-html.zen hr {
+html.zen hr,
+html.zen .home-recent::before,
+html.zen .home-sections::before {
   background: none;
   background-image: linear-gradient(var(--bone-faint), var(--bone-faint));
   background-size: 100% 1px;
