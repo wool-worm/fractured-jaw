@@ -16,11 +16,11 @@ image_focus: center center
 reading_time: 3–4 min
 ---
 
-Here we go, writing a first post, this is a rite of passage in the blog world, or so I’ve heard. While it doesn’t have to be anything groundbreaking, it actually seems to be quite hard to compose. If you could see all the ways I’ve delayed writing this, all the late late nights spent developing new features for the site, scrolling literally hundreds of pages of fonts just to find the perfect ones, its borderline comedic. I’ve literally worked to exhaustion to avoid writing this post, the exact point of the site itself; there is some wonderful irony in that.
+Here we go, writing a first post, this is a rite of passage in the blog world, or so I’ve heard. While it doesn’t have to be anything groundbreaking, it actually seems to be quite hard to compose. If you could see all the ways I’ve delayed writing this, all the late late nights spent developing new features for the site, scrolling hundreds of pages of fonts just to find the perfect ones, its borderline comedic. I’ve literally worked to exhaustion to avoid writing this post, the exact point of the site itself; there is some wonderful irony in that.
 
 I think there is a certain pressure to say something that will summarize the whole raison d'être of this project, like dropping a keystone in an archway, something that will support the whole thing through from beginning to conclusion. There is an assumption there that I know where this will all go and all there is to do is to chisel the right shape and drop it into place.
 
-In reality, I have no idea what the shape of this thing is or will be, I think the obscurity itself is what drew me to the project from the start. Why bother doing a thing if you know what exactly form it will take, the path it will be drawn along? The obscurity and unknown quality of even just this small corner of the internet is what I’ve been craving and what I sense many people are craving as well.
+In reality, I have no idea what the shape of this thing is or will be, I think the obscurity itself is what drew me to the project from the start. Why bother doing a thing if you know exactly what form it will take, the path it will be drawn along? The obscurity and unknown quality of even just this small corner of the internet is what I’ve been craving and what I sense many people are craving as well.
 
 __> Time for a poetic tangent, buffering…__
 
