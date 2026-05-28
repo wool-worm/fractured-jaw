@@ -522,6 +522,10 @@ module.exports = function (eleventyConfig) {
   // changes to src/_css/*.css need this explicit watch entry to re-trigger
   // the bundle on edit.
   eleventyConfig.addWatchTarget("src/_css/");
+  // Announcement notes read by src/_data/announcements.js via fs (the folder
+  // is .eleventyignore'd, so Eleventy's content watcher skips it). Explicit
+  // watch so adding/editing an announcement rebuilds the dev server.
+  eleventyConfig.addWatchTarget("src/content/_announcements/");
 
   // ---------- Directory config ----------
 

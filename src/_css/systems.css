@@ -7,9 +7,12 @@
 
 .systems-widget {
   position: fixed;
-  /* Center vertically, then nudge 60px below center so the panel
-     sits well clear of the masthead area at the top of the page. */
-  top: calc(50% + 60px);
+  /* Centered vertically. The announcements log roughly doubled the panel
+     height, so the old "+60px below center" nudge is gone (it would push
+     the taller panel's bottom past the fold); pure centering raises the
+     top edge instead. Tuning knob: add/subtract px here to bias it
+     up/down on the page. */
+  top: 50%;
   left: 1rem;
   transform: translateY(-50%);
   width: 220px;
@@ -17,8 +20,13 @@
      sparse, but lets it grow naturally when extra rows appear: a
      longer author list, the encryption-failure banner, etc. Growth is
      symmetric (centered via translateY(-50%)), so the widget puffs up
-     and down equally around its centered position. */
+     and down equally around its centered position.
+     max-height caps the panel at the viewport so a tall announcements
+     log can't run off-screen; the log (the one flexible section, see
+     below) shrinks to absorb the overflow — including the extra ~1.6rem
+     the encryption-failure ticker adds at the top. */
   min-height: 320px;
+  max-height: calc(100vh - 2rem);
   background: var(--void-soft);
   border: 1px solid var(--brass-deep);
   z-index: 50;
@@ -28,6 +36,14 @@
   display: flex;
   flex-direction: column;
   transition: transform 0.25s ease-out;
+}
+
+/* All sections hold their natural size when the panel hits its max-height;
+   only the announcements log (overridden below) is allowed to shrink, so
+   the antennae / bars / stats / origin race never get squeezed. With no
+   max-height pressure (the common case) this flex-shrink:0 is a no-op. */
+.systems-section {
+  flex-shrink: 0;
 }
 
 /* Folded state: slide left by widget width minus the fold-button
@@ -437,4 +453,101 @@ body.is-encryption-failure .systems-failure-banner {
   .systems-widget {
     display: none;
   }
+}
+
+/* ── Announcements log ──────────────────────────────────────────────────────
+   New last section: an in-world "incoming message" banner over a scrollable
+   reverse-chron terminal log (fed by src/_data/announcements.js). This is the
+   one section allowed to shrink when the panel hits its max-height, so the
+   log absorbs the encryption-failure ticker's extra height instead of pushing
+   the panel off-screen. */
+
+.systems-announcements {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;       /* permit the section to shrink inside the flex column */
+  flex-shrink: 1;      /* override the .systems-section flex-shrink:0 above */
+}
+
+/* "incoming message" banner — steady pulse, letter glyph at left. Compact
+   in-world strip in the same family as the encryption row. */
+.systems-announce-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  margin-bottom: 0.3rem;
+  padding: 0.15rem 0.35rem;
+  border: 1px solid var(--brass-deep);
+  background: var(--void);
+  color: var(--brass);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  line-height: 1.4;
+  animation: announce-pulse 2.2s ease-in-out infinite;
+}
+
+.systems-announce-icon {
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+@keyframes announce-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+
+/* Scroll region: capped on tall screens, shrinks under max-height pressure. */
+.systems-announce-log {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--brass-deep) var(--void-mid);
+}
+
+.systems-announce-log::-webkit-scrollbar { width: 6px; }
+.systems-announce-log::-webkit-scrollbar-track { background: var(--void-mid); }
+.systems-announce-log::-webkit-scrollbar-thumb { background: var(--brass-deep); }
+
+/* One entry: left column stacks author / date / time (three > lines),
+   right column is the plain-text body. */
+.announce-entry {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  gap: 0.4rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--bone-faint);
+  font-size: 0.55rem;
+  line-height: 1.5;
+}
+
+.announce-entry:last-child {
+  border-bottom: none;
+}
+
+.announce-meta {
+  display: flex;
+  flex-direction: column;
+  letter-spacing: 0.04em;
+  word-break: break-word;
+}
+
+.announce-author { color: var(--brass); }
+.announce-date,
+.announce-time { color: var(--bone-faint); }
+
+.announce-body {
+  color: var(--bone-dim);
+  white-space: pre-wrap;   /* preserve the note's line breaks; no markdown */
+  word-break: break-word;
+}
+
+.announce-empty {
+  color: var(--bone-faint);
+  font-size: 0.55rem;
+  padding: 0.3rem 0;
 }

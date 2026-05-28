@@ -10,5 +10,10 @@ src/content/_local/
 # content pipeline so they don't render as standalone pages.
 src/content/_data/
 
+# Announcement notes (year/month subfolders) read by src/_data/announcements.js
+# and rendered into the systems widget's log. Tracked so CI sees them, but
+# excluded from the content pipeline: no URLs, feeds, search, graph, or tags.
+src/content/_announcements/
+
 # Build output (in case it ever lives inside src/)
 src/_site/
