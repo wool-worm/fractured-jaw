@@ -1,0 +1,269 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ZEN.CSS — calm reading mode.
+   Loaded LAST in the bundle (after cult.css) so it wins cascade ties.
+   Everything except the toggle-chip base styling is scoped under `html.zen`,
+   which the toggle (/assets/js/zen-toggle.js) + the no-flash bootstrap in
+   head.njk add to <html> when the per-session zen preference is on.
+
+   Strategy, in order of leverage:
+     1. Mute the loud palette tokens. Because the whole site references
+        --blood / --ichor / --bitshadow, remapping those calms most borders,
+        accents, stamps, and title shadows site-wide in one move.
+     2. Kill all motion.
+     3. Hide the overwhelming chrome (ticker, vignette, sawtooth, glitch
+        layers, in-world stamps) and the radio + systems widgets.
+     4. Flatten the literal-rgba drop shadows the token remap can't reach.
+
+   Kept on purpose: the void background + its faint CRT scanline grain, the
+   brass accent, the graph widget (chrome calmed, canvas keeps drifting), and
+   the sodium hover colour (interaction feedback should stay legible).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Toggle chip (always present, both modes) ───────────────────────────────
+   Pinned bottom-left: the one viewport corner no widget occupies (systems is
+   left-center, radio bottom-right, graph top-right). z-index sits above the
+   vignette (9000) so the chip stays crisp in the full site, below the
+   skip-link (9999). */
+.zen-toggle {
+  position: fixed;
+  left: var(--sp-md);
+  bottom: var(--sp-md);
+  z-index: 9500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  background: var(--void);
+  color: var(--bone-dim);
+  border: 1px solid var(--brass-deep);
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.zen-toggle:hover,
+.zen-toggle:focus-visible {
+  color: var(--sodium);
+  border-color: var(--sodium-soft);
+  background: var(--void-soft);
+  outline: none;
+}
+
+.zen-toggle:focus-visible {
+  outline: 2px solid var(--sodium);
+  outline-offset: 2px;
+}
+
+.zen-toggle-glyph {
+  color: var(--brass);
+  font-size: 0.7rem;
+}
+
+/* Chip in zen mode: drop the warm accents for a quiet bone/brass treatment. */
+html.zen .zen-toggle {
+  border-color: var(--bone-faint);
+  color: var(--bone-dim);
+}
+
+html.zen .zen-toggle:hover,
+html.zen .zen-toggle:focus-visible {
+  color: var(--brass);
+  border-color: var(--brass-deep);
+  background: var(--void-soft);
+}
+
+html.zen .zen-toggle-glyph {
+  color: var(--bone-dim);
+}
+
+/* ── 1. Palette: mute the loud tokens ───────────────────────────────────────
+   Remap the danger reds + sickly purples toward the calm brass/bone family.
+   Flatten the chromatic-aberration text-shadow tokens. --void* (background),
+   --bone* (text), --brass* (accent), and --sodium* (hover) are left intact. */
+html.zen {
+  --blood:        var(--brass-deep);
+  --blood-bright: var(--bone-dim);
+  --ichor:        var(--brass-deep);
+  --ichor-bright: var(--bone-dim);
+  --bitshadow:      none;
+  --bitshadow-mast: none;
+}
+
+/* ── 2. Motion: stop everything ─────────────────────────────────────────────
+   Mirrors the prefers-reduced-motion block, scoped to zen. JS-driven canvas
+   motion (the graph widget's force simulation) is unaffected and keeps
+   drifting on purpose. */
+html.zen *,
+html.zen *::before,
+html.zen *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ── 3. Hide the overwhelming chrome ────────────────────────────────────── */
+
+/* Page-level vignette + corruption-bar overlays (both fixed-position, so
+   removing them has no effect on layout flow). */
+html.zen body::before,
+html.zen body::after {
+  display: none;
+}
+
+/* Sticky broadcast ticker: hidden but NOT display:none, so its 1.4rem of
+   sticky-flow height is kept and the page doesn't jump up when entering zen.
+   visibility:hidden also hides the scrolling ticker text, the LIVE badge, and
+   the blood bottom border. */
+html.zen .broadcast-banner {
+  visibility: hidden;
+}
+
+/* Sawtooth strips under the header + above the footer, and the footer's
+   continuously-scrambled glitch line. */
+html.zen .site-header::after,
+html.zen .site-footer::before,
+html.zen .footer-glitch {
+  display: none;
+}
+
+/* Keep the nav station-ID (it also preserves header spacing) but reword it to
+   a quiet "disconnected" status. Its flicker animation is already killed by
+   the motion-kill above; the brass-deep colour reads calm. zen.css is bundled
+   after cult.css, so on equal specificity this also wins over the
+   is-encryption-failure "UNENCRYPTED" variant. */
+html.zen .site-nav::after {
+  content: '// system disconnected // no freq found // machine: idle';
+}
+
+/* In-world stamps + glyph prefixes that read as machine chatter. */
+html.zen .post-card::before,           /* INTERCEPTED_TRANSMISSION stamp */
+html.zen blockquote::before,           /* TRANSMISSION // label */
+html.zen .home-featured h2::before,
+html.zen .home-recent h2::before,
+html.zen .home-sections h2::before,
+html.zen .section-title::before {      /* the ⬡ section glyph */
+  display: none;
+}
+
+/* Every sawtooth-teeth divider plus the static-noise <hr> keep their full
+   height (so the page doesn't reflow between modes) but swap the loud
+   teeth/noise for a single faint centered hairline drawn as a 1px background
+   gradient. Covers: the `.sawtooth` utility class (+ its --sodium/--blood/
+   --thin variants), the static-noise <hr>, and the homepage between-section
+   dividers (.home-recent::before / .home-sections::before, which are
+   pseudo-element teeth, not .sawtooth elements). Height + margins are
+   inherited from the base rules, not overridden here. The header + footer
+   sawtooth strips are display:none'd separately above. */
+html.zen .sawtooth,
+html.zen hr,
+html.zen .home-recent::before,
+html.zen .home-sections::before {
+  background: none;
+  background-image: linear-gradient(var(--bone-faint), var(--bone-faint));
+  background-size: 100% 1px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: none;
+}
+
+/* ── 4. Flatten shadows + filters the token remap can't reach ───────────────
+   The literal rgba(139,0,0,...) drop shadows and the SVG turbulence /
+   skull drop-shadow filters don't reference --blood, so neutralise them
+   explicitly. */
+html.zen h1, html.zen h2, html.zen h3, html.zen h4, html.zen h5, html.zen h6,
+html.zen .page-title, html.zen .section-title, html.zen .post-title,
+html.zen .post-card-title a {
+  text-shadow: none;
+}
+
+html.zen .post-card:hover {
+  transform: none;
+  box-shadow: none;
+  background: var(--void-soft);
+}
+
+html.zen .graph-widget {
+  box-shadow: none;
+}
+
+html.zen .wikilink-preview {
+  box-shadow: none !important;
+}
+
+html.zen .search-modal-panel {
+  box-shadow: none;
+}
+
+html.zen .section-title {
+  filter: none;
+}
+
+/* ── 5. Masthead + skull: calm, readable, static ────────────────────────────
+   Keep the solid bone first-child layer (the real, accessible title) and
+   hide the three chromatic glitch layers stacked on top of it. */
+html.zen .site-title {
+  text-shadow: none;
+}
+
+html.zen .site-title > span:first-child {
+  text-shadow: none;
+}
+
+html.zen .site-title > span:nth-child(2),
+html.zen .site-title > span:nth-child(3),
+html.zen .site-title > span:nth-child(4) {
+  display: none;
+}
+
+/* Skull: swap in the calm "dissolve" sprite (20 frames, 1280x64; rests on the
+   final frame a beat longer) and step through it slowly with no glitch overlay
+   or chromatic drop-shadow. The animation !important beats the blanket
+   motion-kill above because the selector is more specific (it wins the
+   !important tie); this is the one motion zen keeps besides the graph drift.
+   Reduced-motion users still get it frozen via the prefers-reduced-motion
+   blocks. Tempo is 8s and easy to tune. */
+html.zen .skull-logo {
+  background-image: url('/assets/images/skull-sprite-dissolve.png');
+  background-size: calc(var(--skull-size) * 20) var(--skull-size);
+  background-position: 0 0;
+  filter: none;
+  animation: zen-skull-frames 8s steps(20) infinite !important;
+}
+
+html.zen .site-logo-mark:hover .skull-logo {
+  filter: brightness(1.1);
+}
+
+/* ── 6. Header + footer surfaces ────────────────────────────────────────────
+   Drop the animated diagonal grain washes (border colours come from the
+   token remap above, so they're already brass-deep). */
+html.zen .site-header,
+html.zen .site-footer {
+  background-image: none;
+}
+
+/* ── 7. Reading surfaces ────────────────────────────────────────────────────
+   The blockquote's faint purple wash is a literal rgba, so replace it with
+   the neutral panel colour. */
+html.zen blockquote {
+  background: var(--void-soft);
+}
+
+/* ── 8. Widgets ─────────────────────────────────────────────────────────────
+   Hide the radio + systems widgets entirely (radio audio is also stopped by
+   the fj:zenchange listener in radio-widget.js). The graph widget stays. */
+html.zen .radio-widget,
+html.zen .systems-widget {
+  display: none !important;
+}
+
+/* ── Keyframes ──────────────────────────────────────────────────────────── */
+/* Zen skull: step through the 20-frame dissolve sprite. Mirrors cult.css's
+   skull-frames keyframe but for a 20-frame sheet, so the endpoint is
+   -20 × frame width (vs -17 for the original 17-frame sprite). */
+@keyframes zen-skull-frames {
+  to { background-position: calc(var(--skull-size, 64px) * -20) 0; }
+}
