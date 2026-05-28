@@ -1,7 +1,7 @@
 ---
 title: Sample Standalone Blog
 date_published: 2026-05-14T08:00:00
-date_updated: 2026-05-27T07:54:48
+date_updated: 2026-05-27T11:50:29
 author: ["[[authors/wool-worm|wool-worm]]"]
 tags: [signals, broadcast, theory]
 series_name:
@@ -12,6 +12,7 @@ exclude: true
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/blog/sample-standalone-blog/image.png|Pirate Radio]]"
+image_focus: center center
 reading_time: 3 min
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER

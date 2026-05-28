@@ -15,7 +15,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { computePermalink, extractSection, vaultPathToAttachmentUrl, VAULT_ATTACHMENT_DIR } = require("../utils/permalink");
+const { computePermalink, extractSection, vaultPathToAttachmentUrl, vaultPathToAttachmentSrc, VAULT_ATTACHMENT_DIR } = require("../utils/permalink");
 const { reportIssue } = require("../utils/build-report");
 
 const isProduction = process.env.ELEVENTY_ENV === "production";
@@ -83,7 +83,75 @@ function parseFrontmatterImage(raw) {
       reason: `no file at src/content/_attachments/${stripped}`,
     };
   }
-  return { kind: "wikilink", url, alt };
+  // srcPath is the input-relative path the eleventyImageTransformPlugin
+  // uses to find the source file on disk (it joins the plugin's input dir,
+  // src/, to this path), then rewrites the <img> in the final HTML to point
+  // at /img/<hash>-<width>w.<ext>. Distinct from `url`, the public-facing
+  // /attachments/ URL used for og:image meta tags etc. Shared helper with
+  // the body-image-embed path in wikilinks.js.
+  const srcPath = vaultPathToAttachmentSrc(vaultPath);
+  return { kind: "wikilink", url, alt, srcPath };
+}
+
+// Validate the frontmatter `image_focus` field — a CSS object-position
+// value piped into the responsive image shortcode (see .eleventy.js) to
+// set the focal point of the cover-fit crop on rendered <img> tags.
+//
+// Strict form: one or two CSS keywords from {left, center, right, top,
+// bottom}, separated by spaces. Examples: "center", "center center",
+// "left top", "right bottom".
+//
+// Reject anything containing surrounding quote characters (a common
+// authoring or linter mishap that produces malformed inline style), and
+// anything outside the keyword grammar (typos, percentages, lengths).
+// Percentages/lengths CAN be supported later by widening this regex; for
+// now we keep it tight to catch typos at build time.
+//
+// Returns the trimmed valid string, or null if the field is absent or
+// the value failed validation. Templates that receive null skip the
+// object-position style attribute entirely (defaulting to center via
+// the browser's object-position initial value).
+const VALID_IMAGE_FOCUS_RE = /^(left|center|right|top|bottom)( +(left|center|right|top|bottom))?$/i;
+
+function validateImageFocus(data) {
+  const raw = data.image_focus;
+  if (raw === undefined || raw === null) return null;
+
+  const file = (data.page && data.page.inputPath) || "(unknown source)";
+  const isDraft = data.draft === true;
+  const isExcluded = data.exclude === true;
+
+  if (typeof raw !== "string") {
+    reportIssue({
+      kind: "image-focus-frontmatter",
+      file,
+      offending: `image_focus: ${JSON.stringify(raw)}`,
+      reason: "must be a string of CSS object-position keywords (e.g. center center, left top)",
+      isDraft,
+      isExcluded,
+    });
+    return null;
+  }
+
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  if (!VALID_IMAGE_FOCUS_RE.test(trimmed)) {
+    reportIssue({
+      kind: "image-focus-frontmatter",
+      file,
+      offending: `image_focus: ${raw}`,
+      reason:
+        "must be one or two CSS object-position keywords from " +
+        "{left, center, right, top, bottom} without surrounding quotes " +
+        "(e.g. center center, left top, right bottom)",
+      isDraft,
+      isExcluded,
+    });
+    return null;
+  }
+
+  return trimmed;
 }
 
 // Compute a `{ url, alt }` pair from `data.image`, reporting any issue
@@ -109,7 +177,7 @@ function resolveFrontmatterImage(data) {
 
   let result;
   if (parsed.kind === "empty") {
-    result = { url: null, alt: "" };
+    result = { url: null, alt: "", srcPath: null };
   } else if (parsed.kind === "bareString") {
     reportIssue({
       kind: "image-frontmatter",
@@ -119,7 +187,7 @@ function resolveFrontmatterImage(data) {
       isDraft,
       isExcluded,
     });
-    result = { url: null, alt: "" };
+    result = { url: null, alt: "", srcPath: null };
   } else if (parsed.kind === "deadWikilink") {
     reportIssue({
       kind: "image-frontmatter",
@@ -129,9 +197,9 @@ function resolveFrontmatterImage(data) {
       isDraft,
       isExcluded,
     });
-    result = { url: null, alt: "" };
+    result = { url: null, alt: "", srcPath: null };
   } else {
-    result = { url: parsed.url, alt: parsed.alt };
+    result = { url: parsed.url, alt: parsed.alt, srcPath: parsed.srcPath };
   }
 
   if (cacheKey) resolveCache.set(cacheKey, result);
@@ -207,5 +275,14 @@ module.exports = {
     // alt text without re-parsing.
     image: (data) => resolveFrontmatterImage(data).url,
     image_alt: (data) => resolveFrontmatterImage(data).alt,
+    // Input-relative source path for the eleventyImageTransformPlugin.
+    // Templates pass this as <img src> so the plugin can locate the source
+    // file on disk and emit responsive <picture> markup. Distinct from
+    // `image` (the public URL) so og:image meta tags keep their absolute
+    // URL form.
+    image_src: (data) => resolveFrontmatterImage(data).srcPath,
+    // Validate + normalize `image_focus`. The shortcode (.eleventy.js)
+    // trusts this value verbatim, so any bad input must be caught here.
+    image_focus: (data) => validateImageFocus(data),
   },
 };

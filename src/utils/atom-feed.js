@@ -140,9 +140,19 @@ function renderEntry(item, siteUrl, defaultAuthor, authorsByUrl) {
 // Make root-relative hrefs/srcs absolute against siteUrl. Best-effort —
 // covers the common cases (<a href="/...">, <img src="/...">) without
 // pulling in a full HTML parser.
+//
+// Body HTML comes from item.templateContent, which is the markdown render
+// captured BEFORE the eleventyImageTransformPlugin rewrites <img> tags on
+// the final page output. So inline image embeds here still carry the
+// input-relative src the wikilinks plugin emits (/content/_attachments/...),
+// which is NOT a served path. Rewrite it to the public /attachments/ URL
+// (the raw passthrough-copied original, which IS served) so feed readers
+// get a working image. Feeds can't use the optimized /img/ variants — those
+// only exist via the transform plugin, which doesn't touch feed content.
 function absolutizeUrls(html, siteUrl) {
   const base = siteUrl.replace(/\/+$/, "");
   return String(html)
+    .replace(/(\ssrc=")\/content\/_attachments\//gi, "$1/attachments/")
     .replace(/(\shref=")\/(?!\/)/gi, `$1${base}/`)
     .replace(/(\ssrc=")\/(?!\/)/gi, `$1${base}/`);
 }

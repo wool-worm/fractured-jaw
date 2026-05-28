@@ -14,8 +14,8 @@ layout: layouts/base.njk
 
 <article class="section-page series-page series-{{ page.fileSlug }}">
   <header class="section-header">
-    {% if image %}
-      <img src="{{ image }}" alt="{{ image_alt or '' }}" class="series-hero" loading="lazy">
+    {% if image_src %}
+      <img src="{{ image_src }}" alt="{{ image_alt or '' }}" class="series-hero" sizes="(max-width: 720px) 100vw, 720px"{% if image_focus %} style="object-position: {{ image_focus }}"{% endif %}>
     {% endif %}
     <h1 class="section-title">
       Series: <span class="series-name">{{ title }}</span>

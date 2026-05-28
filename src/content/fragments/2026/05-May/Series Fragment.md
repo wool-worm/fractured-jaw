@@ -1,7 +1,7 @@
 ---
 title: Series Fragment
 date_published: 2026-05-13T16:00:00
-date_updated: 2026-05-26T22:24:14
+date_updated: 2026-05-27T11:50:57
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [field-notes, errata, signals]
 series_name: "[[series/Field Notes|Field Notes]]"
@@ -12,6 +12,7 @@ exclude: true
 preview_enabled: true
 graph_enabled: true
 image:
+image_focus: center center
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
 

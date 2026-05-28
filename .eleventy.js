@@ -7,6 +7,7 @@
 //     (content/<section>/YYYY/MM-MMM/<File>.md → /<section>/<slug>/).
 //   - This file: collections, filters, watch targets.
 
+const { eleventyImageTransformPlugin } = require("@11ty/eleventy-img");
 const { DateTime } = require("luxon");
 const slugify = require("./src/utils/slugify");
 const { CONTENT_SECTIONS } = require("./src/utils/permalink");
@@ -80,6 +81,41 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addShortcode("currentYear", () =>
     DateTime.now().toFormat("yyyy")
   );
+
+  // ---------- Responsive image transform plugin ----------
+  //
+  // Rewrites <img src="..."> tags in the rendered HTML to <picture> markup
+  // with multi-format srcsets so the browser picks the right variant for
+  // the viewport. Operates at the HTML output stage (after Nunjucks render),
+  // which sidesteps the Nunjucks limitation where async shortcodes inside
+  // {% include %} inside {% for %} silently produce empty output.
+  //
+  // Templates pass `image_src` (input-relative path computed by
+  // src/content/content.11tydata.js, e.g. /content/_attachments/<...>) as
+  // the src attribute. The plugin resolves that to a disk file under the
+  // input dir, processes it through Sharp, and emits /img/<hash>-<w>w.<ext>
+  // variants. `image` (the public /attachments/ URL) stays reserved for
+  // og:image meta tags etc. that need the absolute deployed URL.
+  //
+  // Widths cover small mobile cards through retina desktop heroes.
+  // Formats: webp (~30% smaller than jpeg) with a jpeg fallback for
+  // browsers without webp support. Skipping avif — encode time is
+  // significantly slower and the savings vs. webp are modest at these
+  // image sizes.
+  //
+  // failOnError: true so a missing-file or unreadable image fails the
+  // build loudly rather than shipping a broken/mangled <img>.
+  eleventyConfig.addPlugin(eleventyImageTransformPlugin, {
+    extensions: "html",
+    formats: ["webp", "jpeg"],
+    widths: [400, 800, 1200, 1600],
+    urlPath: "/img/",
+    defaultAttributes: {
+      loading: "lazy",
+      decoding: "async",
+    },
+    failOnError: true,
+  });
 
   // Slugify (exposed in templates so tag links can compute /tags/<slug>/).
   eleventyConfig.addFilter("slug", slugify);
@@ -481,6 +517,11 @@ module.exports = function (eleventyConfig) {
   // Rebuild on changes to utility code or static assets.
   eleventyConfig.addWatchTarget("src/utils/");
   eleventyConfig.addWatchTarget("src/assets/");
+  // CSS modules consumed by src/site-css.11ty.js. Eleventy's automatic
+  // template-dependency tracking doesn't see fs.readFileSync calls, so
+  // changes to src/_css/*.css need this explicit watch entry to re-trigger
+  // the bundle on edit.
+  eleventyConfig.addWatchTarget("src/_css/");
 
   // ---------- Directory config ----------
 

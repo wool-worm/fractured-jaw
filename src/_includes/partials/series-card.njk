@@ -11,9 +11,9 @@
    hover lift is handled in CSS. #}
 <li class="series-card">
   <article>
-    {% if parent.data.image %}
+    {% if parent.data.image_src %}
       <a href="{{ parent.url }}" class="series-card-image-link" tabindex="-1" aria-hidden="true">
-        <img src="{{ parent.data.image }}" alt="{{ parent.data.image_alt or '' }}" class="series-card-image" loading="lazy">
+        <img src="{{ parent.data.image_src }}" alt="{{ parent.data.image_alt or '' }}" class="series-card-image" sizes="(max-width: 720px) 100vw, 720px"{% if parent.data.image_focus %} style="object-position: {{ parent.data.image_focus }}"{% endif %}>
       </a>
     {% endif %}
     <h2 class="series-card-title">

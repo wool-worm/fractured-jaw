@@ -6,11 +6,47 @@
 //
 // Lives outside src/content/ so content.11tydata.js doesn't try to compute
 // a permalink for it. The data() permalink wins.
+//
+// Image markup is pre-rendered at build time (image_html field) using the
+// same eleventy-img widths/formats as the transform plugin's <img> output.
+// This lets the client-side renderer inject the same optimized <picture>
+// markup the rest of the site uses instead of falling back to raw jpegs.
+// The Sharp processing dedupes against the transform plugin via shared
+// content-hashed output filenames, so each unique source image is only
+// processed once per build.
 
+const path = require("path");
+const Image = require("@11ty/eleventy-img");
 const slugify = require("./utils/slugify");
 const { parseAuthorField, resolveAuthors } = require("./utils/authors");
 
 const CONTENT_ROOT = "src/content";
+
+const IMG_OPTIONS = {
+  widths: [400, 800, 1200, 1600],
+  formats: ["webp", "jpeg"],
+  outputDir: "_site/img/",
+  urlPath: "/img/",
+};
+const IMG_SIZES = "(max-width: 720px) 100vw, 720px";
+
+async function buildImageHtml(data) {
+  const imageSrc = data.image_src;
+  if (!imageSrc) return null;
+  const diskPath = path.join("src", imageSrc);
+  const metadata = await Image(diskPath, IMG_OPTIONS);
+  const attrs = {
+    alt: data.image_alt || "",
+    sizes: IMG_SIZES,
+    class: "post-card-image",
+    loading: "lazy",
+    decoding: "async",
+  };
+  if (data.image_focus) {
+    attrs.style = `object-position: ${data.image_focus}`;
+  }
+  return Image.generateHTML(metadata, attrs);
+}
 
 class SearchIndex {
   data() {
@@ -20,7 +56,7 @@ class SearchIndex {
     };
   }
 
-  render({ collections }) {
+  async render({ collections }) {
     const items = (collections && collections.all_content) || [];
     const authorsCollection = (collections && collections.authors) || [];
     const records = [];
@@ -43,6 +79,11 @@ class SearchIndex {
       const resolved = resolveAuthors(parsedAuthors, authorsCollection);
       const authors = resolved.map((r) => r.displayName);
       const authorSlugs = resolved.map((r) => r.slug);
+      // Pre-render the <picture> markup so the runtime renderer can inject
+      // it directly instead of building a raw <img> from a URL. Awaiting
+      // sequentially is fine here — Sharp's disk cache makes repeat calls
+      // for the same source nearly free.
+      const imageHtml = await buildImageHtml(data);
       records.push({
         url: item.url,
         title: data.title || "",
@@ -55,7 +96,7 @@ class SearchIndex {
         authorSlugs: authorSlugs,
         section: data.section || "",
         date: data.date_published || null,
-        image: data.image || null,
+        image_html: imageHtml,
         content: plain,
       });
     }

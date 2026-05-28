@@ -309,10 +309,14 @@
   function renderCard(record) {
     var parts = [];
     parts.push('<li class="post-card"><article>');
-    if (record.image) {
+    if (record.image_html) {
+      // record.image_html is the full <picture>...</picture> markup
+      // pre-rendered by src/search-index.11ty.js using eleventy-img with
+      // the same widths/formats as the rest of the site, so the inline
+      // injection here matches what server-rendered cards emit.
       parts.push(
         '<a href="' + escapeHtml(record.url) + '" class="post-card-image-link" tabindex="-1" aria-hidden="true">' +
-          '<img src="' + escapeHtml(record.image) + '" alt="" class="post-card-image" loading="lazy">' +
+          record.image_html +
         '</a>'
       );
     }

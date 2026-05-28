@@ -1,7 +1,7 @@
 ---
 title: Essay Example
 date_published: 2026-05-11T14:00:00
-date_updated: 2026-05-26T22:24:01
+date_updated: 2026-05-27T11:50:39
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [field-notes, theory, machine-listening, hauntology]
 series_name: "[[series/Field Notes|Field Notes]]"
@@ -12,6 +12,7 @@ exclude: true
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/blog/sample-standalone-blog/image.png|Pirate Radio]]"
+image_focus: center center
 reading_time: 3 min
 ---
 ### IGNORE :: ALL CONTENT BELOW IS GENERATED PLACEHOLDER
