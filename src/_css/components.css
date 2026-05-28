@@ -408,6 +408,46 @@
   margin-top: var(--sp-sm);
 }
 
+/* Author-specific header chrome on /authors/<slug>/. Avatar sits to the
+   left of the title/description block. The flex container is scoped to
+   .author-page so series/tag/section headers keep their default block
+   layout. The avatar source image is expected to be square; CSS masks
+   it to a circle so the source doesn't have to ship as a transparent
+   PNG (jpeg fallback variants stay safe). */
+.author-page .section-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--sp-md);
+}
+
+.author-hero {
+  flex: 0 0 auto;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--bone-faint);
+}
+
+.author-header-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Stack avatar above text on narrow viewports — matches the breakpoint
+   the rest of the responsive layout uses for tight-mobile treatment. */
+@media (max-width: 720px) {
+  .author-page .section-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .author-header-content {
+    width: 100%;
+  }
+}
+
 .series-intro {
   margin: var(--sp-lg) 0;
   font-family: var(--font-post-body);

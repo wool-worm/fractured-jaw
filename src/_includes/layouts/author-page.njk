@@ -16,26 +16,28 @@ layout: layouts/base.njk
 <article class="section-page author-page author-{{ page.fileSlug }}">
   <header class="section-header">
     {% if image_src %}
-      <img src="{{ image_src }}" alt="{{ image_alt or '' }}" class="series-hero" sizes="(max-width: 720px) 100vw, 720px"{% if image_focus %} style="object-position: {{ image_focus }}"{% endif %}>
+      <img src="{{ image_src }}" alt="{{ image_alt or '' }}" class="author-hero" sizes="120px"{% if image_focus %} style="object-position: {{ image_focus }}"{% endif %}>
     {% endif %}
-    <h1 class="section-title">
-      Author: <span class="author-name">{{ title }}</span>
-    </h1>
-    {% if description %}
-      <p class="section-description">{{ description }}</p>
-    {% endif %}
-    <p class="series-meta">
-      {% set count = posts.length or 0 %}
-      {{ count }} post{% if count != 1 %}s{% endif %}
-      &middot; <a href="/authors/">all authors</a>
-    </p>
-    {% if tags and tags.length %}
-      <ul class="tag-list series-tags">
-        {% for tag in tags %}
-          <li><a href="/tags/{{ tag | slug }}/">{{ tag }}</a></li>
-        {% endfor %}
-      </ul>
-    {% endif %}
+    <div class="author-header-content">
+      <h1 class="section-title">
+        Author: <span class="author-name">{{ title }}</span>
+      </h1>
+      {% if description %}
+        <p class="section-description">{{ description }}</p>
+      {% endif %}
+      <p class="series-meta">
+        {% set count = posts.length or 0 %}
+        {{ count }} post{% if count != 1 %}s{% endif %}
+        &middot; <a href="/authors/">all authors</a>
+      </p>
+      {% if tags and tags.length %}
+        <ul class="tag-list series-tags">
+          {% for tag in tags %}
+            <li><a href="/tags/{{ tag | slug }}/">{{ tag }}</a></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
   </header>
 
   {% if content %}
