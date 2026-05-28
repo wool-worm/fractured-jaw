@@ -1652,6 +1652,14 @@
       resize();
       draw();
     });
+
+    // Zen mode hides this widget (zen.css). If the radio is playing when the
+    // visitor enters zen, the audio would keep going with no visible control,
+    // so power off on zen-enter. setPowered no-ops when already off, so this
+    // is safe regardless of current state. Dispatched by zen-toggle.js.
+    document.addEventListener("fj:zenchange", function (e) {
+      if (e.detail && e.detail.zen) setPowered(false);
+    });
   }
 
   // ── Ticker injection ────────────────────────────────────────────────────

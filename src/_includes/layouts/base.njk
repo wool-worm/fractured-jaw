@@ -40,6 +40,25 @@
   <script src="/assets/js/systems-widget.js" defer></script>
   <script src="/assets/js/wikilink-preview.js" defer></script>
   <script src="/assets/js/baffle.js" defer></script>
+  {# Zen-mode toggle. Persistent chip pinned bottom-left (the one viewport
+     corner no widget occupies). Toggling adds/removes the `zen` class on
+     <html>; zen.css keys off it to strip motion + decoration, mute the
+     loud palette, and hide the radio + systems widgets down to a calm
+     reading state (the graph stays). State lives in sessionStorage so it
+     survives navigation but resets each session: the full site is always
+     the default. See /assets/js/zen-toggle.js. #}
+  <button
+    type="button"
+    class="zen-toggle"
+    id="zen-toggle"
+    aria-pressed="false"
+    aria-label="Toggle zen mode"
+    title="Quiet the signal"
+  >
+    <span class="zen-toggle-glyph" aria-hidden="true">◉</span>
+    <span class="zen-toggle-label">quiet the signal</span>
+  </button>
+  <script src="/assets/js/zen-toggle.js" defer></script>
   {% include "partials/search-modal.njk" %}
   <script src="/assets/js/search.js" defer></script>
 </body>
