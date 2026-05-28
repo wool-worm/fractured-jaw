@@ -327,14 +327,15 @@
   }
 
   // Auto-fold viewport range. Systems folds earlier than the right-side
-  // widgets (1400 vs 1100) because as the widest left-side element it
-  // hits the main column first as the viewport narrows. While the
-  // viewport is in this range the widget is forced folded regardless of
-  // the localStorage preference. Outside the range, the widget falls
+  // widgets (1455 vs 1100) because as the widest left-side element it
+  // hits the main column first as the viewport narrows. The upper bound
+  // is 1455 (recalculated from 1400 for the 250px widget width). While
+  // the viewport is in this range the widget is forced folded regardless
+  // of the localStorage preference. Outside the range, the widget falls
   // back to the user's stored choice. matchMedia gives us instant change
   // events so we don't need a resize listener.
   var AUTOFOLD_MQ = window.matchMedia(
-    "(max-width: 1400px) and (min-width: 1001px)"
+    "(max-width: 1455px) and (min-width: 1001px)"
   );
 
   function targetFoldState() {
