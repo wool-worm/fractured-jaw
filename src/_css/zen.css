@@ -198,12 +198,19 @@ html.zen .site-title > span:nth-child(4) {
   display: none;
 }
 
-/* Skull: hold the first sprite frame, drop the glitch + chromatic drop-shadow.
-   SEAM: the modified zen-mode skull animation will slot in here later, swapped
-   in by re-enabling an animation on this selector. */
+/* Skull: swap in the calm "dissolve" sprite (18 frames, 1152x64) and step
+   through it slowly with no glitch overlay or chromatic drop-shadow. The
+   animation !important beats the blanket motion-kill above because the
+   selector is more specific (it wins the !important tie); this is the one
+   motion zen keeps besides the graph drift. Reduced-motion users still get
+   it frozen via the prefers-reduced-motion blocks. Tempo is 9s for now and
+   easy to tune. */
 html.zen .skull-logo {
+  background-image: url('/assets/images/skull-sprite-dissolve.png');
+  background-size: calc(var(--skull-size) * 18) var(--skull-size);
   background-position: 0 0;
   filter: none;
+  animation: zen-skull-frames 9s steps(18) infinite !important;
 }
 
 html.zen .site-logo-mark:hover .skull-logo {
@@ -231,4 +238,12 @@ html.zen blockquote {
 html.zen .radio-widget,
 html.zen .systems-widget {
   display: none !important;
+}
+
+/* ── Keyframes ──────────────────────────────────────────────────────────── */
+/* Zen skull: step through the 18-frame dissolve sprite. Mirrors cult.css's
+   skull-frames keyframe but for an 18-frame sheet, so the endpoint is
+   -18 × frame width (vs -17 for the original 17-frame sprite). */
+@keyframes zen-skull-frames {
+  to { background-position: calc(var(--skull-size, 64px) * -18) 0; }
 }
