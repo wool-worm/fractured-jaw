@@ -106,21 +106,36 @@ html.zen *::after {
 
 /* ── 3. Hide the overwhelming chrome ────────────────────────────────────── */
 
-/* Sticky broadcast ticker + the page-level vignette and corruption-bar
-   overlays. */
-html.zen .broadcast-banner,
+/* Page-level vignette + corruption-bar overlays (both fixed-position, so
+   removing them has no effect on layout flow). */
 html.zen body::before,
 html.zen body::after {
   display: none;
 }
 
-/* Sawtooth strips under the header + above the footer, the nav station-ID,
-   and the footer's continuously-scrambled glitch line. */
+/* Sticky broadcast ticker: hidden but NOT display:none, so its 1.4rem of
+   sticky-flow height is kept and the page doesn't jump up when entering zen.
+   visibility:hidden also hides the scrolling ticker text, the LIVE badge, and
+   the blood bottom border. */
+html.zen .broadcast-banner {
+  visibility: hidden;
+}
+
+/* Sawtooth strips under the header + above the footer, and the footer's
+   continuously-scrambled glitch line. */
 html.zen .site-header::after,
 html.zen .site-footer::before,
-html.zen .site-nav::after,
 html.zen .footer-glitch {
   display: none;
+}
+
+/* Keep the nav station-ID (it also preserves header spacing) but reword it to
+   a quiet "disconnected" status. Its flicker animation is already killed by
+   the motion-kill above; the brass-deep colour reads calm. zen.css is bundled
+   after cult.css, so on equal specificity this also wins over the
+   is-encryption-failure "UNENCRYPTED" variant. */
+html.zen .site-nav::after {
+  content: '// system disconnected // no freq found // machine: idle';
 }
 
 /* In-world stamps + glyph prefixes that read as machine chatter. */
@@ -133,20 +148,18 @@ html.zen .section-title::before {      /* the ⬡ section glyph */
   display: none;
 }
 
-/* Authored sawtooth dividers in content: collapse to a quiet hairline rule
-   rather than removing them, so the divider's structural spacing survives. */
-html.zen .sawtooth {
-  background: none;
-  height: 1px;
-  border-top: 1px solid var(--bone-faint);
-}
-
-/* The static-noise HR becomes a plain hairline too. */
+/* Authored sawtooth dividers + the static-noise <hr> keep their full height
+   (so the page doesn't reflow between modes) but swap the loud teeth/noise for
+   a single faint centered hairline drawn as a 1px background gradient. Height
+   + margins are inherited from the base/cult rules, not overridden here. */
+html.zen .sawtooth,
 html.zen hr {
-  height: 0;
   background: none;
+  background-image: linear-gradient(var(--bone-faint), var(--bone-faint));
+  background-size: 100% 1px;
+  background-position: center;
+  background-repeat: no-repeat;
   border: none;
-  border-top: 1px solid var(--bone-faint);
 }
 
 /* ── 4. Flatten shadows + filters the token remap can't reach ───────────────
@@ -203,14 +216,14 @@ html.zen .site-title > span:nth-child(4) {
    animation !important beats the blanket motion-kill above because the
    selector is more specific (it wins the !important tie); this is the one
    motion zen keeps besides the graph drift. Reduced-motion users still get
-   it frozen via the prefers-reduced-motion blocks. Tempo is 9s for now and
-   easy to tune. */
+   it frozen via the prefers-reduced-motion blocks. Tempo is 6s and easy to
+   tune. */
 html.zen .skull-logo {
   background-image: url('/assets/images/skull-sprite-dissolve.png');
   background-size: calc(var(--skull-size) * 18) var(--skull-size);
   background-position: 0 0;
   filter: none;
-  animation: zen-skull-frames 9s steps(18) infinite !important;
+  animation: zen-skull-frames 6s steps(18) infinite !important;
 }
 
 html.zen .site-logo-mark:hover .skull-logo {
