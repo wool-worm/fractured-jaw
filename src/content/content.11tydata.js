@@ -15,7 +15,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { computePermalink, extractSection, vaultPathToAttachmentUrl, VAULT_ATTACHMENT_DIR } = require("../utils/permalink");
+const { computePermalink, extractSection, vaultPathToAttachmentUrl, vaultPathToAttachmentSrc, VAULT_ATTACHMENT_DIR } = require("../utils/permalink");
 const { reportIssue } = require("../utils/build-report");
 
 const isProduction = process.env.ELEVENTY_ENV === "production";
@@ -84,12 +84,12 @@ function parseFrontmatterImage(raw) {
     };
   }
   // srcPath is the input-relative path the eleventyImageTransformPlugin
-  // uses to find the source file on disk: it joins the plugin's input dir
-  // (src/) to this path. The plugin then rewrites the <img> in the final
-  // HTML to point at /img/<hash>-<width>w.<ext>. Distinct from `url`, which
-  // is the public-facing /attachments/ URL used for og:image meta tags etc.
-  const stripped = vaultPath.replace(/^\/+/, "").replace(/^(?:_?attachments)\//, "");
-  const srcPath = "/content/" + VAULT_ATTACHMENT_DIR + "/" + stripped;
+  // uses to find the source file on disk (it joins the plugin's input dir,
+  // src/, to this path), then rewrites the <img> in the final HTML to point
+  // at /img/<hash>-<width>w.<ext>. Distinct from `url`, the public-facing
+  // /attachments/ URL used for og:image meta tags etc. Shared helper with
+  // the body-image-embed path in wikilinks.js.
+  const srcPath = vaultPathToAttachmentSrc(vaultPath);
   return { kind: "wikilink", url, alt, srcPath };
 }
 

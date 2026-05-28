@@ -23,12 +23,22 @@
 //
 // Output (with caption):
 //   <figure class="image-embed">
-//     <img src="/attachments/blog/post-name/cover.jpg" alt="caption" style="width:400px">
+//     <img src="/content/_attachments/blog/post-name/cover.jpg" alt="caption" style="width:400px" sizes="400px">
 //     <figcaption>caption</figcaption>
 //   </figure>
 //
 // Output (no caption):
-//   <img src="/attachments/blog/post-name/cover.jpg" alt="" class="image-embed" style="width:400px">
+//   <img src="/content/_attachments/blog/post-name/cover.jpg" alt="" class="image-embed" style="width:400px" sizes="400px">
+//
+// The emitted <img src> is the INPUT-relative attachment path (via
+// vaultPathToAttachmentSrc), NOT the public /attachments/ URL. This lets
+// the eleventyImageTransformPlugin (registered in .eleventy.js) locate the
+// source file on disk and rewrite the <img> to a <picture> with webp + jpeg
+// srcset variants in the final HTML. The reader never sees the intermediate
+// /content/_attachments/ path — the plugin replaces it with /img/<hash>...
+// The `sizes` attribute reflects the embed's display width so the browser
+// can pick the right variant; bare/uncapped embeds fall back to the
+// column-width pattern used by heroes and cards.
 //
 // Resolution rules (links):
 //   - Vault path's first segment is the section (blog/essays/fragments/
@@ -48,7 +58,12 @@
 
 const fs = require("fs");
 const path = require("path");
-const { vaultPathToUrl, vaultPathToAttachmentUrl, VAULT_ATTACHMENT_DIR } = require("./permalink");
+const {
+  vaultPathToUrl,
+  vaultPathToAttachmentUrl,
+  vaultPathToAttachmentSrc,
+  VAULT_ATTACHMENT_DIR,
+} = require("./permalink");
 const { reportIssue } = require("./build-report");
 
 const OPEN = 0x5b; // [
@@ -163,6 +178,16 @@ function styleFromSize(size) {
   if (!size) return "";
   if (size.height) return `width:${size.width}px;height:${size.height}px`;
   return `width:${size.width}px`;
+}
+
+// The `sizes` attribute the eleventyImageTransformPlugin needs to choose a
+// responsive variant. When the embed specifies a pixel width, the displayed
+// image is that wide, so `sizes` is just that width. Without an explicit
+// width the image fills its column, so fall back to the same viewport-based
+// sizes pattern heroes and cards use.
+function sizesFromSize(size) {
+  if (size && size.width) return `${size.width}px`;
+  return "(max-width: 720px) 100vw, 720px";
 }
 
 function parseWikilink(content) {
@@ -317,6 +342,11 @@ function emitImageEmbed(state, inner, contentRoot) {
   const esc = state.md.utils.escapeHtml;
   const style = styleFromSize(size);
   const styleAttr = style ? ` style="${esc(style)}"` : "";
+  // Input-relative path for the transform plugin (resolves under src/).
+  // We already confirmed url + on-disk existence above, so this resolves
+  // too; fall back to the public url defensively if it somehow doesn't.
+  const src = vaultPathToAttachmentSrc(vaultPath) || url;
+  const sizesAttr = ` sizes="${esc(sizesFromSize(size))}"`;
 
   if (caption) {
     // NOTE: <figure> is block-level and `<p><figure>...</figure></p>` is invalid
@@ -326,13 +356,13 @@ function emitImageEmbed(state, inner, contentRoot) {
     // rule would also work but doubles the code. Revisit if validation matters.
     const html =
       `<figure class="image-embed">` +
-      `<img src="${esc(url)}" alt="${esc(caption)}"${styleAttr}>` +
+      `<img src="${esc(src)}" alt="${esc(caption)}"${styleAttr}${sizesAttr}>` +
       `<figcaption>${esc(caption)}</figcaption>` +
       `</figure>`;
     const token = state.push("html_inline", "", 0);
     token.content = html;
   } else {
-    const html = `<img src="${esc(url)}" alt="" class="image-embed"${styleAttr}>`;
+    const html = `<img src="${esc(src)}" alt="" class="image-embed"${styleAttr}${sizesAttr}>`;
     const token = state.push("html_inline", "", 0);
     token.content = html;
   }

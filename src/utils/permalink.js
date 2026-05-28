@@ -125,11 +125,36 @@ function vaultPathToAttachmentUrl(vaultPath) {
   return `/${URL_ATTACHMENT_DIR}/${tail}`;
 }
 
+// Compute the INPUT-relative source path for an attachment — the form the
+// eleventyImageTransformPlugin needs to locate the file on disk. The plugin
+// joins the Eleventy input dir (src/) to this path, so it must point at the
+// real on-disk location: src/content/_attachments/<tail>.
+//
+// Accepts the same two spellings as vaultPathToAttachmentUrl (_attachments/
+// or attachments/), and returns null for anything else. Distinct from
+// vaultPathToAttachmentUrl, which returns the PUBLIC URL (/attachments/<tail>)
+// used for og:image meta and as the eventual served path. A template/markdown
+// renderer passes THIS value as <img src> when it wants the transform plugin
+// to optimize the image; the plugin rewrites it to /img/<hash>... in the
+// final HTML, so this intermediate path never reaches the reader.
+function vaultPathToAttachmentSrc(vaultPath) {
+  if (!vaultPath || typeof vaultPath !== "string") return null;
+  const trimmed = vaultPath.trim().replace(/^\/+/, "");
+  const slashIdx = trimmed.indexOf("/");
+  if (slashIdx === -1) return null;
+  const head = trimmed.slice(0, slashIdx);
+  const tail = trimmed.slice(slashIdx + 1);
+  if (head !== VAULT_ATTACHMENT_DIR && head !== URL_ATTACHMENT_DIR) return null;
+  if (!tail) return null;
+  return `/content/${VAULT_ATTACHMENT_DIR}/${tail}`;
+}
+
 module.exports = {
   computePermalink,
   extractSection,
   vaultPathToUrl,
   vaultPathToAttachmentUrl,
+  vaultPathToAttachmentSrc,
   CONTENT_SECTIONS,
   PAGES_SECTION,
   SERIES_SECTION,
