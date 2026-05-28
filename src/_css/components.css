@@ -693,6 +693,16 @@
   line-height: 1.8;
 }
 
+/* Inline body image embeds (![[...|caption|size]]) emit a <figure
+   class="image-embed"> with an <img> + <figcaption>. The caption text is
+   also written to the <img alt> by the wikilinks plugin, so it still
+   reaches screen readers; we hide the visible figcaption per author
+   preference (image speaks for itself, no caption line below). Remove this
+   rule to restore visible captions. */
+.image-embed figcaption {
+  display: none;
+}
+
 /* Hero image inside .post-header. Sits between the description and the
    post-meta block. Mirrors .post-card-image styling but allows a taller
    crop since this is the dedicated post page. */
