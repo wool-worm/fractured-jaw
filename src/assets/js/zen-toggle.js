@@ -35,12 +35,12 @@
   }
 
   // Reflect the current state in the chip's affordances. Glyph: filled ring
-  // (signal live) in the full site, hollow ring (signal quieted) in zen.
+  // (signal live) in the full site, hollow ring (signal flatlined) in zen.
   function apply(zen) {
     btn.setAttribute("aria-pressed", zen ? "true" : "false");
-    btn.setAttribute("title", zen ? "Restore signal" : "Quiet the signal");
+    btn.setAttribute("title", zen ? "Revive the signal" : "Flatline the signal");
     if (glyph) glyph.textContent = zen ? "◯" : "◉";
-    if (label) label.textContent = zen ? "restore signal" : "quiet the signal";
+    if (label) label.textContent = zen ? "revive" : "flatline";
   }
 
   function persist(zen) {
