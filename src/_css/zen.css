@@ -211,19 +211,19 @@ html.zen .site-title > span:nth-child(4) {
   display: none;
 }
 
-/* Skull: swap in the calm "dissolve" sprite (18 frames, 1152x64) and step
-   through it slowly with no glitch overlay or chromatic drop-shadow. The
-   animation !important beats the blanket motion-kill above because the
-   selector is more specific (it wins the !important tie); this is the one
-   motion zen keeps besides the graph drift. Reduced-motion users still get
-   it frozen via the prefers-reduced-motion blocks. Tempo is 6s and easy to
-   tune. */
+/* Skull: swap in the calm "dissolve" sprite (20 frames, 1280x64; rests on the
+   final frame a beat longer) and step through it slowly with no glitch overlay
+   or chromatic drop-shadow. The animation !important beats the blanket
+   motion-kill above because the selector is more specific (it wins the
+   !important tie); this is the one motion zen keeps besides the graph drift.
+   Reduced-motion users still get it frozen via the prefers-reduced-motion
+   blocks. Tempo is 8s and easy to tune. */
 html.zen .skull-logo {
   background-image: url('/assets/images/skull-sprite-dissolve.png');
-  background-size: calc(var(--skull-size) * 18) var(--skull-size);
+  background-size: calc(var(--skull-size) * 20) var(--skull-size);
   background-position: 0 0;
   filter: none;
-  animation: zen-skull-frames 6s steps(18) infinite !important;
+  animation: zen-skull-frames 8s steps(20) infinite !important;
 }
 
 html.zen .site-logo-mark:hover .skull-logo {
@@ -254,9 +254,9 @@ html.zen .systems-widget {
 }
 
 /* ── Keyframes ──────────────────────────────────────────────────────────── */
-/* Zen skull: step through the 18-frame dissolve sprite. Mirrors cult.css's
-   skull-frames keyframe but for an 18-frame sheet, so the endpoint is
-   -18 × frame width (vs -17 for the original 17-frame sprite). */
+/* Zen skull: step through the 20-frame dissolve sprite. Mirrors cult.css's
+   skull-frames keyframe but for a 20-frame sheet, so the endpoint is
+   -20 × frame width (vs -17 for the original 17-frame sprite). */
 @keyframes zen-skull-frames {
-  to { background-position: calc(var(--skull-size, 64px) * -18) 0; }
+  to { background-position: calc(var(--skull-size, 64px) * -20) 0; }
 }
