@@ -1,7 +1,7 @@
 ---
 date_created: 2026-05-24T09:30:00Z
 date_modified: 2026-05-24T09:30:00Z
-author: wool-worm
+author: "[[authors/wool-worm|wool-worm]]"
 title: feed maintenance
 tags: [meta, infra]
 date_published: 2026-05-28T16:49:08

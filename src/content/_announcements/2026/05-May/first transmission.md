@@ -1,7 +1,7 @@
 ---
 date_created: 2026-05-20T18:45:00Z
 date_modified: 2026-05-20T18:45:00Z
-author: wool-worm
+author: "[[authors/wool-worm|wool-worm]]"
 title: first transmission
 tags: [meta]
 date_published: 2026-05-28T16:49:15

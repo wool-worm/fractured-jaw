@@ -1,7 +1,7 @@
 ---
 date_created: 2026-05-28T14:02:00Z
 date_modified: 2026-05-28T14:02:00Z
-author: wool-worm
+author: "[[authors/wool-worm|wool-worm]]"
 title: board is live
 tags: [meta]
 date_published: 2026-05-28T16:49:00

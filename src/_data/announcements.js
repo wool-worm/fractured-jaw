@@ -27,6 +27,7 @@ const fs = require("fs");
 const path = require("path");
 const matter = require("gray-matter");
 const { DateTime } = require("luxon");
+const { parseWikilink } = require("../utils/wikilinks");
 
 const SOURCE_DIR = path.join(__dirname, "..", "content", "_announcements");
 
@@ -58,6 +59,28 @@ function firstDefined(data, keys) {
   return null;
 }
 
+// Resolve the `author` field to a plain display name. The vault authors
+// everything as wikilinks, so `author` usually arrives as the quoted string
+// "[[authors/<Name>|alias]]". We only need the display text here (the log
+// isn't clickable), so reuse the canonical parseWikilink primitive to pull
+// the alias (it falls back to the last path segment when there's no pipe).
+// A plain string author is used as-is; an array (co-authored) is joined.
+const WIKILINK_RE = /^\s*\[\[([^\]\n]+?)\]\]\s*$/;
+
+function oneAuthorName(value) {
+  if (value == null) return "";
+  const s = String(value).trim();
+  const m = s.match(WIKILINK_RE);
+  return m ? parseWikilink(m[1]).alias : s;
+}
+
+function authorDisplay(raw) {
+  const names = (Array.isArray(raw) ? raw : [raw])
+    .map(oneAuthorName)
+    .filter(Boolean);
+  return names.length ? names.join(", ") : "unknown";
+}
+
 // Normalize a frontmatter date to a UTC Luxon DateTime, or null. js-yaml
 // (via gray-matter) parses an UNQUOTED ISO timestamp into a JS Date object,
 // while a quoted value stays a string — handle both. A Date carries an
@@ -85,7 +108,7 @@ module.exports = function () {
 
     const createdRaw = firstDefined(data, ["date_created", "created", "date_published"]);
     const modifiedRaw = firstDefined(data, ["date_modified", "modified", "date_updated"]);
-    const author = (firstDefined(data, ["author"]) || "unknown").toString();
+    const author = authorDisplay(firstDefined(data, ["author"]));
     const body = (parsed.content || "").trim();
 
     const created = toUtcDateTime(createdRaw);
