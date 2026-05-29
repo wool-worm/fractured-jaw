@@ -17,6 +17,10 @@
 // on document so other widgets can react. radio-widget.js listens and powers
 // the radio off on zen-enter (it's hidden in zen, so its audio would
 // otherwise keep playing with no visible control).
+//
+// Also wires the announcements caret (#zen-announce-toggle), shown only in
+// zen: it reveals a calm panel (#zen-announce-panel) carrying the same
+// announcements log the hidden systems widget normally shows.
 
 (function () {
   "use strict";
@@ -29,6 +33,25 @@
   var root = document.documentElement;
   var glyph = btn.querySelector(".zen-toggle-glyph");
   var label = btn.querySelector(".zen-toggle-label");
+
+  // Announcements disclosure (zen only). Zen hides the systems widget, which
+  // normally carries the announcements log, so a caret next to the chip
+  // reveals a calm panel with the same log. The panel is CSS-gated to
+  // html.zen .is-open, so this just toggles the .is-open class + affordances.
+  var announceBtn = document.getElementById("zen-announce-toggle");
+  var announcePanel = document.getElementById("zen-announce-panel");
+
+  function isAnnounceOpen() {
+    return !!announcePanel && announcePanel.classList.contains("is-open");
+  }
+
+  function setAnnounceOpen(open) {
+    if (!announceBtn || !announcePanel) return;
+    announcePanel.classList.toggle("is-open", open);
+    announceBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    announceBtn.setAttribute("title", open ? "Hide transmissions" : "Incoming transmissions");
+    announceBtn.textContent = open ? "▾" : "▴";
+  }
 
   function isZen() {
     return root.classList.contains("zen");
@@ -54,6 +77,7 @@
     root.classList.toggle("zen", zen);
     apply(zen);
     persist(zen);
+    if (!zen) setAnnounceOpen(false); // leaving zen: collapse the panel
     document.dispatchEvent(
       new CustomEvent("fj:zenchange", { detail: { zen: zen } })
     );
@@ -65,4 +89,22 @@
   btn.addEventListener("click", function () {
     setZen(!isZen());
   });
+
+  // Announcements caret: toggle the panel; Escape and an outside click close it.
+  if (announceBtn && announcePanel) {
+    announceBtn.addEventListener("click", function (e) {
+      e.stopPropagation(); // don't let the document handler immediately re-close
+      setAnnounceOpen(!isAnnounceOpen());
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && isAnnounceOpen()) setAnnounceOpen(false);
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!isAnnounceOpen()) return;
+      var dock = document.getElementById("zen-dock");
+      if (dock && !dock.contains(e.target)) setAnnounceOpen(false);
+    });
+  }
 })();

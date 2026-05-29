@@ -40,24 +40,67 @@
   <script src="/assets/js/systems-widget.js" defer></script>
   <script src="/assets/js/wikilink-preview.js" defer></script>
   <script src="/assets/js/baffle.js" defer></script>
-  {# Zen-mode toggle. Persistent chip pinned bottom-left (the one viewport
-     corner no widget occupies). Toggling adds/removes the `zen` class on
-     <html>; zen.css keys off it to strip motion + decoration, mute the
-     loud palette, and hide the radio + systems widgets down to a calm
-     reading state (the graph stays). State lives in sessionStorage so it
-     survives navigation but resets each session: the full site is always
-     the default. See /assets/js/zen-toggle.js. #}
-  <button
-    type="button"
-    class="zen-toggle"
-    id="zen-toggle"
-    aria-pressed="false"
-    aria-label="Toggle zen mode"
-    title="Flatline the signal"
-  >
-    <span class="zen-toggle-glyph" aria-hidden="true">◉</span>
-    <span class="zen-toggle-label">flatline</span>
-  </button>
+  {# Zen-mode dock, pinned bottom-left (the one viewport corner no widget
+     occupies). Holds the zen toggle chip and — only in zen — a caret that
+     reveals the announcements panel above it. Zen hides the systems widget
+     (which normally carries the announcements log), so this is the calm
+     zen-only way to still surface them. The panel reuses the `announcements`
+     global (server-rendered, no fetch) and the same .announce-* row markup
+     the systems widget uses; it's display:none unless html.zen .is-open, so
+     it can never appear in the full site. See /assets/js/zen-toggle.js. #}
+  <div class="zen-dock" id="zen-dock">
+    <div class="zen-announce-panel" id="zen-announce-panel" role="dialog" aria-label="Announcements">
+      <div class="zen-announce-head">
+        <span class="zen-announce-icon" aria-hidden="true">✉&#xFE0E;</span>
+        <span class="zen-announce-title">incoming message</span>
+      </div>
+      <div class="zen-announce-log">
+        {% if announcements and announcements.length %}
+          {% for ann in announcements %}
+            <div class="announce-entry">
+              <div class="announce-meta">
+                <span class="announce-author">&gt; {{ ann.author }}</span>
+                <span class="announce-date">&gt; {{ ann.dateDisplay }}</span>
+                <span class="announce-time">&gt; {{ ann.timeDisplay }}</span>
+              </div>
+              <div class="announce-body">{{ ann.body }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="announce-empty">&gt; no transmissions logged</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="zen-dock-controls">
+      {# Toggling adds/removes the `zen` class on <html>; zen.css keys off it
+         to strip motion + decoration, mute the loud palette, and hide the
+         radio + systems widgets down to a calm reading state (the graph
+         stays). State lives in sessionStorage so it survives navigation but
+         resets each session: the full site is always the default. #}
+      <button
+        type="button"
+        class="zen-toggle"
+        id="zen-toggle"
+        aria-pressed="false"
+        aria-label="Toggle zen mode"
+        title="Flatline the signal"
+      >
+        <span class="zen-toggle-glyph" aria-hidden="true">◉</span>
+        <span class="zen-toggle-label">flatline</span>
+      </button>
+      {# Announcements disclosure — hidden in the full site (the systems widget
+         carries the log there), revealed only in zen via html.zen. #}
+      <button
+        type="button"
+        class="zen-announce-toggle"
+        id="zen-announce-toggle"
+        aria-expanded="false"
+        aria-controls="zen-announce-panel"
+        aria-label="Show announcements"
+        title="Incoming transmissions"
+      >▴</button>
+    </div>
+  </div>
   <script src="/assets/js/zen-toggle.js" defer></script>
   {% include "partials/search-modal.njk" %}
   <script src="/assets/js/search.js" defer></script>
