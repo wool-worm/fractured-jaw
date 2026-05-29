@@ -1652,12 +1652,26 @@
       draw();
     });
 
-    // Zen mode hides this widget (zen.css). If the radio is playing when the
-    // visitor enters zen, the audio would keep going with no visible control,
-    // so power off on zen-enter. setPowered no-ops when already off, so this
-    // is safe regardless of current state. Dispatched by zen-toggle.js.
+    // Zen mode hides this widget (zen.css). Dispatched by zen-toggle.js,
+    // which toggles the html.zen class BEFORE firing this event, so by the
+    // time we run the widget's display state already matches the new mode.
     document.addEventListener("fj:zenchange", function (e) {
-      if (e.detail && e.detail.zen) setPowered(false);
+      if (!e.detail) return;
+      if (e.detail.zen) {
+        // Entering zen: the radio is about to be hidden, so power off or its
+        // audio would keep playing with no visible control. setPowered no-ops
+        // when already off, so this is safe regardless of current state.
+        setPowered(false);
+      } else {
+        // Leaving zen re-shows the widget. If this page first loaded while in
+        // zen, boot()'s resize() ran with the widget display:none, sizing the
+        // dial canvas to clientWidth 0 (a 0x0 backing store that renders as a
+        // broken block). The class is already gone, so the canvas is
+        // measurable again: re-measure and redraw. No-op visual cost when the
+        // canvas was already sized correctly.
+        resize();
+        draw();
+      }
     });
   }
 
