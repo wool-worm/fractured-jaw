@@ -41,7 +41,7 @@
   <script src="/assets/js/wikilink-preview.js" defer></script>
   <script src="/assets/js/baffle.js" defer></script>
   {# Zen-mode dock, pinned bottom-left (the one viewport corner no widget
-     occupies). Holds the zen toggle chip and — only in zen — a caret that
+     occupies). Holds the zen toggle chip and (only in zen) a caret that
      reveals the announcements panel above it. Zen hides the systems widget
      (which normally carries the announcements log), so this is the calm
      zen-only way to still surface them. The panel reuses the `announcements`
@@ -53,6 +53,13 @@
       <div class="zen-announce-head">
         <span class="zen-announce-icon" aria-hidden="true">✉&#xFE0E;</span>
         <span class="zen-announce-title">incoming message</span>
+        <button
+          type="button"
+          class="zen-announce-close"
+          id="zen-announce-close"
+          aria-label="Close announcements"
+          title="Close"
+        >&#xD7;</button>
       </div>
       <div class="zen-announce-log">
         {% if announcements and announcements.length %}
@@ -88,7 +95,7 @@
         <span class="zen-toggle-glyph" aria-hidden="true">◉</span>
         <span class="zen-toggle-label">flatline</span>
       </button>
-      {# Announcements disclosure — hidden in the full site (the systems widget
+      {# Announcements disclosure: hidden in the full site (the systems widget
          carries the log there), revealed only in zen via html.zen. #}
       <button
         type="button"

@@ -26,6 +26,7 @@
   "use strict";
 
   var STORAGE_KEY = "fj.zen";
+  var STORAGE_KEY_ANNOUNCE = "fj.zen.announce";
 
   var btn = document.getElementById("zen-toggle");
   if (!btn) return;
@@ -40,6 +41,7 @@
   // html.zen .is-open, so this just toggles the .is-open class + affordances.
   var announceBtn = document.getElementById("zen-announce-toggle");
   var announcePanel = document.getElementById("zen-announce-panel");
+  var announceClose = document.getElementById("zen-announce-close");
 
   function isAnnounceOpen() {
     return !!announcePanel && announcePanel.classList.contains("is-open");
@@ -51,6 +53,12 @@
     announceBtn.setAttribute("aria-expanded", open ? "true" : "false");
     announceBtn.setAttribute("title", open ? "Hide transmissions" : "Incoming transmissions");
     announceBtn.textContent = open ? "▾" : "▴";
+    // Persist so the open/closed state survives navigation within a tab
+    // session (same lifecycle as zen itself; see STORAGE_KEY note above).
+    try {
+      if (open) sessionStorage.setItem(STORAGE_KEY_ANNOUNCE, "1");
+      else sessionStorage.removeItem(STORAGE_KEY_ANNOUNCE);
+    } catch (e) {}
   }
 
   function isZen() {
@@ -77,7 +85,6 @@
     root.classList.toggle("zen", zen);
     apply(zen);
     persist(zen);
-    if (!zen) setAnnounceOpen(false); // leaving zen: collapse the panel
     document.dispatchEvent(
       new CustomEvent("fj:zenchange", { detail: { zen: zen } })
     );
@@ -86,14 +93,24 @@
   // Sync the chip to whatever state the no-flash bootstrap already applied.
   apply(isZen());
 
+  // Restore the panel's open/closed state so it persists across navigation.
+  // The panel is CSS-gated to html.zen, so restoring while not in zen just
+  // pre-sets the affordance and stays invisible until zen is entered.
+  try {
+    if (sessionStorage.getItem(STORAGE_KEY_ANNOUNCE) === "1") setAnnounceOpen(true);
+  } catch (e) {}
+
   btn.addEventListener("click", function () {
     setZen(!isZen());
   });
 
-  // Announcements caret: toggle the panel; Escape and an outside click close it.
+  // Announcements caret: toggle the panel; Escape closes it. No
+  // click-outside-to-close: a click on a nav link is "outside" the dock too,
+  // so closing on it would clear the persisted open state right before the
+  // page unloads, defeating the across-navigation persistence. The panel is
+  // a sticky info panel, so it closes only via the caret or Escape.
   if (announceBtn && announcePanel) {
-    announceBtn.addEventListener("click", function (e) {
-      e.stopPropagation(); // don't let the document handler immediately re-close
+    announceBtn.addEventListener("click", function () {
       setAnnounceOpen(!isAnnounceOpen());
     });
 
@@ -101,10 +118,10 @@
       if (e.key === "Escape" && isAnnounceOpen()) setAnnounceOpen(false);
     });
 
-    document.addEventListener("click", function (e) {
-      if (!isAnnounceOpen()) return;
-      var dock = document.getElementById("zen-dock");
-      if (dock && !dock.contains(e.target)) setAnnounceOpen(false);
-    });
+    if (announceClose) {
+      announceClose.addEventListener("click", function () {
+        setAnnounceOpen(false);
+      });
+    }
   }
 })();

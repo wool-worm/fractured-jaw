@@ -22,7 +22,7 @@
 /* ── Zen dock (always present, both modes) ──────────────────────────────────
    Fixed bottom-left: the one viewport corner no widget occupies (systems is
    left-center, radio bottom-right, graph top-right). Holds the toggle chip and
-   — only in zen — the announcements caret + panel, stacked so the panel rises
+   (only in zen) the announcements caret + panel, stacked so the panel rises
    ABOVE the chip. The chip used to carry this fixed positioning itself; it now
    sits in the dock's flow so its on-screen spot is unchanged. z-index sits
    above the vignette (9000) so the dock stays crisp in the full site, below
@@ -145,8 +145,10 @@ html.zen .zen-announce-toggle:focus-visible {
 html.zen .zen-announce-panel.is-open {
   display: flex;
   flex-direction: column;
-  width: min(320px, calc(100vw - 2 * var(--sp-md)));
-  max-height: min(60vh, 420px);
+  /* 250px matches the systems-widget footprint, so the open panel sits inside
+     the left gutter without overlapping the centered content column. */
+  width: min(250px, calc(100vw - 2 * var(--sp-md)));
+  max-height: min(78vh, 546px);
   padding: 0.5rem 0.6rem;
   background: var(--void);
   border: 1px solid var(--brass-deep);
@@ -171,6 +173,30 @@ html.zen .zen-announce-panel.is-open {
 .zen-announce-icon {
   font-size: 0.72rem;
   line-height: 1;
+}
+
+/* Close affordance, pushed to the head's right edge. */
+.zen-announce-close {
+  margin-left: auto;
+  padding: 0 0.15rem;
+  background: none;
+  border: none;
+  color: var(--bone-faint);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.zen-announce-close:hover,
+.zen-announce-close:focus-visible {
+  color: var(--brass);
+  outline: none;
+}
+
+.zen-announce-close:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 1px;
 }
 
 .zen-announce-log {
