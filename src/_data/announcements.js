@@ -118,6 +118,11 @@ module.exports = function () {
       body,
       // Epoch millis sort key; undated notes sink to the bottom.
       _sort: created ? created.toMillis() : 0,
+      // Stable UTC ISO instant. Doubles as the diff id for the Discord
+      // announcements webhook (src/announcements-feed.11ty.js emits it) and
+      // an unambiguous timestamp. UTC zone keeps the build's local timezone
+      // from leaking, same rule as the isoDate filter.
+      iso: created ? created.toISO() : null,
       dateDisplay: created ? created.toFormat("yyyy-LL-dd") : "----.--.--",
       timeDisplay: created ? created.toFormat("HH:mm'Z'") : "--:--",
       modified: modifiedRaw ? String(modifiedRaw) : null,
