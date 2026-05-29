@@ -129,12 +129,12 @@ html.zen .footer-glitch {
   display: none;
 }
 
-/* Keep the nav station-ID (it also preserves header spacing) but reword it to
-   a quiet "disconnected" status. Its flicker animation is already killed by
+/* Reword the station-ID (now under the masthead at .site-station-id::after)
+   to a quiet "disconnected" status. Its flicker animation is already killed by
    the motion-kill above; the brass-deep colour reads calm. zen.css is bundled
-   after cult.css, so on equal specificity this also wins over the
+   after cult.css, so this overrides both the normal content and the
    is-encryption-failure "UNENCRYPTED" variant. */
-html.zen .site-nav::after {
+html.zen .site-station-id::after {
   content: '// system disconnected // no freq found // machine: idle';
 }
 

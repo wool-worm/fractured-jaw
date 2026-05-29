@@ -186,7 +186,10 @@
   line-height: 1.8;
 }
 
-.home-intro p {
+.home-intro p,
+.section-intro p,
+.page-intro p,
+.series-intro p {
   max-width: none;
 }
 
@@ -267,7 +270,7 @@
 .section-intro {
   color: var(--bone-dim);
   font-size: 0.9rem;
-  max-width: 80ch;
+  max-width: none;
   margin-bottom: var(--sp-lg);
 }
 
@@ -460,7 +463,7 @@
   font-size: 1.125rem;
   line-height: 1.8;
   color: var(--bone);
-  max-width: 80ch;
+  max-width: none;
 }
 
 .series-empty {
