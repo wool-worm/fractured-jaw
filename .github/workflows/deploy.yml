@@ -71,6 +71,21 @@ jobs:
             -H "Accept: application/atom+xml, application/xml, text/xml, */*" \
             https://fractured-jaw.com/feed.xml -o previous-feed.xml
 
+      # Same idea for the announcements webhook: snapshot the currently-live
+      # /announcements.json so detect-new-announcements.js can diff it against
+      # the freshly-built one. Unlike the feed fetch this is `|| true`: on the
+      # very first deploy (before /announcements.json exists) the 404 must NOT
+      # fail the build. A missing/invalid snapshot makes the detect script
+      # establish a baseline and announce nothing, so existing announcements
+      # are never spammed on first run.
+      - name: Fetch live announcements snapshot
+        if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          curl -fsSL \
+            -A "fractured-jaw-deploy/1.0 (+https://github.com/wool-worm/fractured-jaw)" \
+            -H "Accept: application/json, */*" \
+            https://fractured-jaw.com/announcements.json -o previous-announcements.json || true
+
       - name: Build site
         run: npm run build
 
@@ -96,6 +111,25 @@ jobs:
         with:
           name: new-posts
           path: new-posts.json
+          retention-days: 1
+
+      # Diff the live /announcements.json snapshot vs the freshly-built one,
+      # emit new-announcements.json. Baseline-safe: a missing/invalid previous
+      # snapshot announces nothing (see detect-new-announcements.js).
+      - name: Detect new announcements
+        if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          node .github/scripts/detect-new-announcements.js \
+            previous-announcements.json \
+            _site/announcements.json \
+            new-announcements.json
+
+      - name: Upload new-announcements payload
+        if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: new-announcements
+          path: new-announcements.json
           retention-days: 1
 
       - name: Configure Pages
@@ -181,6 +215,25 @@ jobs:
         env:
           DISCORD_WEBHOOK_DISPATCHES: ${{ secrets.DISCORD_WEBHOOK_DISPATCHES }}
         run: node .github/scripts/post-dispatches.js new-posts.json
+
+      # Best-effort download of the new-announcements payload, same shape as
+      # the new-posts download above.
+      - name: Download new-announcements payload
+        if: steps.deployment.outcome == 'success'
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: new-announcements
+
+      # Post one Discord embed per new announcement to the announcements
+      # channel. continue-on-error so a Discord outage doesn't fail the
+      # workflow after the actual deploy succeeded.
+      - name: Post new announcements to Discord announcements
+        if: steps.deployment.outcome == 'success' && hashFiles('new-announcements.json') != ''
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK_ANNOUNCEMENTS: ${{ secrets.DISCORD_WEBHOOK_ANNOUNCEMENTS }}
+        run: node .github/scripts/post-announcements.js new-announcements.json
 
       - name: Post deploy success to Discord system
         if: steps.deployment.outcome == 'success'
