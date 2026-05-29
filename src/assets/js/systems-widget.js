@@ -326,16 +326,15 @@
     saveFoldedState();
   }
 
-  // Auto-fold viewport range. Systems folds earlier than the right-side
-  // widgets (1455 vs 1100) because as the widest left-side element it
-  // hits the main column first as the viewport narrows. The upper bound
-  // is 1455 (recalculated from 1400 for the 250px widget width). While
-  // the viewport is in this range the widget is forced folded regardless
-  // of the localStorage preference. Outside the range, the widget falls
-  // back to the user's stored choice. matchMedia gives us instant change
-  // events so we don't need a resize listener.
+  // Auto-fold viewport range: 1031–1279px. Above 1280px the content column
+  // holds a side gutter for this widget (see `main` max-width in layout.css),
+  // so it stays unfolded. Below 1280px the column stops holding the gutter and
+  // slides left into the widget, so we force-fold here until the 1030px hide
+  // breakpoint takes over. While in range the widget is folded regardless of
+  // the stored preference; outside it, the widget falls back to the user's
+  // stored choice. matchMedia gives us instant change events.
   var AUTOFOLD_MQ = window.matchMedia(
-    "(max-width: 1455px) and (min-width: 1001px)"
+    "(max-width: 1279px) and (min-width: 821px)"
   );
 
   function targetFoldState() {

@@ -8,21 +8,83 @@ body {
 main {
   flex: 1;
   width: 100%;
-  max-width: var(--col-wide);
+  /* Below 1280px the column is frozen at the 1280 handoff width (720px =
+     1280 − 560 gutter) so it does NOT snap wider when the gutter-hold
+     releases. It keeps this width and slides left (centered; both gutters
+     shrink) as the viewport narrows. The >=1280 rule below holds the gutter
+     above the handoff. */
+  max-width: 720px;
   margin: 0 auto;
   padding: calc(var(--sp-lg) + 10px) var(--sp-md) var(--sp-lg);
 }
 
+/* Systems-widget overlap handling. Between 1280px and ~1460px the centered
+   column holds a fixed side gutter instead of sliding into the systems widget,
+   so the widget stays unfolded down to 1280px (the smallest common laptop
+   width). 560px = 2 × (250px widget + 1rem left offset + ~14px buffer); once
+   `100vw - 560px` is the smaller term (below ~1460px at 100ch ≈ 900px) the
+   column narrows in place keeping a ~280px gutter each side. Full 100ch is
+   preserved above the crossover.
+
+   BELOW 1280px the gutter-hold releases but the column stays FROZEN at the
+   720px handoff width (see the base rule) rather than snapping back to 100ch;
+   it slides left as the viewport narrows. The systems widget auto-folds at the
+   handoff (systems-widget.js AUTOFOLD_MQ, 1031–1279px); the right widgets keep
+   their own fold thresholds for now (overlap point still being tuned), then the
+   mobile collapse. */
+@media (min-width: 1280px) {
+  main,
+  .site-header-inner {
+    max-width: min(var(--col-wide), calc(100vw - 560px));
+  }
+}
+
 /* ── Header ─────────────────────────────────────────────────────────────── */
+/* The header is a full-width bar (background, border, sawtooth strip); the
+   actual masthead + nav live in a centered inner block. */
 .site-header {
-  display: flex;
-  align-items: baseline;
-  gap: var(--sp-lg);
   padding: var(--sp-md) var(--sp-md);
   border-bottom: 2px solid var(--brass-deep);
   background: var(--void);
   position: relative;
   z-index: 20;
+}
+
+/* Centered inner block, stacked: masthead row above the nav row. Bound to the
+   content-column width (default 720px here; the >=1280 rule above widens it to
+   the column formula) so it slides left and clears the floating widgets in
+   step with the page body. */
+.site-header-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-xs);
+}
+
+/* Masthead row: skull + wordmark (with the station-ID beneath it), centered.
+   The box is centered, but the wordmark's heavy glitch text-shadow extends
+   further right than left, biasing it optically right of the nav's centre, so
+   a small left nudge re-centres it visually. Tune translateX to taste. */
+.site-masthead-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  transform: translateX(-0.8rem);
+}
+
+.site-masthead {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;   /* right-align the station-ID under the wordmark */
+}
+
+/* Tuck the station-ID right up under the wordmark (the display font leaves a
+   tall line-box below the glyphs). Tunable. */
+.site-station-id {
+  margin-top: -0.35rem;
+  line-height: 1;
 }
 
 .site-header::after {
@@ -61,14 +123,15 @@ main {
 }
 
 /* ── Navigation ─────────────────────────────────────────────────────────── */
+/* Single centered row beneath the masthead. */
 .site-nav {
-  flex: 1;
-  align-self: end;
+  width: 100%;
 }
 
 .site-nav ul {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  justify-content: center;
   gap: 0;
   list-style: none;
 }
@@ -260,73 +323,49 @@ main {
   font-size: 1.0125rem;
 }
 
-/* ── Responsive: nav drops to second row in the 761–1200 zone ───────────── */
-/* Between 760 and 1200px there isn't enough horizontal room for the
-   inline nav row alongside the masthead — the items would wrap into a
-   tall vertical stack and bloat the header height. Drop the nav to a
-   full-width second row instead so items stay on a single horizontal
-   line. Hamburger button stays hidden in this zone (handled below 760px).
-   Achieved with flex-wrap on the header + flex: 0 0 100% on the nav,
-   which forces the nav onto its own line below the skull + masthead. */
-@media (max-width: 1200px) and (min-width: 761px) {
-  .site-header {
-    flex-wrap: wrap;
-    row-gap: var(--sp-xs);
-  }
-
-  .site-nav {
-    flex: 0 0 100%;
-    align-self: stretch;
+/* ── Responsive: collapse nav into a hamburger panel ────────────────────── */
+/* At/below 820px the single nav row is swapped for a hamburger button (pinned
+   top-right of the masthead row) + an absolute dropdown panel below the header.
+   820px is the de-facto mobile switchover: it matches the widget hide-point and
+   the intro-fold breakpoint. Open/close is driven by data-open on .site-nav,
+   toggled by /assets/js/nav-toggle.js. The masthead/skull keep their own clamp
+   (cult.css, <=620px), untouched. */
+@media (max-width: 820px) {
+  /* Mobile header: the masthead row goes full-width so the skull + wordmark sit
+     left-aligned and the hamburger pins to the right (standard mobile layout;
+     the two never overlap). The desktop optical nudge is dropped here. The
+     masthead shifting from centered (desktop, over the nav) to left-aligned
+     (mobile, with the hamburger) at this breakpoint is intentional. */
+  .site-masthead-row {
     width: 100%;
-    border-top: 1px solid var(--bone-faint);
-    padding-top: var(--sp-xs);
-  }
-
-  .site-nav ul {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-}
-
-/* ── Responsive: collapse nav into hamburger panel ──────────────────────── */
-/* Below 760px (matches the widget hide-breakpoint for radio + graph), the
-   inline nav row would wrap badly and the masthead crowds the items.
-   Swap to a hamburger button + absolute-positioned dropdown panel that
-   drops below the header. The panel's open/close is driven by data-open
-   on .site-nav, toggled by the script in /assets/js/nav-toggle.js. */
-@media (max-width: 760px) {
-  .site-header {
-    /* Keep the row layout but tighten the gap so skull + masthead +
-       hamburger fit without the masthead pushing the hamburger off-screen.
-       align-items: center keeps the hamburger vertically centered against
-       the skull sprite rather than baseline-aligned with the masthead. */
     gap: var(--sp-sm);
-    align-items: center;
+    transform: translateX(-0.4rem);
   }
 
-  /* Masthead font-size for mobile is handled in cult.css via a single
-     clamp() that covers every width — clamp(0.85rem, 3.5vw, 2.3rem).
-     Adding a width-conditional override here would be dead code: cult.css
-     is imported after layout.css, so its base `.site-title` rule beats
-     anything we'd set in this media query. */
+  /* Push the hamburger to the right via the wordmark's auto margin (instead of
+     the hamburger's own), so the hamburger can carry a small fixed left margin
+     for a bit of breathing room from the wordmark without touching the
+     skull -> wordmark gap. */
+  .site-masthead {
+    margin-right: auto;
+  }
 
   .site-nav-toggle {
     display: block;
+    margin-left: var(--sp-sm);
   }
 
   /* Collapsed nav — hidden until [data-open="true"], then drops below the
-     header as a full-width panel. position:absolute escapes the header
-     flex row; left:0/right:0 spans full width; z-index:19 sits just
-     under the header's z-index:20 so the header border still draws
-     above the panel. */
+     header as a full-width panel. position:absolute is relative to
+     .site-header (position:relative); left:0/right:0 spans full width;
+     z-index:19 sits just under the header's z-index:20. */
   .site-nav {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     z-index: 19;
-    flex: 0 0 auto;
-    align-self: auto;
+    width: auto;
     background: var(--void);
     border-bottom: 2px solid var(--brass-deep);
     box-shadow: 0 4px 0 -1px var(--brass-faint);
@@ -340,6 +379,7 @@ main {
   .site-nav ul {
     flex-direction: column;
     flex-wrap: nowrap;
+    justify-content: flex-start;
     gap: 0;
     padding: var(--sp-xs) 0;
   }

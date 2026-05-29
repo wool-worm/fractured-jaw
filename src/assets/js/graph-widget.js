@@ -514,14 +514,13 @@
     saveFoldedState();
   }
 
-  // Auto-fold viewport range. While the viewport is in this range the
-  // widget is forced folded regardless of the localStorage preference,
-  // because at narrow desktop / tablet widths the unfolded panel
-  // overlaps the main column. Outside the range, the widget falls back
-  // to the user's stored choice. matchMedia gives us instant change
-  // events so we don't need a resize listener.
+  // Auto-fold viewport range. Folds at the 1280px handoff alongside the
+  // systems widget: below 1280 the content column unfreezes and slides left
+  // into the widgets, so all three fold together. While in range the widget is
+  // forced folded regardless of the stored preference; outside it, it falls
+  // back to the user's stored choice. matchMedia gives us instant change events.
   var AUTOFOLD_MQ = window.matchMedia(
-    "(max-width: 1100px) and (min-width: 721px)"
+    "(max-width: 1279px) and (min-width: 821px)"
   );
 
   function targetFoldState() {

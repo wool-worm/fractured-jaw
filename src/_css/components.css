@@ -177,11 +177,17 @@
 }
 
 /* ── Home sections ───────────────────────────────────────────────────────── */
+/* Intro spans the full center column (matches the cards/sections below it),
+   so both the wrapper and its paragraphs drop the prose max-width caps. */
 .home-intro {
-  max-width: 80ch;
+  max-width: none;
   margin-bottom: var(--sp-xl);
   font-size: 0.95rem;
   line-height: 1.8;
+}
+
+.home-intro p {
+  max-width: none;
 }
 
 .home-featured,
