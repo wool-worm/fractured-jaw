@@ -484,8 +484,11 @@ body.is-encryption-failure .systems-failure-banner {
   flex-shrink: 1;      /* override the .systems-section flex-shrink:0 above */
 }
 
-/* "incoming message" banner — steady pulse, letter glyph at left. Compact
-   in-world strip in the same family as the encryption row. */
+/* "recent messages" banner: static brass header above the announcement log.
+   Was previously a pulsing ichor "incoming message" banner; renamed and
+   restyled 2026-05-30 so it no longer competes visually with the radio
+   widget's pulsing ichor "incoming signal" engage button (which IS a
+   clickable affordance; this label is purely a header). */
 .systems-announce-banner {
   display: flex;
   align-items: center;
@@ -493,24 +496,28 @@ body.is-encryption-failure .systems-failure-banner {
   flex-shrink: 0;
   margin-bottom: 0.3rem;
   padding: 0.15rem 0.35rem;
-  border: 1px solid var(--ichor-bright);
+  border: 1px solid var(--brass);
   background: var(--void);
-  color: var(--ichor-bright);
+  color: var(--brass);
   font-size: 0.6rem;
   letter-spacing: 0.1em;
   text-transform: lowercase;
   line-height: 1.4;
-  animation: announce-pulse 2.2s ease-in-out infinite;
+}
+
+/* During the encryption-failure window (body.is-encryption-failure), the
+   banner shifts to the same blood-bright accent the failure marquee + the
+   broadcast ticker swap to — keeps the systems widget visually coherent
+   during the alarm rather than leaving a calm brass label sitting under a
+   blaring red marquee. */
+body.is-encryption-failure .systems-announce-banner {
+  border-color: var(--blood-bright);
+  color: var(--blood-bright);
 }
 
 .systems-announce-icon {
   font-size: 0.72rem;
   line-height: 1;
-}
-
-@keyframes announce-pulse {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.45; }
 }
 
 /* Scroll region: capped on tall screens, shrinks under max-height pressure. */
