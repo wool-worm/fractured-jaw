@@ -507,7 +507,7 @@ body.is-encryption-failure .systems-failure-banner {
 
 /* During the encryption-failure window (body.is-encryption-failure), the
    banner shifts to the same blood-bright accent the failure marquee + the
-   broadcast ticker swap to — keeps the systems widget visually coherent
+   broadcast ticker swap to, so the systems widget stays visually coherent
    during the alarm rather than leaving a calm brass label sitting under a
    blaring red marquee. */
 body.is-encryption-failure .systems-announce-banner {
