@@ -123,11 +123,32 @@
   function position(el, anchor) {
     var rect = anchor.getBoundingClientRect();
     var width = el.offsetWidth || 320;
-    var top = rect.bottom + window.scrollY + 4;
+    var height = el.offsetHeight || 0;
+    var margin = 8;
+    var gap = 4;
+
+    // Horizontal: align to the anchor's left edge, clamped to the viewport.
     var left = rect.left + window.scrollX;
-    var maxLeft = window.innerWidth + window.scrollX - width - 8;
-    el.style.top = top + "px";
-    el.style.left = Math.max(8, Math.min(left, maxLeft)) + "px";
+    var maxLeft = window.innerWidth + window.scrollX - width - margin;
+    el.style.left = Math.max(margin, Math.min(left, maxLeft)) + "px";
+
+    // Vertical: prefer rendering below the anchor, but flip above it when
+    // there isn't room below (e.g. links near the bottom of the window).
+    // All math is done in viewport coordinates so we can clamp to the
+    // visible area; only at the end do we convert to document coordinates
+    // by adding scrollY. Keeping the tooltip inside the viewport stops it
+    // from spilling off-screen and from growing the page when it sits near
+    // the bottom.
+    var spaceBelow = window.innerHeight - rect.bottom;
+    var spaceAbove = rect.top;
+    var topVp;
+    if (spaceBelow >= height + gap + margin || spaceBelow >= spaceAbove) {
+      topVp = rect.bottom + gap;
+    } else {
+      topVp = rect.top - gap - height;
+    }
+    topVp = Math.max(margin, Math.min(topVp, window.innerHeight - height - margin));
+    el.style.top = topVp + window.scrollY + "px";
   }
 
   function cancelHide() {
