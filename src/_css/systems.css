@@ -11,7 +11,7 @@
      height; 55% biases it slightly below center so the taller panel sits
      clear of the masthead while keeping its bottom on-screen. Tuning
      knob: nudge this %  up/down to taste. */
-  top: 55%;
+  top: 49%;
   left: 1rem;
   transform: translateY(-50%);
   width: 250px;

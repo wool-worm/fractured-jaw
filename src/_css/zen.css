@@ -183,7 +183,7 @@ html.zen .zen-announce-panel.is-open {
   border: none;
   color: var(--bone-faint);
   font-family: var(--font-body);
-  font-size: 0.95rem;
+  font-size: 1.3rem;
   line-height: 1;
   cursor: pointer;
 }
