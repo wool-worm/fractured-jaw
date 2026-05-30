@@ -341,3 +341,28 @@
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.55; }
 }
+
+/* Review link surfaced under the embed in engaged state. Fixed text
+   ("> read review") so sizing stays consistent across stations; the
+   emitter resolves the wikilink and the widget just renders it here. */
+.radio-widget-review {
+  display: inline-block;
+  margin-top: 0.4rem;
+  color: var(--bone-dim);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  text-decoration: none;
+}
+
+.radio-widget-review:hover,
+.radio-widget-review:focus-visible {
+  color: var(--sodium);
+  outline: none;
+}
+
+.radio-widget-review:focus-visible {
+  outline: 2px solid var(--sodium);
+  outline-offset: 2px;
+}

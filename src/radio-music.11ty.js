@@ -23,11 +23,30 @@
 const fs = require("fs");
 const path = require("path");
 const matter = require("gray-matter");
-const { parseWikilink } = require("./utils/wikilinks");
+const { parseWikilink, vaultPathExists } = require("./utils/wikilinks");
 const { vaultPathToUrl } = require("./utils/permalink");
+const { reportIssue } = require("./utils/build-report");
 
-const SOURCE_PATH = path.join(__dirname, "content", "_data", "radio-music.md");
+const CONTENT_ROOT = path.join(__dirname, "content");
+const SOURCE_PATH = path.join(CONTENT_ROOT, "_data", "radio-music.md");
+const HOST_FILE = "src/content/_data/radio-music.md";
 const WIKILINK_RE = /^\s*\[\[([^\]\n]+?)\]\]\s*$/;
+
+// Cache: vaultPath -> target file's parsed frontmatter (or null on read error).
+// One build invocation = one Node process = fresh cache, so no staleness.
+const targetFmCache = new Map();
+function readTargetFrontmatter(vaultPath) {
+  if (targetFmCache.has(vaultPath)) return targetFmCache.get(vaultPath);
+  const abs = path.join(CONTENT_ROOT, `${vaultPath}.md`);
+  let data = null;
+  try {
+    data = matter(fs.readFileSync(abs, "utf8")).data || {};
+  } catch (e) {
+    data = null;
+  }
+  targetFmCache.set(vaultPath, data);
+  return data;
+}
 
 // js-yaml turns unquoted ISO dates into JS Date objects, quoted ones into
 // strings. Normalize both to YYYY-MM-DD so the public JSON is uniform and
@@ -38,29 +57,106 @@ function normalizeDate(value) {
   return String(value).trim();
 }
 
-// Wikilink string -> { url, alias } using the same primitives the rest of
-// the site uses (so a review link here resolves to the same URL the body
-// wikilink to that review would). Returns null when the value is empty, not
-// a strict wikilink, or points outside KNOWN_SECTIONS.
+// Wikilink string -> { url, alias }, or null when the link shouldn't render.
+// Validates against the same rules the rest of the site uses for wikilinks
+// (vaultPathExists + frontmatter draft/exclude flags + reportIssue at
+// fatal-in-prod severity), with one tweak: this returns null for bad targets
+// so the widget never renders a dead link. Body wikilinks render a live <a>
+// either way and rely on reportIssue to halt the prod build; the radio
+// widget is a clientside fetch consumer, so swallowing the bad URL is the
+// only way to prevent a 404 from shipping if the report's prod-fatal halt
+// somehow doesn't fire (e.g. host-context quirks for a pipeline-excluded
+// data file).
 //
-// TODO (deferred): wire this through the build-report validator the same
-// way body wikilinks and the `author` frontmatter field do. Today this is a
-// silent best-effort resolve: a typo, a deleted review file, or a draft/
-// excluded target all return null and the link just doesn't render. The
-// existing wikilink validator in src/utils/wikilinks.js (vaultPathExists +
-// vaultPathTargetIsExcluded) plus reportIssue() at fatal-in-prod would catch
-// "album points at a draft review" and "album points at a deleted review"
-// at build time, preventing a published album from shipping with a 404
-// link. Pattern to copy: parseAuthorField in src/utils/authors.js.
+// Specifically:
+//   - Not a strict wikilink, unknown section, malformed path, or missing
+//     target file -> null + report (dead link).
+//   - Target has `exclude: true` -> null + report (would 404 in prod).
+//   - Target has `draft: true`:
+//       - in production -> null + report.
+//       - in dev -> render the link (drafts are reachable in dev).
+//   - Otherwise -> { url, alias }.
+//
+// All reports use `isDraft: false, isExcluded: false` on the host context so
+// the issue is fatal-in-prod regardless of the data file's own pipeline-
+// excluded status. The radio-music file is technically excluded from the
+// content pipeline, but it's an author-authored source that should be
+// validated as strictly as any content post.
 function resolveReviewLink(raw) {
   if (!raw) return null;
   const s = String(raw).trim();
+  if (!s) return null;
+
   const m = s.match(WIKILINK_RE);
-  if (!m) return null;
+  if (!m) {
+    reportIssue({
+      kind: "review-link",
+      file: HOST_FILE,
+      offending: s,
+      reason: "review_link must be a strict wikilink (`[[<section>/<...>]]`)",
+      isDraft: false,
+      isExcluded: false,
+    });
+    return null;
+  }
+
   const { vaultPath, alias } = parseWikilink(m[1]);
   const cleanPath = vaultPath.replace(/\.md$/i, "");
   const url = vaultPathToUrl(cleanPath);
-  return url ? { url, alias } : null;
+  if (!url) {
+    reportIssue({
+      kind: "review-link",
+      file: HOST_FILE,
+      offending: `[[${m[1]}]]`,
+      reason: "unknown section or malformed path",
+      isDraft: false,
+      isExcluded: false,
+    });
+    return null;
+  }
+  if (!vaultPathExists(cleanPath, CONTENT_ROOT)) {
+    reportIssue({
+      kind: "review-link",
+      file: HOST_FILE,
+      offending: `[[${m[1]}]]`,
+      reason: "no matching .md file in src/content/",
+      isDraft: false,
+      isExcluded: false,
+    });
+    return null;
+  }
+
+  const data = readTargetFrontmatter(cleanPath) || {};
+  if (data.exclude === true) {
+    reportIssue({
+      kind: "review-link",
+      file: HOST_FILE,
+      offending: `[[${m[1]}]]`,
+      reason: "target is excluded (`exclude: true`); URL would 404 in production",
+      isDraft: false,
+      isExcluded: false,
+    });
+    return null;
+  }
+  if (data.draft === true) {
+    // Always report draft targets. reportIssue routes severity by env:
+    // warn in dev (so authors see the warning that the link will 404 in
+    // prod) and fatal in prod (build halts). We additionally return null
+    // in prod so the link doesn't render even if the report somehow
+    // doesn't halt the build.
+    reportIssue({
+      kind: "review-link",
+      file: HOST_FILE,
+      offending: `[[${m[1]}]]`,
+      reason: "target is draft (`draft: true`); URL will 404 in production",
+      isDraft: false,
+      isExcluded: false,
+    });
+    if (process.env.ELEVENTY_ENV === "production") return null;
+    // Dev: drafts are reachable at their URL, so render the link.
+  }
+
+  return { url, alias };
 }
 
 class RadioMusic {
