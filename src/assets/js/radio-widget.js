@@ -1714,6 +1714,7 @@
     var ticker = document.getElementById("radio-widget-ticker");
     var engageBtn = document.getElementById("radio-widget-engage");
     var slot = document.getElementById("radio-widget-embed");
+    var reviewLink = document.getElementById("radio-widget-review");
     var alive = true;
     var ttsPending = null;
     var clickHandler = null;
@@ -1738,6 +1739,13 @@
         if (slot) {
           slot.innerHTML = buildBandcampEmbedHTML(station);
           slot.hidden = false;
+        }
+        // Surface the review link if the emitter resolved one for this
+        // station. station.review is { url, alias } or null (the emitter
+        // returns null for dead, excluded, or draft-in-prod targets).
+        if (reviewLink && station.review && station.review.url) {
+          reviewLink.setAttribute("href", station.review.url);
+          reviewLink.hidden = false;
         }
       };
       engageBtn.addEventListener("click", clickHandler);
@@ -1790,6 +1798,10 @@
         if (slot) {
           slot.innerHTML = "";
           slot.hidden = true;
+        }
+        if (reviewLink) {
+          reviewLink.hidden = true;
+          reviewLink.removeAttribute("href");
         }
         if (statusEl) statusEl.hidden = false;
       }
