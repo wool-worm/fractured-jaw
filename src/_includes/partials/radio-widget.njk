@@ -17,6 +17,12 @@
   data-band="ALPHA"
   data-frequency="0"
 >
+  {# Ticker: shown by createBandcampEngine when tuned to a bandcamp station,
+     pre-engage. Mirrors the systems-widget failure-banner marquee pattern. #}
+  <div class="radio-widget-ticker" id="radio-widget-ticker" aria-hidden="true" hidden>
+    <span class="radio-widget-ticker-text">organic signal detected ◆ organic signal detected ◆ organic signal detected ◆</span>
+  </div>
+
   <div class="radio-widget-header">
     {# Fold button is the leftmost header element so it stays visible
        when the widget translates right and only a thin strip remains
@@ -83,5 +89,15 @@
 
   <div class="radio-widget-status">
     <span id="radio-widget-status">offline</span>
+    {# Bandcamp alert state: pulsing ichor button shown by createBandcampEngine
+       when tuned to a bandcamp station. Click transitions to engaged state
+       (the engine kills the ticker + TTS and inserts the iframe below). #}
+    <button type="button" class="radio-widget-engage" id="radio-widget-engage" hidden>
+      <span class="radio-widget-engage-glyph" aria-hidden="true">📡&#xFE0E;</span>
+      <span class="radio-widget-engage-label">incoming signal</span>
+    </button>
+    {# Slot for the Bandcamp player on engaged state. Populated by
+       createBandcampEngine after the engage button is clicked. #}
+    <div id="radio-widget-embed" hidden></div>
   </div>
 </aside>
