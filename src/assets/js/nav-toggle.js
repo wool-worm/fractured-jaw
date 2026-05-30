@@ -64,8 +64,8 @@
 
   // Resize past the breakpoint: clear the open state so the panel
   // doesn't stay logically "open" while invisible at desktop widths.
-  // Matches the 760px breakpoint in layout.css.
-  var desktopMQ = window.matchMedia("(min-width: 761px)");
+  // Matches the 820px hamburger breakpoint in layout.css.
+  var desktopMQ = window.matchMedia("(min-width: 821px)");
   function onMQChange(e) {
     if (e.matches && open) setOpen(false);
   }

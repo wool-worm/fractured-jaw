@@ -177,11 +177,20 @@
 }
 
 /* ── Home sections ───────────────────────────────────────────────────────── */
+/* Intro spans the full center column (matches the cards/sections below it),
+   so both the wrapper and its paragraphs drop the prose max-width caps. */
 .home-intro {
-  max-width: 80ch;
+  max-width: none;
   margin-bottom: var(--sp-xl);
   font-size: 0.95rem;
   line-height: 1.8;
+}
+
+.home-intro p,
+.section-intro p,
+.page-intro p,
+.series-intro p {
+  max-width: none;
 }
 
 .home-featured,
@@ -261,7 +270,7 @@
 .section-intro {
   color: var(--bone-dim);
   font-size: 0.9rem;
-  max-width: 80ch;
+  max-width: none;
   margin-bottom: var(--sp-lg);
 }
 
@@ -454,7 +463,7 @@
   font-size: 1.125rem;
   line-height: 1.8;
   color: var(--bone);
-  max-width: 80ch;
+  max-width: none;
 }
 
 .series-empty {

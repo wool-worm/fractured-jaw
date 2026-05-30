@@ -7,18 +7,25 @@
 
 .systems-widget {
   position: fixed;
-  /* Center vertically, then nudge 60px below center so the panel
-     sits well clear of the masthead area at the top of the page. */
-  top: calc(50% + 60px);
+  /* Vertical anchor. The announcements log roughly doubled the panel
+     height; 55% biases it slightly below center so the taller panel sits
+     clear of the masthead while keeping its bottom on-screen. Tuning
+     knob: nudge this %  up/down to taste. */
+  top: 49%;
   left: 1rem;
   transform: translateY(-50%);
-  width: 220px;
+  width: 250px;
   /* min-height keeps the widget visually consistent when content is
      sparse, but lets it grow naturally when extra rows appear: a
      longer author list, the encryption-failure banner, etc. Growth is
      symmetric (centered via translateY(-50%)), so the widget puffs up
-     and down equally around its centered position. */
+     and down equally around its centered position.
+     max-height caps the panel at the viewport so a tall announcements
+     log can't run off-screen; the log (the one flexible section, see
+     below) shrinks to absorb the overflow — including the extra ~1.6rem
+     the encryption-failure ticker adds at the top. */
   min-height: 320px;
+  max-height: calc(100vh - 2rem);
   background: var(--void-soft);
   border: 1px solid var(--brass-deep);
   z-index: 50;
@@ -28,6 +35,14 @@
   display: flex;
   flex-direction: column;
   transition: transform 0.25s ease-out;
+}
+
+/* All sections hold their natural size when the panel hits its max-height;
+   only the announcements log (overridden below) is allowed to shrink, so
+   the antennae / bars / stats / origin race never get squeezed. With no
+   max-height pressure (the common case) this flex-shrink:0 is a no-op. */
+.systems-section {
+  flex-shrink: 0;
 }
 
 /* Folded state: slide left by widget width minus the fold-button
@@ -90,15 +105,26 @@
      content down. */
 }
 
-/* ── Antennae table ─────────────────────────────────────────────────────── */
+/* ── Antennae grid ──────────────────────────────────────────────────────── */
+/* Four bands packed into a single 4-up row (was four stacked rows with dead
+   space between) to reclaim vertical height for the announcements log. Each
+   cell stacks the band name over its state, centered. */
+
+.systems-antennae {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.1rem 0.2rem;
+}
 
 .antenna-row {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  font-size: 0.62rem;
-  line-height: 1.5;
-  letter-spacing: 0.04em;
+  text-align: center;
+  gap: 0.05rem;
+  font-size: 0.6rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
 }
 
 .antenna-name {
@@ -106,10 +132,15 @@
   text-transform: lowercase;
 }
 
+/* Small enough that the longest state ("BROADCASTING", 12 chars) fits one
+   line in a ~55px cell; overflow-wrap is a safety net so an unexpectedly
+   wide glyph run breaks cleanly instead of overflowing into the neighbor. */
 .antenna-state {
-  font-size: 0.58rem;
-  letter-spacing: 0.08em;
+  font-size: 0.46rem;
+  letter-spacing: 0.01em;
   color: var(--bone-dim);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 /* State-specific colors. Switches when systems-widget.js updates
@@ -423,18 +454,122 @@ body.is-encryption-failure .systems-failure-banner {
   font-size: 0.55rem;
 }
 
-/* Auto-fold in the medium-wide zone (1001–1400px) is driven by JS
+/* Auto-fold in the medium-wide zone (1001–1455px) is driven by JS
    (matchMedia) in systems-widget.js — see syncFoldedState(). The JS
    toggles .is-folded so the fold button's state (« vs ») stays in sync
-   with the visual. Click-to-peek works in the auto-fold zone too. */
+   with the visual. Click-to-peek works in the auto-fold zone too.
+   1455 (up from 1400) accounts for the 250px widget width. */
 
-/* ── Hide below 1030px ──────────────────────────────────────────────────── */
-/* Systems hides earlier than graph + radio. Even folded it would still
-   crowd the narrower content column at <1030px, so we remove it entirely
-   here instead of leaving an edge tab. */
+/* ── Hide at/below 820px ────────────────────────────────────────────────── */
+/* All three widgets fold-to-hidden together at 820px (the nav hamburger still
+   takes over lower, at 760px). */
 
-@media (max-width: 1030px) {
+@media (max-width: 820px) {
   .systems-widget {
     display: none;
   }
+}
+
+/* ── Announcements log ──────────────────────────────────────────────────────
+   New last section: an in-world "incoming message" banner over a scrollable
+   reverse-chron terminal log (fed by src/_data/announcements.js). This is the
+   one section allowed to shrink when the panel hits its max-height, so the
+   log absorbs the encryption-failure ticker's extra height instead of pushing
+   the panel off-screen. */
+
+.systems-announcements {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;       /* permit the section to shrink inside the flex column */
+  flex-shrink: 1;      /* override the .systems-section flex-shrink:0 above */
+}
+
+/* "recent messages" banner: static brass header above the announcement log.
+   Was previously a pulsing ichor "incoming message" banner; renamed and
+   restyled 2026-05-30 so it no longer competes visually with the radio
+   widget's pulsing ichor "incoming signal" engage button (which IS a
+   clickable affordance; this label is purely a header). */
+.systems-announce-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  margin-bottom: 0.3rem;
+  padding: 0.15rem 0.35rem;
+  border: 1px solid var(--brass);
+  background: var(--void);
+  color: var(--brass);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  line-height: 1.4;
+}
+
+/* During the encryption-failure window (body.is-encryption-failure), the
+   banner shifts to the same blood-bright accent the failure marquee + the
+   broadcast ticker swap to, so the systems widget stays visually coherent
+   during the alarm rather than leaving a calm brass label sitting under a
+   blaring red marquee. */
+body.is-encryption-failure .systems-announce-banner {
+  border-color: var(--blood-bright);
+  color: var(--blood-bright);
+}
+
+.systems-announce-icon {
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+/* Scroll region: capped on tall screens, shrinks under max-height pressure. */
+.systems-announce-log {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 190px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--brass-deep) var(--void-mid);
+}
+
+.systems-announce-log::-webkit-scrollbar { width: 6px; }
+.systems-announce-log::-webkit-scrollbar-track { background: var(--void-mid); }
+.systems-announce-log::-webkit-scrollbar-thumb { background: var(--brass-deep); }
+
+/* One entry: left column stacks author / date / time (three > lines),
+   right column is the plain-text body. */
+.announce-entry {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.4rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--bone-faint);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.announce-entry:last-child {
+  border-bottom: none;
+}
+
+.announce-meta {
+  display: flex;
+  flex-direction: column;
+  letter-spacing: 0.04em;
+  white-space: nowrap;   /* keep the date on one line; column is sized to fit */
+}
+
+.announce-author { color: var(--brass); }
+.announce-date,
+.announce-time { color: var(--bone-faint); }
+
+.announce-body {
+  color: var(--bone-dim);
+  white-space: pre-wrap;   /* preserve the note's line breaks; no markdown */
+  word-break: break-word;
+}
+
+.announce-empty {
+  color: var(--bone-faint);
+  font-size: 0.55rem;
+  padding: 0.3rem 0;
 }

@@ -1,6 +1,22 @@
 {# Per-page <head> contents — included by base.njk. #}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{# Zen-mode no-flash bootstrap. Sets the `zen` class on <html> synchronously,
+   before first paint, when the per-session zen preference is set. Without
+   this, a zen-session page would paint the full (loud) styling first and
+   only calm down once the deferred /assets/js/zen-toggle.js ran. State is
+   sessionStorage (per-tab, cleared when the session ends) so the full site
+   is always the default on a fresh visit. Must stay inline + render-blocking;
+   cannot be deferred. See zen.css and zen-toggle.js. #}
+<script>
+  (function () {
+    try {
+      if (sessionStorage.getItem("fj.zen") === "1") {
+        document.documentElement.classList.add("zen");
+      }
+    } catch (e) {}
+  })();
+</script>
 <title>{% if title and title != site.title %}{{ title }} :: {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
 <meta name="description" content="{{ description or site.description }}">
 {# HTML5 <meta name="author"> is single-valued. For array authors, join

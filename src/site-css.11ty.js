@@ -35,6 +35,7 @@ const path = require("path");
 //   radio.css      — radio widget styling
 //   systems.css    — system-status widget styling
 //   cult.css       — site-wide aesthetic overrides; must win cascade ties
+//   zen.css        — calm reading mode; scoped under html.zen, must win over cult
 const MODULES = [
   "variables.css",
   "fonts.css",
@@ -47,6 +48,7 @@ const MODULES = [
   "radio.css",
   "systems.css",
   "cult.css",
+  "zen.css",
 ];
 
 const MODULE_DIR = path.join(__dirname, "_css");

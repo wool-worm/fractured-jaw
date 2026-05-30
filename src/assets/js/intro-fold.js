@@ -1,4 +1,4 @@
-// Mobile-only intro folding. At <=760px viewport widths, page-intro
+// Mobile-only intro folding. At <=820px viewport widths, page-intro
 // blocks taller than THRESHOLD_PX are clipped with a gradient fade
 // and an inline "read more / read less" toggle. Above the breakpoint,
 // or for short intros, the JS leaves the markup alone.
@@ -14,7 +14,7 @@
 (function () {
   if (typeof document === "undefined") return;
 
-  var BREAKPOINT_MAX = 760;
+  var BREAKPOINT_MAX = 820;
   var THRESHOLD_PX = 100;
   var SELECTORS = ".home-intro, .section-intro";
 

@@ -77,6 +77,19 @@
   var FJR_BAND = "GAMMA";
   var FJR_INDEX = 0x14;
 
+  // ── Bandcamp embed ──────────────────────────────────────────────────────
+  // Constants for the Bandcamp player composed from /radio-music.json IDs.
+  // The emitter only emits the album / track ID; the URL is composed here so
+  // style iteration (size, colors, scale) stays in one place. CSS scale + a
+  // matching wrapper height let us shrink the player proportionally without
+  // its contents spilling. Height/scale derived from the Phase 0 spike.
+  var BANDCAMP_EMBED_HEIGHT = 120;
+  var BANDCAMP_EMBED_SCALE = 0.80;
+  // bgcol=333333: Bandcamp only accepts certain background hex values, and
+  // this is one of them. Closer to --void than the default light grey.
+  var BANDCAMP_EMBED_PARAMS =
+    "size=large/artwork=none/tracklist=false/minimal=true/bgcol=333333/linkcol=ffaa33";
+
   // State.
   var powered = false;
   var currentBand = "ALPHA";
@@ -84,6 +97,41 @@
   var trawling = false;
   var trawlTimer = null;
   var folded = false;
+
+  // Bandcamp music data + (band,freq) -> station lookup, populated by
+  // loadRadioMusic() at boot. Until the fetch settles, musicStationMap is
+  // empty so signalAt falls back to the hash roll for all coords; the
+  // 20 pre-assigned bandcamp slots stay carrier_wave on early frames, then
+  // flip to "bandcamp" once the fetch lands. After settle, an unpopulated
+  // slot (no entry in the JSON) also stays carrier_wave via the same path.
+  var musicStations = null;
+  var musicLoading = null;
+  var musicStationMap = {};
+
+  // User-gesture tracking for voice engines. Web Audio engines effectively
+  // wait for a gesture via audioCtx.state === "suspended" -> silent until
+  // resume; voice engines (speechSynthesis) have no equivalent, so without
+  // gating, a restored powered=true page would auto-speak immediately,
+  // bleeding the previous page's TTS into the new one. Each voice engine's
+  // speakNext bails if !hasGestured and re-registers via whenGestured;
+  // setupListeners wires a one-shot click/keydown/touch listener that flips
+  // the flag and drains the waiters.
+  var hasGestured = false;
+  var gestureWaiters = [];
+
+  function noteGesture() {
+    if (hasGestured) return;
+    hasGestured = true;
+    while (gestureWaiters.length) {
+      var fn = gestureWaiters.shift();
+      try { fn(); } catch (e) {}
+    }
+  }
+
+  function whenGestured(fn) {
+    if (hasGestured) { try { fn(); } catch (e) {} return; }
+    gestureWaiters.push(fn);
+  }
 
   // Trawl pacing. Steps quickly through static, pauses longer on any
   // channel with actual content so the user can hear what they've found.
@@ -108,6 +156,10 @@
     // weight distribution. Whatever signal the hash roll would have
     // chosen for this channel gets replaced.
     if (band === FJR_BAND && index === FJR_INDEX) return "fractured_jaw";
+    // Populated bandcamp stations override their carrier_wave assignment.
+    // An unpopulated slot is absent from musicStationMap and falls through
+    // to the hash roll (which already assigned it carrier_wave).
+    if (musicStationMap[band + ":" + index]) return "bandcamp";
     var roll = hash(band + ":" + index) % 100;
     var acc = 0;
     for (var i = 0; i < SIGNAL_TYPES.length; i++) {
@@ -190,6 +242,10 @@
         case "fractured_jaw":
           tickHeight = 16; // tallest — flagship station
           color = "#9b3ab8"; // --ichor-bright — the only FJR channel
+          break;
+        case "bandcamp":
+          tickHeight = 14;
+          color = "#98BDE6"; // high-contrast cyan-blue, jumps out from the dial
           break;
         case "dead_air":
         default:
@@ -368,9 +424,9 @@
     setResumePromptVisible(true);
 
     function onGesture() {
-      document.removeEventListener("click", onGesture);
-      document.removeEventListener("keydown", onGesture);
-      document.removeEventListener("touchstart", onGesture);
+      shell.removeEventListener("click", onGesture);
+      shell.removeEventListener("keydown", onGesture);
+      shell.removeEventListener("touchstart", onGesture);
       setResumePromptVisible(false);
       // Re-run applyAudio inside the user-activated context. Just
       // calling audioCtx.resume() isn't enough — in some browsers
@@ -383,11 +439,36 @@
       // (oscillators, drone voices, or a new speechSynthesis chain)
       // plays as expected. This is the same path a widget click
       // would take, which is why those have always worked.
-      if (powered) applyAudio();
+      //
+      // EXCEPTION: all voice signal types (anything that uses
+      // speechSynthesis, plus bandcamp's iframe-based audio). The
+      // whenGestured waiter set on speakNext already fires its own
+      // speech on this same gesture click; if we also recreate the
+      // engine here, the new engine's cancel() + speak() races with
+      // the in-flight utterance and Chrome's speak-after-cancel can
+      // swallow it entirely. None of these engines need the Web Audio
+      // context resumed, so skipping applyAudio is safe. For bandcamp
+      // specifically, recreating would also tear down the engaged
+      // state if the same click engaged the embed (was the original
+      // 2-click bug). Web Audio engines (carrier_wave, pirate_signal,
+      // dead_air) DO need the recreate because their oscillators were
+      // scheduled while the context was suspended.
+      if (powered) {
+        var sig = signalAt(currentBand, currentIndex);
+        var isVoice =
+          sig === "bandcamp" || sig === "numbers" || sig === "lock" ||
+          sig === "compromised" || sig === "haunted" || sig === "fractured_jaw";
+        if (!isVoice) applyAudio();
+      }
     }
-    document.addEventListener("click", onGesture);
-    document.addEventListener("keydown", onGesture);
-    document.addEventListener("touchstart", onGesture);
+    // Scoped to the widget shell, not document: resuming the radio should
+    // feel intentional (a click on the widget itself) rather than any
+    // stray click anywhere on the page. Keydown still works when the dial
+    // (or any widget control) is focused; touches outside the widget no
+    // longer count.
+    shell.addEventListener("click", onGesture);
+    shell.addEventListener("keydown", onGesture);
+    shell.addEventListener("touchstart", onGesture);
   }
 
   function scheduleNextTrawl() {
@@ -453,14 +534,13 @@
     saveFoldedState();
   }
 
-  // Auto-fold viewport range. While the viewport is in this range the
-  // widget is forced folded regardless of the localStorage preference,
-  // because at narrow desktop / tablet widths the unfolded panel
-  // overlaps the main column. Outside the range, the widget falls back
-  // to the user's stored choice. matchMedia gives us instant change
-  // events so we don't need a resize listener.
+  // Auto-fold viewport range. Folds at the 1280px handoff alongside the
+  // systems widget: below 1280 the content column unfreezes and slides left
+  // into the widgets, so all three fold together. While in range the widget is
+  // forced folded regardless of the stored preference; outside it, it falls
+  // back to the user's stored choice. matchMedia gives us instant change events.
   var AUTOFOLD_MQ = window.matchMedia(
-    "(max-width: 1100px) and (min-width: 721px)"
+    "(max-width: 1279px) and (min-width: 821px)"
   );
 
   function targetFoldState() {
@@ -1043,6 +1123,39 @@
     return fjrLoading;
   }
 
+  // ── Bandcamp music (radio-widget data source) ───────────────────────────
+  // Populates musicStationMap from /radio-music.json. The emitter writes only
+  // POPULATED entries (a station with a bandcamp_album_id), so any coord
+  // absent from the map stays carrier_wave via signalAt's hash fall-through.
+  // On settle, re-evaluates the current channel: if the listener landed on a
+  // bandcamp coord before the fetch finished, the dial briefly showed
+  // carrier_wave; now we flip it to bandcamp.
+  function loadRadioMusic() {
+    if (musicStations) return Promise.resolve(musicStations);
+    if (musicLoading) return musicLoading;
+    if (typeof fetch !== "function") {
+      musicStations = [];
+      return Promise.resolve(musicStations);
+    }
+    musicLoading = fetch("/radio-music.json")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        musicStations = (data && data.stations) || [];
+        musicStationMap = {};
+        for (var i = 0; i < musicStations.length; i++) {
+          var s = musicStations[i];
+          if (!s.station_band || s.station_freq == null) continue;
+          musicStationMap[s.station_band + ":" + s.station_freq] = s;
+        }
+        updateReadout();
+        draw();
+        if (powered) applyAudio();
+        return musicStations;
+      })
+      .catch(function () { musicStations = []; return musicStations; });
+    return musicLoading;
+  }
+
   // ── Voice engine: numbers ───────────────────────────────────────────────
   // Pre-generates a deterministic playlist of 30 random 5-digit groups,
   // speaks them with ~1.2s gaps, loops forever. Playlist is fixed per
@@ -1068,6 +1181,10 @@
 
     function speakNext() {
       if (!alive) return;
+      if (!hasGestured) {
+        whenGestured(function () { if (alive) speakNext(); });
+        return;
+      }
       if (!voice) voice = pickVoice("numbers", channelKey);
       var u = new SpeechSynthesisUtterance(digitsToWords(groups[idx]));
       configureUtterance(u, "numbers", voice);
@@ -1114,6 +1231,10 @@
 
     function speakNext() {
       if (!alive || !groups || !groups.length) return;
+      if (!hasGestured) {
+        whenGestured(function () { if (alive) speakNext(); });
+        return;
+      }
       if (!voice) voice = pickVoice("lock", channelKey);
       var u = new SpeechSynthesisUtterance(digitsToWords(groups[idx]));
       configureUtterance(u, "lock", voice);
@@ -1364,6 +1485,10 @@
 
     function speakNext() {
       if (!alive) return;
+      if (!hasGestured) {
+        whenGestured(function () { if (alive) speakNext(); });
+        return;
+      }
       if (!voice) voice = pickVoice("compromised", channelKey);
       // 25% chance of glitching per repetition. When it fires, weighted
       // pick among three variants:
@@ -1444,6 +1569,10 @@
 
     function speakNext() {
       if (!alive) return;
+      if (!hasGestured) {
+        whenGestured(function () { if (alive) speakNext(); });
+        return;
+      }
       if (!voice) voice = pickVoice("haunted", channelKey);
       var doGlitch = glitchRng() < 0.40;
       var parts;
@@ -1498,6 +1627,10 @@
 
     function speakNext() {
       if (!alive || !segments || !segments.length) return;
+      if (!hasGestured) {
+        whenGestured(function () { if (alive) speakNext(); });
+        return;
+      }
       if (!voice) voice = pickVoice("fractured_jaw", channelKey);
       var u = new SpeechSynthesisUtterance(segments[idx]);
       configureUtterance(u, "fractured_jaw", voice);
@@ -1534,6 +1667,147 @@
     };
   }
 
+  // ── Bandcamp engine ─────────────────────────────────────────────────────
+  // Not really a Web Audio engine: the iframe owns its own audio. We insert
+  // the player into the embed slot in the widget's status area on tune-in
+  // and tear it down on stop. Removing the iframe (innerHTML = "") cuts its
+  // audio, which is exactly what we want on tune-away.
+  //
+  // Lazy-insertion is the privacy mitigation we wired into the design: the
+  // cross-origin Bandcamp connection only opens when the listener actually
+  // tunes here, never on page load.
+  //
+  // Phase 1b (this): tune-in shows the ALERT state (red ticker at the top
+  // of the widget, looping TTS at compromised rate/pitch, and a pulsing
+  // ichor "incoming signal" button in the status area). Clicking the
+  // button transitions to the ENGAGED state: alert clears, the iframe
+  // lazy-inserts (cross-origin connection opens only on this click, the
+  // privacy mitigation we wired into the design), and the listener presses
+  // Bandcamp's own play button. Tune-away in either state calls stop()
+  // which tears everything down: kill TTS, hide ticker, hide button,
+  // remove iframe, restore the status text.
+
+  function buildBandcampEmbedURL(station) {
+    var idPart = station.bandcamp_track_id
+      ? "track=" + station.bandcamp_track_id
+      : "album=" + station.bandcamp_album_id;
+    return "https://bandcamp.com/EmbeddedPlayer/" +
+      idPart + "/" + BANDCAMP_EMBED_PARAMS + "/";
+  }
+
+  function buildBandcampEmbedHTML(station) {
+    var url = buildBandcampEmbedURL(station);
+    var wrapperHeight = Math.round(BANDCAMP_EMBED_HEIGHT * BANDCAMP_EMBED_SCALE);
+    var iframeWidth = Math.round((100 / BANDCAMP_EMBED_SCALE) * 100) / 100;
+    return '<div style="height:' + wrapperHeight +
+      'px;overflow:hidden;margin-top:0.3rem;">' +
+      '<iframe style="border:0;display:block;width:' + iframeWidth +
+      '%;height:' + BANDCAMP_EMBED_HEIGHT + 'px;transform:scale(' +
+      BANDCAMP_EMBED_SCALE + ');transform-origin:top left;" src="' + url +
+      '" seamless loading="lazy" title="Bandcamp player"></iframe></div>';
+  }
+
+  function createBandcampEngine(channelKey) {
+    var station = musicStationMap[channelKey];
+    if (!station) return createSilentEngine();
+
+    var ticker = document.getElementById("radio-widget-ticker");
+    var engageBtn = document.getElementById("radio-widget-engage");
+    var slot = document.getElementById("radio-widget-embed");
+    var reviewLink = document.getElementById("radio-widget-review");
+    var alive = true;
+    var ttsPending = null;
+    var clickHandler = null;
+
+    // Alert state: show ticker + pulsing engage button, hide the normal
+    // status text. NO iframe yet; the cross-origin connection waits for
+    // the explicit click.
+    if (ticker) ticker.hidden = false;
+    if (statusEl) statusEl.hidden = true;
+    if (engageBtn) {
+      engageBtn.hidden = false;
+      clickHandler = function () {
+        // Transition to engaged: kill the TTS loop + alert chrome, insert the
+        // iframe. `alive = false` here is what actually stops the loop: cancel()
+        // alone races with the in-flight utterance's onend, which would
+        // otherwise re-schedule speakNext on the alive=true check. Setting
+        // alive=false first makes the onend check fail and the loop ends.
+        alive = false;
+        stopTTS();
+        if (ticker) ticker.hidden = true;
+        if (engageBtn) engageBtn.hidden = true;
+        if (slot) {
+          slot.innerHTML = buildBandcampEmbedHTML(station);
+          slot.hidden = false;
+        }
+        // Surface the review link if the emitter resolved one for this
+        // station. station.review is { url, alias } or null (the emitter
+        // returns null for dead, excluded, or draft-in-prod targets).
+        if (reviewLink && station.review && station.review.url) {
+          reviewLink.setAttribute("href", station.review.url);
+          reviewLink.hidden = false;
+        }
+      };
+      engageBtn.addEventListener("click", clickHandler);
+    }
+
+    // Looping TTS at compromised role (slow + low). The script is the
+    // per-album tts_readout from the data; falls back to a generic line if
+    // empty. Looping ends naturally when the listener engages (clickHandler
+    // calls stopTTS) or tunes away (stop() calls stopTTS); the alive flag
+    // prevents stale onend callbacks from resurrecting a stopped loop.
+    var script = (station.tts_readout || "incoming organic signal").trim();
+    var voice = pickVoice("compromised", channelKey);
+
+    function speakNext() {
+      if (!alive || !hasSpeech() || !script) return;
+      if (!hasGestured) {
+        whenGestured(function () { if (alive) speakNext(); });
+        return;
+      }
+      if (!voice) voice = pickVoice("compromised", channelKey);
+      var u = new SpeechSynthesisUtterance(script);
+      configureUtterance(u, "compromised", voice);
+      u.onend = function () {
+        if (!alive) return;
+        ttsPending = setTimeout(speakNext, 2500);
+      };
+      u.onerror = function () {
+        if (!alive) return;
+        ttsPending = setTimeout(speakNext, 3000);
+      };
+      try { window.speechSynthesis.speak(u); } catch (e) {}
+    }
+
+    function stopTTS() {
+      if (ttsPending) { clearTimeout(ttsPending); ttsPending = null; }
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+    }
+
+    if (hasSpeech()) speakNext();
+
+    return {
+      stop: function () {
+        alive = false;
+        stopTTS();
+        if (ticker) ticker.hidden = true;
+        if (engageBtn) {
+          engageBtn.hidden = true;
+          if (clickHandler) engageBtn.removeEventListener("click", clickHandler);
+        }
+        if (slot) {
+          slot.innerHTML = "";
+          slot.hidden = true;
+        }
+        if (reviewLink) {
+          reviewLink.hidden = true;
+          reviewLink.removeAttribute("href");
+        }
+        if (statusEl) statusEl.hidden = false;
+      }
+    };
+  }
+
   function applyAudio() {
     if (!powered) {
       if (currentEngine) {
@@ -1559,6 +1833,9 @@
     var sig = signalAt(currentBand, currentIndex);
     var key = currentBand + ":" + currentIndex;
     switch (sig) {
+      case "bandcamp":
+        currentEngine = createBandcampEngine(key);
+        break;
       case "carrier_wave":
         currentEngine = createCarrierWaveEngine(key);
         break;
@@ -1651,6 +1928,57 @@
     window.addEventListener("resize", function () {
       resize();
       draw();
+    });
+
+    // Cancel any in-flight speech on page unload. Voice engines (including
+    // the bandcamp alert TTS) speak via the browser-level speechSynthesis
+    // API, which is not bound to the page's JS context; without an explicit
+    // cancel here, an utterance still queued or speaking when the listener
+    // clicks a nav link can carry over into the next page load. `pagehide`
+    // fires for both navigation and bfcache stash; we only care about the
+    // navigation case but the cancel is safe to call either way.
+    window.addEventListener("pagehide", function () {
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+    });
+
+    // First user gesture on the widget: drain whenGestured waiters so any
+    // voice engine that booted before the listener interacted gets to start
+    // speaking. Scoped to the widget shell (not document) so that resuming
+    // broadcasts requires an intentional click ON the radio; clicking
+    // elsewhere on the page won't auto-start TTS. The pagehide cancel above
+    // only stops the previous page's speech; without this gate, the new
+    // page's voice engine would still auto-speak on creation and the
+    // listener would perceive continuous TTS across navigation.
+    function noteGestureOnce() {
+      shell.removeEventListener("click", noteGestureOnce);
+      shell.removeEventListener("keydown", noteGestureOnce);
+      shell.removeEventListener("touchstart", noteGestureOnce);
+      noteGesture();
+    }
+    shell.addEventListener("click", noteGestureOnce);
+    shell.addEventListener("keydown", noteGestureOnce);
+    shell.addEventListener("touchstart", noteGestureOnce);
+
+    // Zen mode hides this widget (zen.css). Dispatched by zen-toggle.js,
+    // which toggles the html.zen class BEFORE firing this event, so by the
+    // time we run the widget's display state already matches the new mode.
+    document.addEventListener("fj:zenchange", function (e) {
+      if (!e.detail) return;
+      if (e.detail.zen) {
+        // Entering zen: the radio is about to be hidden, so power off or its
+        // audio would keep playing with no visible control. setPowered no-ops
+        // when already off, so this is safe regardless of current state.
+        setPowered(false);
+      } else {
+        // Leaving zen re-shows the widget. If this page first loaded while in
+        // zen, boot()'s resize() ran with the widget display:none, sizing the
+        // dial canvas to clientWidth 0 (a 0x0 backing store that renders as a
+        // broken block). The class is already gone, so the canvas is
+        // measurable again: re-measure and redraw. No-op visual cost when the
+        // canvas was already sized correctly.
+        resize();
+        draw();
+      }
     });
   }
 
@@ -1840,6 +2168,7 @@
     loadCompromised();
     loadHaunted();
     loadFracturedJaw();
+    loadRadioMusic();
     initTicker();
   }
 

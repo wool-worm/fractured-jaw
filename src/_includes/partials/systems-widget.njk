@@ -103,4 +103,33 @@
       {# Populated by systems-widget.js after fetching /system-status.json. #}
     </div>
   </div>
+
+  {# Announcements: an in-world "incoming message" banner over a scrollable
+     reverse-chron terminal log, fed by the `announcements` global
+     (src/_data/announcements.js, reading src/content/_announcements/).
+     Server-rendered — no runtime fetch. The log is the widget's flexible
+     scroll region (see systems.css): it shrinks so the panel stays on-screen
+     when the encryption-failure ticker adds height at the top. #}
+  <div class="systems-section systems-announcements">
+    <div class="systems-announce-banner" aria-hidden="true">
+      <span class="systems-announce-icon">✉&#xFE0E;</span>
+      <span class="systems-announce-label">recent messages</span>
+    </div>
+    <div class="systems-announce-log">
+      {% if announcements and announcements.length %}
+        {% for ann in announcements %}
+          <div class="announce-entry">
+            <div class="announce-meta">
+              <span class="announce-author">&gt; {{ ann.author }}</span>
+              <span class="announce-date">&gt; {{ ann.dateDisplay }}</span>
+              <span class="announce-time">&gt; {{ ann.timeDisplay }}</span>
+            </div>
+            <div class="announce-body">{{ ann.body }}</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="announce-empty">&gt; no transmissions logged</div>
+      {% endif %}
+    </div>
+  </div>
 </aside>
