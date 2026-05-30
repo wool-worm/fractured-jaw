@@ -1,9 +1,4 @@
----
-title: fractured-jaw-radio
-date_published: 2026-05-16T14:53:06
-date_updated: 2026-05-16T15:16:18
----
-This is Fractured Jaw Radio. You are tuned to the only signal still operating on this band. Transmissions resume hourly. Stand by.
+This is Fractured Jaw Radio. You are tuned to the only human signal still operating in this frequency range. Transmissions resume hourly. Stand by.
 
 ---
 
