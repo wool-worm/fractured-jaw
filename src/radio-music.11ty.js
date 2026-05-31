@@ -162,7 +162,12 @@ function mapFromAlbumNote(pointer, albumFm) {
     genre: albumFm.genre || "",
     subgenre: Array.isArray(albumFm.subgenre) ? albumFm.subgenre.slice() : [],
     tts_readout: albumFm.tts_readout || "",
-    review: resolveReviewLink(pointer.review_link),
+    // review_link normally lives on the album note (single source of
+    // truth: a review belongs to the album, not the dial slot). Station
+    // pointer may still override per-station for the rare case where
+    // the radio should link somewhere other than the album's canonical
+    // review.
+    review: resolveReviewLink(pointer.review_link || albumFm.review_link),
     station_band: pointer.band != null ? pointer.band : pointer.station_band,
     station_freq: pointer.frequency != null ? pointer.frequency : pointer.station_freq,
   };

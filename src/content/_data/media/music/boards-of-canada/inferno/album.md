@@ -18,5 +18,6 @@ compilation: false
 cover_image:
 discogs_master_id:
 discogs_release_id:
+review_link:
 tts_readout: Incoming organic signal detected... sender... boards of canada... subject... inferno... click below to decrypt...
 ---

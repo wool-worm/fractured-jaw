@@ -18,5 +18,6 @@ compilation: false
 cover_image:
 discogs_master_id:
 discogs_release_id:
+review_link:
 tts_readout: Incoming organic signal detected... sender... komodo... subject... uninvited chokehold... click below to decrypt...
 ---

@@ -20,5 +20,6 @@ compilation: false
 cover_image:
 discogs_master_id:
 discogs_release_id:
+review_link:
 tts_readout: Incoming organic signal detected... sender... yawn yellinick... subject... loop finding jazz records... click below to decrypt...
 ---
