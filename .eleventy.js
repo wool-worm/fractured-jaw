@@ -23,6 +23,7 @@ const {
   indexAuthorsByUrl,
 } = require("./src/utils/authors");
 const { reportIssue, flush: flushBuildReport } = require("./src/utils/build-report");
+const { buildBandcampEmbed } = require("./src/assets/js/bandcamp-embed");
 
 const CONTENT_ROOT = "src/content";
 const SERIES_GLOB = "src/content/series/**/*.md";
@@ -81,6 +82,36 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addShortcode("currentYear", () =>
     DateTime.now().toFormat("yyyy")
   );
+
+  // Bandcamp inline embed. Two call shapes:
+  //   {% bandcamp "450473414" %}                          → album, default preset
+  //   {% bandcamp "450473414", "slim" %}                  → album, named preset
+  //   {% bandcamp { track: "12345", preset: "slim" } %}   → track id, object form
+  // Default preset is big-art-tracks (full player with artwork + tracklist),
+  // suitable for a feature embed at the top of a review. Authors switch to
+  // "slim" for inline track references inside body prose. Builder/preset
+  // definitions live in src/assets/js/bandcamp-embed.js (shared with the
+  // radio widget).
+  eleventyConfig.addShortcode("bandcamp", function (idOrOpts, maybePreset) {
+    var opts;
+    if (typeof idOrOpts === "string") {
+      opts = { album: idOrOpts };
+      if (typeof maybePreset === "string") opts.preset = maybePreset;
+    } else {
+      opts = idOrOpts || {};
+    }
+    var id = opts.album || opts.track;
+    if (!id || !/^\d+$/.test(String(id))) {
+      throw new Error(
+        "bandcamp shortcode: album or track id must be a numeric string (got " +
+        JSON.stringify(id) + ")"
+      );
+    }
+    var embed = buildBandcampEmbed(opts);
+    return '<iframe class="bandcamp-embed-inline" src="' + embed.src +
+      '" height="' + embed.height + '" width="100%" style="border:0;"' +
+      ' seamless loading="lazy" title="Bandcamp player"></iframe>';
+  });
 
   // ---------- Responsive image transform plugin ----------
   //

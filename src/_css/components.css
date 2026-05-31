@@ -995,3 +995,16 @@ body.search-modal-open {
 .feed-link-icon {
   display: block;
 }
+
+/* ── Bandcamp inline embed ───────────────────────────────────────────────── */
+/* Used by the {% bandcamp %} shortcode. Width is the column; height is set
+   per preset as an inline attribute by the shortcode (Bandcamp expects fixed
+   pixel heights and the wizard varies them by variant). The radio widget
+   has its own scaled wrapper for its compact "radio" preset; this rule
+   only covers reviews and other body-flow embeds. */
+.bandcamp-embed-inline {
+  display: block;
+  width: 100%;
+  margin: var(--sp-md) 0;
+  border: 0;
+}

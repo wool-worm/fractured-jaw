@@ -33,6 +33,10 @@
   {# Pirate-radio tuner widget — bottom-right corner, every page.
      No dedicated full-page view (unlike the graph), so no suppression. #}
   {% include "partials/radio-widget.njk" %}
+  {# bandcamp-embed.js defines window.FJ.bandcampEmbed; loaded before
+     radio-widget.js so the widget can call into it. defer preserves
+     document order, so this script runs first. #}
+  <script src="/assets/js/bandcamp-embed.js" defer></script>
   <script src="/assets/js/radio-widget.js" defer></script>
   {# Systems-status panel — left-center, every page. Counterweight
      to the graph (top-right) and radio (bottom-right) widgets. #}
