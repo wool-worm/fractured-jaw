@@ -24,6 +24,9 @@ const {
 } = require("./src/utils/authors");
 const { reportIssue, flush: flushBuildReport } = require("./src/utils/build-report");
 const { buildBandcampEmbed } = require("./src/assets/js/bandcamp-embed");
+const { resolveAlbumLink, isWikilinkString } = require("./src/utils/album-note");
+const pathModule = require("path");
+const CONTENT_ROOT_ABS = pathModule.join(__dirname, "src", "content");
 
 const CONTENT_ROOT = "src/content";
 const SERIES_GLOB = "src/content/series/**/*.md";
@@ -83,15 +86,20 @@ module.exports = function (eleventyConfig) {
     DateTime.now().toFormat("yyyy")
   );
 
-  // Bandcamp inline embed. Two call shapes:
-  //   {% bandcamp "450473414" %}                          → album, default preset
-  //   {% bandcamp "450473414", "slim" %}                  → album, named preset
+  // Bandcamp inline embed. Call shapes:
+  //   {% bandcamp "450473414" %}                          → album id, default preset
+  //   {% bandcamp "450473414", "slim" %}                  → album id, named preset
   //   {% bandcamp { track: "12345", preset: "slim" } %}   → track id, object form
+  //   {% bandcamp "[[_data/media/music/<artist>/<album>/album]]" %}   → wikilink
+  //   {% bandcamp "[[_data/media/music/.../album]]", "slim" %}
   // Default preset is big-art-tracks (full player with artwork + tracklist),
   // suitable for a feature embed at the top of a review. Authors switch to
-  // "slim" for inline track references inside body prose. Builder/preset
-  // definitions live in src/assets/js/bandcamp-embed.js (shared with the
-  // radio widget).
+  // "slim" for inline track references inside body prose. Wikilink form
+  // resolves to the album note's frontmatter at build time and uses its
+  // bandcamp_track_id (preferred when set) or bandcamp_album_id. Builder /
+  // preset definitions live in src/assets/js/bandcamp-embed.js (shared with
+  // the radio widget); wikilink resolution lives in src/utils/album-note.js
+  // (shared with the radio emitter).
   eleventyConfig.addShortcode("bandcamp", function (idOrOpts, maybePreset) {
     var opts;
     if (typeof idOrOpts === "string") {
@@ -100,6 +108,25 @@ module.exports = function (eleventyConfig) {
     } else {
       opts = idOrOpts || {};
     }
+
+    // Wikilink form: resolve the album note and replace the id field with
+    // the actual numeric id from the note's frontmatter. Track id wins when
+    // both are set on the note (more specific embed).
+    var rawValue = opts.album || opts.track;
+    if (typeof rawValue === "string" && isWikilinkString(rawValue)) {
+      var hostFile = (this.page && this.page.inputPath) || "(bandcamp shortcode call)";
+      var resolved = resolveAlbumLink(rawValue, hostFile, CONTENT_ROOT_ABS);
+      if (!resolved) return "";  // reportIssue already called; emit nothing
+      var fm = resolved.frontmatter;
+      if (fm.bandcamp_track_id) {
+        opts.track = String(fm.bandcamp_track_id);
+        delete opts.album;
+      } else {
+        opts.album = String(fm.bandcamp_album_id);
+        delete opts.track;
+      }
+    }
+
     var id = opts.album || opts.track;
     if (!id || !/^\d+$/.test(String(id))) {
       throw new Error(
