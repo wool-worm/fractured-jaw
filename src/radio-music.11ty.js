@@ -161,7 +161,9 @@ function mapFromAlbumNote(pointer, albumFm) {
     date_updated: normalizeDate(albumFm.date_updated),
     genre: albumFm.genre || "",
     subgenre: Array.isArray(albumFm.subgenre) ? albumFm.subgenre.slice() : [],
-    tts_readout: albumFm.tts_readout || "",
+    // tts_readout lives on the station pointer (it's radio metadata —
+    // a phonetic readout only matters when this album is on the dial).
+    tts_readout: pointer.tts_readout || "",
     // review_link normally lives on the album note (single source of
     // truth: a review belongs to the album, not the dial slot). Station
     // pointer may still override per-station for the rare case where

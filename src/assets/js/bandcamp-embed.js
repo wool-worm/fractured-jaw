@@ -50,7 +50,7 @@
     if (!opts.album && !opts.track) {
       throw new Error("buildBandcampEmbed: album or track id is required");
     }
-    var presetName = opts.preset || "big-art-tracks";
+    var presetName = opts.preset || "small-art-tracks";
     var preset = PRESETS[presetName];
     if (!preset) {
       throw new Error('buildBandcampEmbed: unknown preset "' + presetName + '"');

@@ -19,5 +19,4 @@ cover_image:
 discogs_master_id:
 discogs_release_id:
 review_link:
-tts_readout: Incoming organic signal detected... sender... blood incantation... subject... absolute elsewhere... click below to decrypt...
 ---

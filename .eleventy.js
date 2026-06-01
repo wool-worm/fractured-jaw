@@ -135,9 +135,18 @@ module.exports = function (eleventyConfig) {
       );
     }
     var embed = buildBandcampEmbed(opts);
+    // Width override: when opts.width is set, constrain the iframe via a
+    // max-width inline style (the actual width still scales down on
+    // narrower viewports). Without it, the iframe takes the full column.
+    // Height override (opts.height) wins over the preset's natural height
+    // when Bandcamp's content needs more vertical room than the preset
+    // default (e.g. a long tracklist).
+    var height = opts.height || embed.height;
+    var widthAttr = opts.width ? ' width="' + opts.width + '"' : ' width="100%"';
+    var style = 'border:0;' + (opts.width ? 'max-width:' + opts.width + 'px;' : '');
     return '<iframe class="bandcamp-embed-inline" src="' + embed.src +
-      '" height="' + embed.height + '" width="100%" style="border:0;"' +
-      ' seamless loading="lazy" title="Bandcamp player"></iframe>';
+      '" height="' + height + '"' + widthAttr +
+      ' style="' + style + '" seamless loading="lazy" title="Bandcamp player"></iframe>';
   });
 
   // ---------- Responsive image transform plugin ----------

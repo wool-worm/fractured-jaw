@@ -4,43 +4,59 @@ stations:
   - band: ALPHA
     frequency: 6
     album: "[[_data/media/music/skee-mask/compro/album]]"
+    tts_readout: Incoming organic signal detected... sender... Ski Mask... subject... Com pro... click below to decrypt...
   - band: ALPHA
     frequency: 18
     album: "[[_data/media/music/boards-of-canada/inferno/album]]"
+    tts_readout: Incoming organic signal detected... sender... boards of canada... subject... inferno... click below to decrypt...
   - band: ALPHA
     frequency: 28
     album: "[[_data/media/music/blood-incantation/absolute-elsewhere/album]]"
+    tts_readout: Incoming organic signal detected... sender... blood incantation... subject... absolute elsewhere... click below to decrypt...
   - band: ALPHA
     frequency: 35
     album: "[[_data/media/music/oklou/choke-enough/album]]"
+    tts_readout: Incoming organic signal detected... sender... ok lou... subject... choke enough... click below to decrypt...
   - band: ALPHA
     frequency: 61
     album: "[[_data/media/music/otto-taimela/uncommon-fragile/album]]"
+    tts_readout: Incoming organic signal detected... sender... otto tiemeala... subject... uncommon and fragile... click below to decrypt...
 
   # ── BETA ───────────────────────────────────────────────────────────────
   - band: BETA
     frequency: 1
     album: "[[_data/media/music/body-boys/growth-window/album]]"
+    tts_readout: Incoming organic signal detected... sender... body boys... subject... growth window... click below to decrypt...
   - band: BETA
     frequency: 17
     album: "[[_data/media/music/giant-claw/decadent-stress-chamber/album]]"
+    tts_readout: Incoming organic signal detected... sender... giant claw... subject... decadent stress chamber... click below to decrypt...
   - band: BETA
     frequency: 30
     album: "[[_data/media/music/jan-jelinek/loop-finding-jazz-records/album]]"
+    tts_readout: Incoming organic signal detected... sender... yawn yellinick... subject... loop finding jazz records... click below to decrypt...
   - band: BETA
     frequency: 55
     album: "[[_data/media/music/celine-dessberg/selenge-chintamani/album]]"
+    tts_readout: Incoming organic signal detected... sender... celine dessberg... click below to decrypt...
   - band: BETA
     frequency: 62
     album: "[[_data/media/music/commodo/uninvited-chokehold/album]]"
+    tts_readout: Incoming organic signal detected... sender... komodo... subject... uninvited chokehold... click below to decrypt...
 
   # ── GAMMA ──────────────────────────────────────────────────────────────
   - band: GAMMA
     frequency: 6
+    album: "[[_data/media/music/skee-mask/itlp09-pool/album]]"
+    tts_readout: Incoming organic signal detected... sender... Skee Mask... subject... ITLP09 - Pool... click below to decrypt...
   - band: GAMMA
     frequency: 14
+    album: "[[_data/media/music/joel-lyssarides/late-on-earth/album]]"
+    tts_readout: Incoming organic signal detected... sender... Joel Liss saridees... subject... Late on Earth... click below to decrypt...
   - band: GAMMA
     frequency: 29
+    album: "[[_data/media/music/giant-swan/giant-swan/album]]"
+    tts_readout: Incoming organic signal detected... sender... Giant Swan... subject... Unknown... click below to decrypt...
   - band: GAMMA
     frequency: 41
   - band: GAMMA
