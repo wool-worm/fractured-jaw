@@ -103,7 +103,10 @@ for (const s of stations) {
   const artists = Array.isArray(page.artists) && page.artists.length
     ? page.artists.join(", ")
     : "?";
-  rows.push([coord, artists, page.file.link, page.source || "?"]);
+  // Use album_name from frontmatter as the link display text. Without
+  // this override, every link reads "album" (the literal filename).
+  const albumLink = dv.fileLink(page.file.path, false, page.album_name || page.file.name);
+  rows.push([coord, artists, albumLink, page.source || "?"]);
 }
 
 rows.sort((a, b) => {
