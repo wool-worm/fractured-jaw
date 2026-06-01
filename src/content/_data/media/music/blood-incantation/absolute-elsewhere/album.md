@@ -3,9 +3,10 @@ artists:
   - Blood Incantation
 album_name: Absolute Elsewhere
 track_name:
-bandcamp_album_id: 1836947161
-bandcamp_track_id:
-bandcamp_url:
+source: bandcamp
+album_id: 1836947161
+track_id:
+source_url:
 label: Century Media Records
 date_released: 2024-10-04
 date_updated: 2026-05-30

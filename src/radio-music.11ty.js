@@ -149,14 +149,22 @@ function resolveReviewLink(raw) {
 // Builds the widget-ready station record from a parsed album-note
 // frontmatter plus the station-pointer's own fields (coord + optional
 // review_link override).
+//
+// Note on field naming: the album-note schema uses unified `album_id` /
+// `track_id` (with a `source: bandcamp|spotify` discriminator). The radio
+// widget's JSON contract, however, still uses `bandcamp_album_id` /
+// `bandcamp_track_id` field names — that's because the widget only ever
+// plays Bandcamp (the radio is Bandcamp-only by design), so the name in
+// the output is more specific and self-documenting than a bare `album_id`
+// would be. The mapping is intentional.
 function mapFromAlbumNote(pointer, albumFm) {
   return {
     artists: Array.isArray(albumFm.artists) ? albumFm.artists.slice() : [],
     album_name: albumFm.album_name || "",
     track_name: albumFm.track_name || "",
     label: albumFm.label || "",
-    bandcamp_album_id: albumFm.bandcamp_album_id,
-    bandcamp_track_id: albumFm.bandcamp_track_id || null,
+    bandcamp_album_id: albumFm.album_id,
+    bandcamp_track_id: albumFm.track_id || null,
     date_released: normalizeDate(albumFm.date_released),
     date_updated: normalizeDate(albumFm.date_updated),
     genre: albumFm.genre || "",
@@ -201,7 +209,34 @@ class RadioMusic {
       if (!s || !s.album) continue;  // empty slot, stays carrier_wave on its coord
       const resolved = resolveAlbumLink(s.album, HOST_FILE, CONTENT_ROOT);
       if (!resolved) continue;
-      populated.push(mapFromAlbumNote(s, resolved.frontmatter));
+      const fm = resolved.frontmatter;
+      // Radio plays Bandcamp embeds only (Spotify is editorial signal: if it's
+      // on the dial, the artist gets paid in a meaningful way). Validate the
+      // album note's source explicitly so a Spotify-sourced album can't slip
+      // onto the dial via a wikilink typo.
+      if (fm.source !== "bandcamp") {
+        reportIssue({
+          kind: "radio-station-album",
+          file: HOST_FILE,
+          offending: typeof s.album === "string" ? s.album : "(non-string album)",
+          reason: `radio stations require \`source: bandcamp\` (got source=${JSON.stringify(fm.source)})`,
+          isDraft: false,
+          isExcluded: false,
+        });
+        continue;
+      }
+      if (!fm.album_id && !fm.track_id) {
+        reportIssue({
+          kind: "radio-station-album",
+          file: HOST_FILE,
+          offending: typeof s.album === "string" ? s.album : "(non-string album)",
+          reason: "album note has no `album_id` or `track_id`",
+          isDraft: false,
+          isExcluded: false,
+        });
+        continue;
+      }
+      populated.push(mapFromAlbumNote(s, fm));
     }
 
     return JSON.stringify({ stations: populated });

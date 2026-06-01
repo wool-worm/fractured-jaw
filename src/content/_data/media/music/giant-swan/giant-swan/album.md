@@ -3,9 +3,10 @@ artists:
   - Giant Swan
 album_name: Giant Swan
 track_name:
-bandcamp_album_id: 984984185
-bandcamp_track_id:
-bandcamp_url: https://giantswan.bandcamp.com/album/giant-swan
+source: bandcamp
+album_id: 984984185
+track_id:
+source_url: https://giantswan.bandcamp.com/album/giant-swan
 label:
 date_released: 2019-11-08
 date_updated: 2026-06-01

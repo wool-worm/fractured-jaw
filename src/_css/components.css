@@ -1008,3 +1008,55 @@ body.search-modal-open {
   margin: var(--sp-md) 0;
   border: 0;
 }
+
+/* ── Spotify inline embed (click-to-load) ────────────────────────────────── */
+/* Privacy mitigation for the {% spotify %} shortcode: Spotify's iframe loads
+   tracking scripts on injection regardless of authentication, so the
+   shortcode renders a click-to-load shell instead. Reader clicks it, the
+   shell swaps for the real iframe via /assets/js/spotify-embed-shell.js.
+   Default page loads pay no privacy cost; only readers who actively engage
+   opt in. Brass left-border (vs sodium) so it visually reads as
+   "platform fallback" not "first-class signal" like Bandcamp. */
+.spotify-embed-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-xs);
+  width: 100%;
+  min-height: 152px;
+  padding: var(--sp-md);
+  margin: var(--sp-md) 0;
+  text-align: center;
+  background: var(--void-soft);
+  border: 1px solid var(--bone-faint);
+  border-left: 3px solid var(--brass-deep);
+  cursor: pointer;
+  transition: border-left-color 0.12s, background 0.12s;
+  box-sizing: border-box;
+}
+
+.spotify-embed-shell:hover,
+.spotify-embed-shell:focus-visible {
+  background: var(--void-mid);
+  border-left-color: var(--sodium);
+  outline: none;
+}
+
+.spotify-embed-shell-play {
+  font-size: 1.1em;
+  color: var(--bone);
+}
+
+.spotify-embed-shell-notice {
+  font-size: 0.85em;
+  opacity: 0.7;
+  max-width: 40ch;
+}
+
+.spotify-embed-inline {
+  display: block;
+  width: 100%;
+  margin: var(--sp-md) 0;
+  border: 0;
+}

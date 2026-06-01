@@ -3,9 +3,10 @@ artists:
   - Otto Taimela
 album_name: Uncommon & Fragile
 track_name:
-bandcamp_album_id: 2424478372
-bandcamp_track_id:
-bandcamp_url:
+source: bandcamp
+album_id: 2424478372
+track_id:
+source_url:
 label: SWIMS
 date_released: 2025-11-07
 date_updated: 2026-05-30

@@ -3,9 +3,10 @@ artists:
   - Boards of Canada
 album_name: Inferno
 track_name:
-bandcamp_album_id: 477965531
-bandcamp_track_id:
-bandcamp_url:
+source: bandcamp
+album_id: 477965531
+track_id:
+source_url:
 label: Warp Records
 date_released: 2026-05-29
 date_updated: 2026-05-30

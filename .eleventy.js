@@ -24,6 +24,7 @@ const {
 } = require("./src/utils/authors");
 const { reportIssue, flush: flushBuildReport } = require("./src/utils/build-report");
 const { buildBandcampEmbed } = require("./src/assets/js/bandcamp-embed");
+const { buildSpotifyEmbed } = require("./src/assets/js/spotify-embed");
 const { resolveAlbumLink, isWikilinkString } = require("./src/utils/album-note");
 const pathModule = require("path");
 const CONTENT_ROOT_ABS = pathModule.join(__dirname, "src", "content");
@@ -111,18 +112,42 @@ module.exports = function (eleventyConfig) {
 
     // Wikilink form: resolve the album note and replace the id field with
     // the actual numeric id from the note's frontmatter. Track id wins when
-    // both are set on the note (more specific embed).
+    // both are set on the note (more specific embed). The album note must
+    // declare `source: bandcamp` — a Spotify-sourced note caught here is
+    // an editorial mistake (use the {% spotify %} shortcode instead).
     var rawValue = opts.album || opts.track;
     if (typeof rawValue === "string" && isWikilinkString(rawValue)) {
       var hostFile = (this.page && this.page.inputPath) || "(bandcamp shortcode call)";
       var resolved = resolveAlbumLink(rawValue, hostFile, CONTENT_ROOT_ABS);
       if (!resolved) return "";  // reportIssue already called; emit nothing
       var fm = resolved.frontmatter;
-      if (fm.bandcamp_track_id) {
-        opts.track = String(fm.bandcamp_track_id);
+      if (fm.source !== "bandcamp") {
+        reportIssue({
+          kind: "album-link",
+          file: hostFile,
+          offending: rawValue,
+          reason: "album note has `source: " + JSON.stringify(fm.source) + "` but {% bandcamp %} requires `source: bandcamp` (use {% spotify %} if this album is Spotify-only)",
+          isDraft: false,
+          isExcluded: false,
+        });
+        return "";
+      }
+      if (!fm.album_id && !fm.track_id) {
+        reportIssue({
+          kind: "album-link",
+          file: hostFile,
+          offending: rawValue,
+          reason: "album note has no `album_id` or `track_id`",
+          isDraft: false,
+          isExcluded: false,
+        });
+        return "";
+      }
+      if (fm.track_id) {
+        opts.track = String(fm.track_id);
         delete opts.album;
       } else {
-        opts.album = String(fm.bandcamp_album_id);
+        opts.album = String(fm.album_id);
         delete opts.track;
       }
     }
@@ -147,6 +172,93 @@ module.exports = function (eleventyConfig) {
     return '<iframe class="bandcamp-embed-inline" src="' + embed.src +
       '" height="' + height + '"' + widthAttr +
       ' style="' + style + '" seamless loading="lazy" title="Bandcamp player"></iframe>';
+  });
+
+  // Spotify inline embed. Last-ditch fallback for albums that aren't on
+  // Bandcamp (Spotify has the deepest library; using it lets reviews ship
+  // when there's no Bandcamp alternative).
+  //
+  // Privacy contract: Spotify's iframe loads tracking scripts the moment it
+  // enters the DOM, so the shortcode does NOT render the iframe directly.
+  // It renders a `.spotify-embed-shell` placeholder; the reader has to
+  // click it to swap in the actual iframe. Default page loads stay clean
+  // and only readers who actively engage pay the privacy cost. The swap
+  // is wired by /assets/js/spotify-embed-shell.js.
+  //
+  // Call shapes (Spotify ids are base62 alphanumeric, typically 22 chars):
+  //   {% spotify "<id>" %}                                  -> album, "full" variant
+  //   {% spotify "<id>", "compact" %}                       -> album, named variant
+  //   {% spotify { track: "<id>", variant: "compact" } %}   -> track id, object form
+  //
+  // Phase 2 will add wikilink form ({% spotify "[[...]]" %}) backed by the
+  // shared album-note resolver, same as the bandcamp shortcode.
+  eleventyConfig.addShortcode("spotify", function (idOrOpts, maybeVariant) {
+    var opts;
+    if (typeof idOrOpts === "string") {
+      opts = { album: idOrOpts };
+      if (typeof maybeVariant === "string") opts.variant = maybeVariant;
+    } else {
+      opts = idOrOpts || {};
+    }
+
+    // Wikilink form: resolve the album note and pull its Spotify ids. The
+    // album note must declare `source: spotify` — a Bandcamp-sourced note
+    // caught here is an editorial mistake (use the {% bandcamp %} shortcode
+    // instead, which is the preferred path when both are available).
+    var rawValue = opts.album || opts.track;
+    if (typeof rawValue === "string" && isWikilinkString(rawValue)) {
+      var hostFile = (this.page && this.page.inputPath) || "(spotify shortcode call)";
+      var resolved = resolveAlbumLink(rawValue, hostFile, CONTENT_ROOT_ABS);
+      if (!resolved) return "";
+      var fm = resolved.frontmatter;
+      if (fm.source !== "spotify") {
+        reportIssue({
+          kind: "album-link",
+          file: hostFile,
+          offending: rawValue,
+          reason: "album note has `source: " + JSON.stringify(fm.source) + "` but {% spotify %} requires `source: spotify` (use {% bandcamp %} if this album is on Bandcamp)",
+          isDraft: false,
+          isExcluded: false,
+        });
+        return "";
+      }
+      if (!fm.album_id && !fm.track_id) {
+        reportIssue({
+          kind: "album-link",
+          file: hostFile,
+          offending: rawValue,
+          reason: "album note has no `album_id` or `track_id`",
+          isDraft: false,
+          isExcluded: false,
+        });
+        return "";
+      }
+      if (fm.track_id) {
+        opts.track = String(fm.track_id);
+        delete opts.album;
+      } else {
+        opts.album = String(fm.album_id);
+        delete opts.track;
+      }
+    }
+
+    var id = opts.album || opts.track;
+    if (!id || !/^[A-Za-z0-9]{16,}$/.test(String(id))) {
+      throw new Error(
+        "spotify shortcode: album or track id must be a base62 alphanumeric string (Spotify ids are typically 22 chars; got " +
+        JSON.stringify(id) + ")"
+      );
+    }
+    var sEmbed = buildSpotifyEmbed(opts);
+    var sHeight = opts.height || sEmbed.height;
+    var sMaxWidthAttr = opts.width ? ' data-max-width="' + opts.width + '"' : "";
+    var sShellStyle = opts.width ? ' style="max-width:' + opts.width + 'px;"' : "";
+    return '<div class="spotify-embed-shell" data-src="' + sEmbed.src +
+      '" data-height="' + sHeight + '"' + sMaxWidthAttr + sShellStyle +
+      ' role="button" tabindex="0" aria-label="Load Spotify player">' +
+      '<span class="spotify-embed-shell-play">&#9654; Load Spotify player</span>' +
+      '<span class="spotify-embed-shell-notice">Connecting loads Spotify\'s trackers (IP + browser fingerprint).</span>' +
+      '</div>';
   });
 
   // ---------- Responsive image transform plugin ----------

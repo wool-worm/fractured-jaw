@@ -4,9 +4,10 @@ artists:
   - Another Dude
 album_name: Compro
 track_name:
-bandcamp_album_id: 450473414
-bandcamp_track_id:
-bandcamp_url:
+source: bandcamp
+album_id: 450473414
+track_id:
+source_url:
 label: Ilian Tapes
 date_released: 2018-05-15
 date_updated: 2026-05-29

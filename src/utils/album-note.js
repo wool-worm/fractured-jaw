@@ -2,10 +2,13 @@
 // src/content/_data/media/music/. Used by:
 //   - src/radio-music.11ty.js   — when a station pointer carries `album:`
 //   - .eleventy.js {% bandcamp %} shortcode — when the call passes a wikilink
+//   - .eleventy.js {% spotify %} shortcode  — same pattern, different ids
 //
 // Album notes are gitignored-pipeline data files (not published pages), so
-// the resolver only validates that the .md file exists + carries at least
-// one bandcamp id. Draft/exclude frontmatter checks are intentionally skipped
+// the resolver only validates wikilink shape + file existence + returns the
+// parsed frontmatter. Service-specific id validation (bandcamp_album_id vs
+// spotify_album_id etc.) belongs at the call site, since each consumer
+// requires different fields. Draft/exclude frontmatter checks are skipped
 // (they're never relevant for data notes).
 //
 // Failed resolves route through reportIssue at fatal-in-prod severity, so a
@@ -79,18 +82,6 @@ function resolveAlbumLink(raw, hostFile, contentRoot) {
 
   const absPath = path.join(contentRoot, `${cleanPath}.md`);
   const frontmatter = readFrontmatter(absPath) || {};
-  if (!frontmatter.bandcamp_album_id && !frontmatter.bandcamp_track_id) {
-    reportIssue({
-      kind: "album-link",
-      file: hostFile,
-      offending: `[[${m[1]}]]`,
-      reason: "album note has neither `bandcamp_album_id` nor `bandcamp_track_id`; nothing to embed",
-      isDraft: false,
-      isExcluded: false,
-    });
-    return null;
-  }
-
   return { frontmatter, vaultPath: cleanPath };
 }
 

@@ -3,9 +3,10 @@ artists:
   - Oklou
 album_name: Choke Enough
 track_name:
-bandcamp_album_id: 520418156
-bandcamp_track_id:
-bandcamp_url:
+source: bandcamp
+album_id: 520418156
+track_id:
+source_url:
 label: True Panther
 date_released: 2025-02-07
 date_updated: 2026-05-30

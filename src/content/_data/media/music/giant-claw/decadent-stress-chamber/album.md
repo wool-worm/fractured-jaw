@@ -3,9 +3,10 @@ artists:
   - Giant Claw
 album_name: Decadent Stress Chamber
 track_name:
-bandcamp_album_id: 440237254
-bandcamp_track_id:
-bandcamp_url:
+source: bandcamp
+album_id: 440237254
+track_id:
+source_url:
 label: Orange Milk Records
 date_released: 2025-07-24
 date_updated: 2026-05-30

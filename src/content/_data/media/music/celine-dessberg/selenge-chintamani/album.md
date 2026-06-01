@@ -3,9 +3,10 @@ artists:
   - Celine Dessberg
 album_name: Selenge / Chintamani
 track_name:
-bandcamp_album_id: 3801531154
-bandcamp_track_id:
-bandcamp_url:
+source: bandcamp
+album_id: 3801531154
+track_id:
+source_url:
 label: That's Love Records
 date_released: 2025-01-28
 date_updated: 2026-05-30

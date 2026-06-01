@@ -44,6 +44,9 @@
   <script src="/assets/js/systems-widget.js" defer></script>
   <script src="/assets/js/wikilink-preview.js" defer></script>
   <script src="/assets/js/baffle.js" defer></script>
+  {# Click-to-load handler for {% spotify %} embed shells. No-op on pages
+     with no .spotify-embed-shell elements. See [[spotify-shortcode]]. #}
+  <script src="/assets/js/spotify-embed-shell.js" defer></script>
   {# Zen-mode dock, pinned bottom-left (the one viewport corner no widget
      occupies). Holds the zen toggle chip and (only in zen) a caret that
      reveals the announcements panel above it. Zen hides the systems widget
