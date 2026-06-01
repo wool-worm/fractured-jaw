@@ -178,12 +178,13 @@ module.exports = function (eleventyConfig) {
   // Bandcamp (Spotify has the deepest library; using it lets reviews ship
   // when there's no Bandcamp alternative).
   //
-  // Privacy contract: Spotify's iframe loads tracking scripts the moment it
-  // enters the DOM, so the shortcode does NOT render the iframe directly.
-  // It renders a `.spotify-embed-shell` placeholder; the reader has to
-  // click it to swap in the actual iframe. Default page loads stay clean
-  // and only readers who actively engage pay the privacy cost. The swap
-  // is wired by /assets/js/spotify-embed-shell.js.
+  // Renders the iframe directly. NOTE: Spotify's iframe loads tracking
+  // scripts the moment it enters the DOM, so default page loads now pay
+  // a privacy cost on any page containing a Spotify embed. A click-to-load
+  // shell (src/assets/js/spotify-embed-shell.js + the .spotify-embed-shell
+  // CSS rules) is still in the tree, dormant — to revive it, swap the
+  // <iframe> emission below for the <div class="spotify-embed-shell" ...>
+  // version and re-add the script tag in base.njk.
   //
   // Call shapes (Spotify ids are base62 alphanumeric, typically 22 chars):
   //   {% spotify "<id>" %}                                  -> album, "full" variant
@@ -251,14 +252,15 @@ module.exports = function (eleventyConfig) {
     }
     var sEmbed = buildSpotifyEmbed(opts);
     var sHeight = opts.height || sEmbed.height;
-    var sMaxWidthAttr = opts.width ? ' data-max-width="' + opts.width + '"' : "";
-    var sShellStyle = opts.width ? ' style="max-width:' + opts.width + 'px;"' : "";
-    return '<div class="spotify-embed-shell" data-src="' + sEmbed.src +
-      '" data-height="' + sHeight + '"' + sMaxWidthAttr + sShellStyle +
-      ' role="button" tabindex="0" aria-label="Load Spotify player">' +
-      '<span class="spotify-embed-shell-play">&#9654; Load Spotify player</span>' +
-      '<span class="spotify-embed-shell-notice">Connecting loads Spotify\'s trackers (IP + browser fingerprint).</span>' +
-      '</div>';
+    var sWidthAttr = opts.width ? ' width="' + opts.width + '"' : ' width="100%"';
+    var sStyle = 'border:0;' + (opts.width ? 'max-width:' + opts.width + 'px;' : '');
+    return '<iframe class="spotify-embed-inline" src="' + sEmbed.src +
+      '" height="' + sHeight + '"' + sWidthAttr +
+      ' style="' + sStyle + '"' +
+      ' frameborder="0"' +
+      ' allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"' +
+      ' loading="lazy"' +
+      ' title="Spotify player"></iframe>';
   });
 
   // ---------- Responsive image transform plugin ----------
