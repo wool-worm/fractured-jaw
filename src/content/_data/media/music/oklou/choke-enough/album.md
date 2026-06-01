@@ -9,14 +9,21 @@ track_id:
 source_url:
 label: True Panther
 date_released: 2025-02-07
-date_updated: 2026-05-30
-genre: pop
+date_updated: 2026-06-01
+genre:
+  - Electronic
+  - Pop
 subgenre:
-  - synth-pop
+  - Ambient
+  - Experimental
+  - Indie Pop
+  - Ambient
+  - Experimental
+  - Indie Pop
 tags: []
 compilation: false
-cover_image:
-discogs_master_id:
+cover_image: "[[_attachments/_data/media/music/oklou/choke-enough/cover.jpg|Oklou — choke enough cover]]"
+discogs_master_id: 3744126
 discogs_release_id:
 review_link:
 ---

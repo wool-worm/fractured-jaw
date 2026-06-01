@@ -13,17 +13,7 @@ date_updated: 2026-06-01
 genre:
   - Electronic
   - Rock
-  - Electronic
-  - Rock
-  - Electronic
-  - Rock
 subgenre:
-  - Death Metal
-  - Ambient
-  - Progressive Metal
-  - Death Metal
-  - Ambient
-  - Progressive Metal
   - Death Metal
   - Ambient
   - Progressive Metal

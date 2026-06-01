@@ -9,17 +9,15 @@ track_id:
 source_url:
 label: SWIMS
 date_released: 2025-11-07
-date_updated: 2026-05-30
-genre: electronic
+date_updated: 2026-06-01
+genre: Electronic
 subgenre:
-  - idm
-  - breakbeat
-  - techno
-  - ambient
+  - Ambient
+  - Techno
 tags: []
 compilation: false
-cover_image:
-discogs_master_id:
+cover_image: "[[_attachments/_data/media/music/otto-taimela/uncommon-fragile/cover.jpg|Otto Taimela — Uncommon & Fragile cover]]"
+discogs_master_id: 4179339
 discogs_release_id:
 review_link:
 ---
