@@ -78,17 +78,19 @@
   var FJR_INDEX = 0x14;
 
   // ── Bandcamp embed ──────────────────────────────────────────────────────
-  // Constants for the Bandcamp player composed from /radio-music.json IDs.
-  // The emitter only emits the album / track ID; the URL is composed here so
-  // style iteration (size, colors, scale) stays in one place. CSS scale + a
-  // matching wrapper height let us shrink the player proportionally without
-  // its contents spilling. Height/scale derived from the Phase 0 spike.
-  var BANDCAMP_EMBED_HEIGHT = 120;
+  // URL params, default colors, and natural iframe height live in
+  // /assets/js/bandcamp-embed.js (also used by the {% bandcamp %} shortcode
+  // in reviews). This widget picks the "radio" preset: large player, no art,
+  // no tracklist, minimal=true so scrub controls are visible. The CSS scale
+  // is widget-specific (we shrink the player to fit the panel) and stays
+  // here; the natural height of the preset (the unscaled iframe height)
+  // comes from the shared module's PRESETS table.
+  var bandcampAPI = (window.FJ && window.FJ.bandcampEmbed) || null;
+  if (!bandcampAPI) {
+    throw new Error("radio-widget: bandcamp-embed.js failed to load");
+  }
+  var BANDCAMP_EMBED_HEIGHT = bandcampAPI.PRESETS.radio.height;
   var BANDCAMP_EMBED_SCALE = 0.80;
-  // bgcol=333333: Bandcamp only accepts certain background hex values, and
-  // this is one of them. Closer to --void than the default light grey.
-  var BANDCAMP_EMBED_PARAMS =
-    "size=large/artwork=none/tracklist=false/minimal=true/bgcol=333333/linkcol=ffaa33";
 
   // State.
   var powered = false;
@@ -1688,11 +1690,11 @@
   // remove iframe, restore the status text.
 
   function buildBandcampEmbedURL(station) {
-    var idPart = station.bandcamp_track_id
-      ? "track=" + station.bandcamp_track_id
-      : "album=" + station.bandcamp_album_id;
-    return "https://bandcamp.com/EmbeddedPlayer/" +
-      idPart + "/" + BANDCAMP_EMBED_PARAMS + "/";
+    return bandcampAPI.buildBandcampEmbed({
+      album: station.bandcamp_album_id,
+      track: station.bandcamp_track_id,
+      preset: "radio",
+    }).src;
   }
 
   function buildBandcampEmbedHTML(station) {

@@ -144,7 +144,7 @@ body::after {
    tail flips to bold blood-red "unencrypted" during the systems widget's
    encryption-failure window (see overrides below). */
 .site-station-id::after {
-  content: '// ZONE_9 // FREQ:' var(--fjr-coordinates, 'GAMMA 0x14') ' // ENCRYPTED';
+  content: '// FREQ:' var(--fjr-coordinates, 'GAMMA 0x14') ' // ENCRYPTED';
   font-family: var(--font-body);
   font-size: 0.52rem;
   letter-spacing: 0.1em;
@@ -167,7 +167,7 @@ body.is-encryption-failure .broadcast-banner::before {
 }
 
 body.is-encryption-failure .site-station-id::after {
-  content: '// ZONE_9 // FREQ:' var(--fjr-coordinates, 'GAMMA 0x14') ' // UNENCRYPTED';
+  content: '// FREQ:' var(--fjr-coordinates, 'GAMMA 0x14') ' // UNENCRYPTED';
   color: var(--blood-bright);
   font-weight: bold;
 }

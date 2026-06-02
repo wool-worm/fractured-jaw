@@ -267,7 +267,7 @@ html.zen .footer-glitch {
    after cult.css, so this overrides both the normal content and the
    is-encryption-failure "UNENCRYPTED" variant. */
 html.zen .site-station-id::after {
-  content: '// system disconnected // no freq found // machine: idle';
+  content: 'FREQ: _null_ // MACHINE: IDLE';
 }
 
 /* In-world stamps + glyph prefixes that read as machine chatter. */
