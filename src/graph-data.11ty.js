@@ -14,6 +14,7 @@ const fs = require("fs");
 const slugify = require("./utils/slugify");
 const { vaultPathToUrl } = require("./utils/permalink");
 const { parseAuthorField } = require("./utils/authors");
+const { parseSeriesField } = require("./utils/series");
 
 const CONTENT_ROOT = "src/content";
 
@@ -108,6 +109,28 @@ class GraphData {
         if (!knownUrls.has(entry.url)) continue;
         linkEdges.push({ source: item.url, target: entry.url });
       }
+    }
+
+    // Series edges synthesized from frontmatter, mirroring the author edges
+    // above. A `series_name:` wikilink lives in frontmatter, so the body
+    // scanner never sees it; without this a post stays unconnected to its
+    // series-parent node in the graph (the parent node exists via the
+    // previewable collection, but nothing links to it). parseSeriesField
+    // handles the strict wikilink form; malformed/dead entries were already
+    // reported by the seriesEntries collection in .eleventy.js, so here we
+    // just skip anything that doesn't resolve. series_name is single-valued,
+    // so at most one post -> series-parent edge per post.
+    for (const item of items) {
+      if (!item.url) continue;
+      if (item.data.graph_enabled === false) continue;
+      // A series parent doesn't carry its own series_name; guard for symmetry
+      // with the author block (and to avoid any self-edge).
+      if (item.data.section === "series") continue;
+
+      const parsed = parseSeriesField(item.data.series_name, CONTENT_ROOT);
+      if (parsed.kind !== "wikilink") continue;
+      if (!knownUrls.has(parsed.url)) continue;
+      linkEdges.push({ source: item.url, target: parsed.url });
     }
 
     // Tag nodes + post→tag edges. Tags are a separate node type so the
