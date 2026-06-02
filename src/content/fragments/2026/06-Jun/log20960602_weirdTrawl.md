@@ -1,13 +1,13 @@
 ---
-title: log20260601_weirdTrawl
+title: log20960602_weirdTrawl
 date_published: 2026-06-02T00:15:16
-date_updated: 2026-06-02T00:31:46
-author: "[[authors/wool-worm|wool-worm]]"
+date_updated: 2026-06-02T00:48:53
+author: ["[[authors/seize-the-light|seize-the-light]]"]
 tags: [fragment]
 series_name: "[[series/Radio Lonelies|Radio Lonelies]]"
 description: Finally got the scanner fixed, back in business!
 featured: false
-draft: true
+draft: false
 exclude: false
 preview_enabled: true
 graph_enabled: true
