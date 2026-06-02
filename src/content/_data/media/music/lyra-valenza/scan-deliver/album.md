@@ -7,15 +7,17 @@ source: bandcamp
 album_id: 82350258
 track_id:
 source_url: https://opaltapes.bandcamp.com/album/scan-deliver
-label:
+label: Black Opal
 date_released: 2018-11-08
-date_updated: 2026-06-01
-genre:
-subgenre: []
+date_updated: 2026-06-02
+genre: Electronic
+subgenre:
+  - Techno
+  - Electro
 tags: []
 compilation: false
-cover_image:
-discogs_master_id:
+cover_image: "[[_attachments/_data/media/music/lyra-valenza/scan-deliver/cover.jpg|Lyra Valenza — Scan, Deliver cover]]"
+discogs_master_id: 4046617
 discogs_release_id:
 review_link:
 ---

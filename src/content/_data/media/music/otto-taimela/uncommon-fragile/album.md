@@ -6,10 +6,10 @@ track_name:
 source: bandcamp
 album_id: 2424478372
 track_id:
-source_url:
+source_url: https://ottotaimela.bandcamp.com/album/uncommon-fragile
 label: SWIMS
 date_released: 2025-11-07
-date_updated: 2026-06-01
+date_updated: 2026-06-02
 genre: Electronic
 subgenre:
   - Ambient

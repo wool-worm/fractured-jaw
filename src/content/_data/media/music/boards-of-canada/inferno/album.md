@@ -17,7 +17,7 @@ subgenre:
   - Ambient
   - IDM
   - Experimental
-  - trip-hop
+  - Trip-Hop
 tags: []
 compilation: false
 cover_image: "[[_attachments/_data/media/music/boards-of-canada/inferno/cover.jpg|Boards of Canada — Inferno cover]]"

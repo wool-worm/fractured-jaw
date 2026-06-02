@@ -37,42 +37,56 @@ stations:
     tts_readout: Incoming organic signal detected... sender... yawn yellinick... subject... loop finding jazz records... click below to decrypt...
   - band: BETA
     frequency: 55
-    album: "[[_data/media/music/celine-dessberg/selenge-chintamani/album]]"
-    tts_readout: Incoming organic signal detected... sender... celine dessberg... click below to decrypt...
+    album: "[[_data/media/music/desecresy/the-secret-of-death/album]]"
+    tts_readout: Incoming organic signal detected... sender... DEH SAY CRESSIE... subject... The Secret of Death... click below to decrypt...
   - band: BETA
     frequency: 62
-    album: "[[_data/media/music/commodo/uninvited-chokehold/album]]"
-    tts_readout: Incoming organic signal detected... sender... komodo... subject... uninvited chokehold... click below to decrypt...
+    album: "[[_data/media/music/commodo/uninvited-chokehold-commodo-x-rocks-foe/album]]"
+    tts_readout: Incoming organic signal detected... sender... komodo ... subject... Uninvited Chokehold... click below to decrypt...
 
   # ── GAMMA ──────────────────────────────────────────────────────────────
   - band: GAMMA
     frequency: 6
-    album: "[[_data/media/music/skee-mask/itlp09-pool/album]]"
-    tts_readout: Incoming organic signal detected... sender... Skee Mask... subject... ITLP09 - Pool... click below to decrypt...
+    album: "[[_data/media/music/bladee/sulfur-surfer/album]]"
+    tts_readout: Incoming organic signal detected... sender... Blade... subject... Sulfur Surfer... click below to decrypt...
   - band: GAMMA
     frequency: 14
-    album: "[[_data/media/music/joel-lyssarides/late-on-earth/album]]"
-    tts_readout: Incoming organic signal detected... sender... Joel Liss saridees... subject... Late on Earth... click below to decrypt...
+    album: "[[_data/media/music/aho-ssan/the-sun-turned-black/album]]"
+    tts_readout: Incoming organic signal detected... sender... Aho San... subject... The Sun Turned Black... click below to decrypt...
   - band: GAMMA
     frequency: 29
     album: "[[_data/media/music/giant-swan/giant-swan/album]]"
-    tts_readout: Incoming organic signal detected... sender... Giant Swan... subject... Unknown... click below to decrypt...
+    tts_readout: Incoming organic signal detected... sender... Giant Swan... subject... Giant Swan... click below to decrypt...
   - band: GAMMA
     frequency: 41
+    album: "[[_data/media/music/lake-haze/vhs-memories-lp/album]]"
+    tts_readout: Incoming organic signal detected... sender... Lake Haze... subject... VHS Memories... click below to decrypt...
   - band: GAMMA
     frequency: 55
+    album: "[[_data/media/music/steve-hauschildt/aeropsia/album]]"
+    tts_readout: Incoming organic signal detected... sender... Steve Hows child... subject... Air rope sia... click below to decrypt...
 
   # ── DELTA ──────────────────────────────────────────────────────────────
   - band: DELTA
     frequency: 1
+    album: "[[_data/media/music/tim-hecker/shards/album]]"
+    tts_readout: Incoming organic signal detected... sender... Tim Hecker... subject... Shards... click below to decrypt...
   - band: DELTA
     frequency: 17
+    album: "[[_data/media/music/benjamin-fulwood/the-stars-are-very-far-away-from-all-of-this/album]]"
+    tts_readout: Incoming organic signal detected... sender... Benjamin Full wood... subject... The Stars Are Very Far Away From All Of This... click below to decrypt...
   - band: DELTA
     frequency: 36
+    album: "[[_data/media/music/lyra-pramuk/hymnal-resung/album]]"
+    tts_readout: Incoming organic signal detected... sender... Lyra Prah muk... subject... Hymnal... click below to decrypt...
   - band: DELTA
     frequency: 53
+    album: "[[_data/media/music/lust-for-youth-croatian-amor/all-worlds/album]]"
+    tts_readout: Incoming organic signal detected... sender... Lust For Youth and Croatian Amor... subject... All Worlds... click below to decrypt...
   - band: DELTA
     frequency: 59
+    album: "[[_data/media/music/kita-kouhei/neospecies/album]]"
+    tts_readout: Incoming organic signal detected... sender... kita koo hey- 北航平... subject... Neo species... click below to decrypt...
 ---
 
 # Radio music stations
