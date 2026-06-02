@@ -1,7 +1,7 @@
 ---
 title: Immediacy Addiction WIP
 date_published: 2026-05-22T10:59:10
-date_updated: 2026-06-01T14:19:13
+date_updated: 2026-05-30T12:44:19
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [essay]
 series_name:
