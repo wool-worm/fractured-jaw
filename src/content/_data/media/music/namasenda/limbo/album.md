@@ -16,6 +16,7 @@ genre:
 subgenre:
   - Dance-pop
   - Bubblegum
+  - Hyperpop
 tags: []
 compilation: false
 cover_image: "[[_attachments/_data/media/music/namasenda/limbo/cover.jpg|Namasenda — Limbo cover]]"
