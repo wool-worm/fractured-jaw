@@ -7,8 +7,8 @@ draft: false
 exclude: false
 preview_enabled: false
 graph_enabled: true
-image: "[[_attachments/authors/wool-worm/img_circle-crop.png|wool-worm]]"
-image_focus: center center
+image:
+image_focus:
 ---
 # bio
 
