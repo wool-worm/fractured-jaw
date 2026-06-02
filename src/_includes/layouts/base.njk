@@ -33,6 +33,10 @@
   {# Pirate-radio tuner widget — bottom-right corner, every page.
      No dedicated full-page view (unlike the graph), so no suppression. #}
   {% include "partials/radio-widget.njk" %}
+  {# bandcamp-embed.js defines window.FJ.bandcampEmbed; loaded before
+     radio-widget.js so the widget can call into it. defer preserves
+     document order, so this script runs first. #}
+  <script src="/assets/js/bandcamp-embed.js" defer></script>
   <script src="/assets/js/radio-widget.js" defer></script>
   {# Systems-status panel — left-center, every page. Counterweight
      to the graph (top-right) and radio (bottom-right) widgets. #}
@@ -40,6 +44,11 @@
   <script src="/assets/js/systems-widget.js" defer></script>
   <script src="/assets/js/wikilink-preview.js" defer></script>
   <script src="/assets/js/baffle.js" defer></script>
+  {# Click-to-load handler for {% spotify %} embeds is dormant — the
+     shortcode currently emits the iframe directly. To revive: re-enable
+     this script tag and swap the iframe back to .spotify-embed-shell in
+     the shortcode body in .eleventy.js.
+     <script src="/assets/js/spotify-embed-shell.js" defer></script> #}
   {# Zen-mode dock, pinned bottom-left (the one viewport corner no widget
      occupies). Holds the zen toggle chip and (only in zen) a caret that
      reveals the announcements panel above it. Zen hides the systems widget
