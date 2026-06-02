@@ -19,11 +19,11 @@ So I finally got the scanner back from repair today, but the saga of the mystery
 
 Anyways, I wanted to log this trawl sesh because we got some really interesting stuff washing up today! First off…
 
-Tons and tons of organic signals today. I seriously haven’t seen this many floating around since those punks out in Delta raided the freqs and flooded the all four arco bands with their militant shit. I swear the next time they pull something like that, good ol’ LMMC isn’t gonna stop with the goons they sent in last time. There hasn’t been a justiciar in the arco for 20 year but that doesn’t mean they aren’t itching to send one in.
+Tons and tons of organic signals today. I seriously haven’t seen this many floating around since those punks out in Delta raided the freqs and flooded the all four arco bands with their militant shit. I swear the next time they pull something like that, good ol’ LMMC isn’t gonna stop with the goons they sent in last time. There hasn’t been a justiciar in the arco for 20 years but that doesn’t mean they aren’t itching to send one in.
 
 Right, I was gonna go over the logs.
 
-First off I found a sweet little signal bobbing around `alpha0x06`. Pretty good quality for such a low freq but maybe they’ve got better parts over in alpha (maybe someone should tell Cherti). This transmission has all the hallmarks of a hit: wicked breakbeats, cold brutal pads underline reverb drenched synth stabs. Its not all about the groove though, this one has got the atmosphere too.
+First off I found a sweet little signal bobbing around `alpha0x06`. Pretty good quality for such a low freq but maybe they’ve got better software over in alpha (maybe someone should tell Cherti). This transmission has all the hallmarks of a hit: wicked breakbeats, cold brutal pads underline reverb drenched synth stabs. Its not all about the groove though, this one has got the atmosphere too.
 
 Another good find on `gamma0x0E`, just like last week! This time they’re broadcasting some wild deconstructed ambient. Synth horns blinking in an out of racing arpeggiators, texture , texture, texture. Our very own Gamma dweller [[authors/boogra-boy|boogra-boy]] caught this one too, check out his other finds on the [[media/2026/06-Jun/May 2026 Listening Log|monthly roundup]]. Gotta give it a listen, sounds like nothing this side of the gatewall.
 
