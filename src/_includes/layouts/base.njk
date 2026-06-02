@@ -11,13 +11,13 @@
      and keyboard users bypass the header + widgets on every page. #}
   <a href="#main" class="skip-link">skip to content</a>
   {% include "partials/header.njk" %}
-  <script src="/assets/js/nav-toggle.js" defer></script>
+  <script src="{{ assets['nav-toggle.js'] }}" defer></script>
   <main id="main" tabindex="-1">
     {{ content | safe }}
   </main>
   {# Mobile-only: collapse long page intros (home + section landings)
      behind a read-more toggle. No-op above 720px or for short intros. #}
-  <script src="/assets/js/intro-fold.js" defer></script>
+  <script src="{{ assets['intro-fold.js'] }}" defer></script>
   {% include "partials/footer.njk" %}
   {# Local-graph widget renders on every page EXCEPT /network_nodes/ — the
      dedicated full-graph view would render the same graph twice. Whether
@@ -28,7 +28,7 @@
      graph-widget.js off data attributes on the partial. #}
   {% if page.url != "/network_nodes/" %}
     {% include "partials/graph-widget.njk" %}
-    <script src="/assets/js/graph-widget.js" defer></script>
+    <script src="{{ assets['graph-widget.js'] }}" defer></script>
   {% endif %}
   {# Pirate-radio tuner widget — bottom-right corner, every page.
      No dedicated full-page view (unlike the graph), so no suppression. #}
@@ -36,19 +36,19 @@
   {# bandcamp-embed.js defines window.FJ.bandcampEmbed; loaded before
      radio-widget.js so the widget can call into it. defer preserves
      document order, so this script runs first. #}
-  <script src="/assets/js/bandcamp-embed.js" defer></script>
-  <script src="/assets/js/radio-widget.js" defer></script>
+  <script src="{{ assets['bandcamp-embed.js'] }}" defer></script>
+  <script src="{{ assets['radio-widget.js'] }}" defer></script>
   {# Systems-status panel — left-center, every page. Counterweight
      to the graph (top-right) and radio (bottom-right) widgets. #}
   {% include "partials/systems-widget.njk" %}
-  <script src="/assets/js/systems-widget.js" defer></script>
-  <script src="/assets/js/wikilink-preview.js" defer></script>
-  <script src="/assets/js/baffle.js" defer></script>
+  <script src="{{ assets['systems-widget.js'] }}" defer></script>
+  <script src="{{ assets['wikilink-preview.js'] }}" defer></script>
+  <script src="{{ assets['baffle.js'] }}" defer></script>
   {# Click-to-load handler for {% spotify %} embeds is dormant — the
      shortcode currently emits the iframe directly. To revive: re-enable
      this script tag and swap the iframe back to .spotify-embed-shell in
      the shortcode body in .eleventy.js.
-     <script src="/assets/js/spotify-embed-shell.js" defer></script> #}
+     <script src="{{ assets['spotify-embed-shell.js'] }}" defer></script> #}
   {# Zen-mode dock, pinned bottom-left (the one viewport corner no widget
      occupies). Holds the zen toggle chip and (only in zen) a caret that
      reveals the announcements panel above it. Zen hides the systems widget
@@ -117,8 +117,8 @@
       >▴</button>
     </div>
   </div>
-  <script src="/assets/js/zen-toggle.js" defer></script>
+  <script src="{{ assets['zen-toggle.js'] }}" defer></script>
   {% include "partials/search-modal.njk" %}
-  <script src="/assets/js/search.js" defer></script>
+  <script src="{{ assets['search.js'] }}" defer></script>
 </body>
 </html>

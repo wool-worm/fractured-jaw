@@ -673,7 +673,12 @@ module.exports = function (eleventyConfig) {
   // src/assets/brutalist-framework/ (local reference only) never lands in
   // the build output. Add new subdirs here as needed.
   eleventyConfig.addPassthroughCopy({ "src/assets/css": "assets/css" });
-  eleventyConfig.addPassthroughCopy({ "src/assets/js":  "assets/js"  });
+  // NOTE: src/assets/js is intentionally NOT passthrough-copied. The client
+  // scripts are emitted with content-hashed filenames (e.g.
+  // /assets/js/radio-widget.<hash>.js) by src/assets-js.11ty.js so they can be
+  // served with a 1-year immutable cache and still update the instant their
+  // bytes change. Templates reference them through the `assets` global
+  // (src/_data/assets.js); hashes come from src/utils/asset-manifest.js.
   eleventyConfig.addPassthroughCopy({ "src/assets/images": "assets/images" });
   // Vault-side content attachments. The underscore prefix marks the folder as
   // plumbing inside Obsidian; we strip it when copying so the public URL is
