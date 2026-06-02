@@ -1,8 +1,8 @@
 ---
 title: scanner signal not making sense, at a loss
 date_published: 2026-06-01T23:03:34
-date_updated: 2026-06-01T23:33:07
-author: "[[authors/wool-worm|wool-worm]]"
+date_updated: 2026-06-02T00:48:44
+author: ["[[authors/seize-the-light|seize-the-light]]"]
 tags: [fragment]
 series_name: "[[series/Radio Lonelies|Radio Lonelies]]"
 description:
@@ -35,4 +35,4 @@ Well we’re at it again folks, scanner chatter is clean until I set it to trawl
 
 Over.
 
-S
+-S
