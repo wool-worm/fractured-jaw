@@ -1,71 +1,40 @@
-// Eleventy JavaScript template — emits /assets/css/site.css at build time.
+// Eleventy JavaScript template. Emits the bundled stylesheet at build time.
 //
-// Source CSS lives as separate authoring modules in src/_css/ (one file
-// per concern: variables, fonts, base, layout, components, etc.). This
-// template concatenates them in load order into a single bundled file
-// served at /assets/css/site.css.
+// Source CSS lives as separate authoring modules in src/_css/ (one file per
+// concern: variables, fonts, base, layout, components, etc.). The module list
+// and the concatenation live in src/utils/asset-manifest.js (CSS_MODULES /
+// buildCss) so the bundler, the fingerprint hash, and the `assets` global all
+// agree. To add a module, edit CSS_MODULES there, in the right cascade
+// position.
 //
-// Why bundle: Lighthouse flagged the previous @import-chain site.css
-// (eleven `@import url(...)` statements) as render-blocking — every
-// @import is a serial blocking request from the browser, producing a
-// long CSS waterfall. Shipping one bundled file collapses that waterfall
-// to a single round-trip and cuts ~550ms off mobile LCP on cold loads.
+// Why bundle: the previous @import-chain site.css (eleven serial `@import`
+// requests) was render-blocking. Shipping one concatenated file collapses that
+// waterfall to a single round-trip.
 //
-// Author workflow is unchanged: edit the files in src/_css/, build
-// concatenates them. To add a new module, drop it in src/_css/ and add
-// the filename to MODULES below in the right position.
+// Why the hashed filename: the published path is /assets/css/site.<hash>.css,
+// not a fixed /assets/css/site.css. Assets are served with a 1-year immutable
+// browser cache, so a fixed URL would strand returning visitors on stale CSS
+// for up to a year after a deploy (Cloudflare's edge purge can't evict a
+// max-age already in a browser). The content hash changes the URL whenever the
+// bundle's bytes change, so browsers fetch the new version immediately.
+// head.njk references it via the `assets` global: {{ assets["site.css"] }}.
 //
 // Relative URLs inside modules (e.g. fonts.css → url('fonts/...')) resolve
-// against the bundle's published URL (/assets/css/site.css), which is
-// the same /assets/css/ path the fonts/ subdir is passthrough-copied to.
-// No URL rewriting needed.
+// against the bundle's directory (/assets/css/), which the filename hash does
+// not change, so the passthrough-copied fonts/ subdir keeps resolving. No URL
+// rewriting needed.
 
-const fs = require("fs");
-const path = require("path");
-
-// Load order matters:
-//   variables.css  — CSS custom properties consumed by every later module
-//   fonts.css      — @font-face rules referenced by base + components
-//   base.css       — element resets / typography defaults
-//   layout.css     — page-level grid / responsive breakpoints
-//   components.css — post-card, post-meta, widgets, etc.
-//   decoration.css — borders, dividers, ornamental flourishes
-//   effects.css    — keyframes / transitions / filter primitives
-//   graph.css      — local-graph widget styling
-//   radio.css      — radio widget styling
-//   systems.css    — system-status widget styling
-//   cult.css       — site-wide aesthetic overrides; must win cascade ties
-//   zen.css        — calm reading mode; scoped under html.zen, must win over cult
-const MODULES = [
-  "variables.css",
-  "fonts.css",
-  "base.css",
-  "layout.css",
-  "components.css",
-  "decoration.css",
-  "effects.css",
-  "graph.css",
-  "radio.css",
-  "systems.css",
-  "cult.css",
-  "zen.css",
-];
-
-const MODULE_DIR = path.join(__dirname, "_css");
+const { buildCss, getManifest } = require("./utils/asset-manifest");
 
 module.exports = class {
   data() {
     return {
-      permalink: "/assets/css/site.css",
+      permalink: getManifest()["site.css"],
       eleventyExcludeFromCollections: true,
     };
   }
 
   render() {
-    return MODULES.map((name) => {
-      const filePath = path.join(MODULE_DIR, name);
-      const contents = fs.readFileSync(filePath, "utf8");
-      return `/* ===== ${name} ===== */\n${contents}`;
-    }).join("\n\n");
+    return buildCss();
   }
 };
