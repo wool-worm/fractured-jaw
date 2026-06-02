@@ -1,7 +1,7 @@
 ---
 title: May 2026 Listening Log
 date_published: 2026-06-01T22:01:27
-date_updated: 2026-06-01T22:42:11
+date_updated: 2026-06-01T23:31:56
 author: ["[[authors/boogra-boy|boogra-boy]]"]
 tags: [review, music, ambient, breakbeat, electronic, lo-fi-house, hyperpop, experiemental, doom-metal]
 series_name: "[[series/boogra-boy's Monthly Mystery Mix|boogra-boy's Monthly Mystery Mix]]"
@@ -12,7 +12,7 @@ exclude: false
 preview_enabled: true
 graph_enabled: true
 image: "[[_attachments/media/may-2026-listening-log/boogra-boy-listening-log-may2026.jpg|Collage of Album Art]]"
-image_focus: center center
+image_focus: top center
 reading_time: 4–5 min
 rating:
 ---
