@@ -7,6 +7,6 @@ draft: false
 exclude: false
 preview_enabled: false
 graph_enabled: true
-image:
-image_focus: center center
+image: "[[_attachments/authors/seize-the-light/seize-the-light.png]]"
+image_focus: center top
 ---
