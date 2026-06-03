@@ -282,7 +282,7 @@
   overflow: hidden;
   padding: 0.18rem 0;
   background: var(--blood);
-  color: var(--blood-bright);
+  color: var(--bone);
   font-family: var(--font-body);
   font-size: 0.6rem;
   letter-spacing: 0.1em;
