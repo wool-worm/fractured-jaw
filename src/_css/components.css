@@ -972,9 +972,20 @@ body.search-modal-open {
 .feed-block {
   display: flex;
   justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-sm);
   margin-top: var(--sp-lg);
   padding-top: var(--sp-md);
   border-top: 1px solid var(--bone-faint);
+}
+
+/* Separator between the email + Atom subscribe links. */
+.feed-sep {
+  color: var(--bone-faint);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  user-select: none;
 }
 
 .feed-link {
@@ -1001,6 +1012,70 @@ body.search-modal-open {
 
 .feed-link-icon {
   display: block;
+}
+
+/* ── Newsletter subscribe form (Buttondown, plain HTML POST, no JS) ─────── */
+.newsletter-form {
+  margin: var(--sp-lg) 0;
+  max-width: 34rem;
+}
+
+.newsletter-form-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--brass-deep);
+  margin-bottom: var(--sp-sm);
+}
+
+.newsletter-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-sm);
+}
+
+.newsletter-form-input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  background: var(--void-soft);
+  border: 1px solid var(--bone-faint);
+  color: var(--bone);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 0.6rem 0.7rem;
+}
+
+.newsletter-form-input:focus {
+  outline: none;
+  border-color: var(--brass);
+}
+
+.newsletter-form-input::placeholder {
+  color: var(--bone-faint);
+}
+
+.newsletter-form-button {
+  flex: 0 0 auto;
+  background: var(--void-mid);
+  border: 1px solid var(--brass);
+  color: var(--bone);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: color 0.1s, border-color 0.1s, background 0.1s;
+}
+
+.newsletter-form-button:hover,
+.newsletter-form-button:focus-visible {
+  color: var(--sodium);
+  border-color: var(--sodium);
+  background: var(--void);
+  outline: none;
 }
 
 /* ── Bandcamp inline embed ───────────────────────────────────────────────── */
