@@ -1,6 +1,6 @@
 ---
 title: blog
-description:
+description: 'Long-form blog posts from Fractured Jaw: stream-of-consciousness, minimally edited, half-true and wholly entertaining. Newest at the top.'
 layout: layouts/section.njk
 page_type: section
 section_name: blog

@@ -1,6 +1,6 @@
 ---
 title: essays
-description:
+description: 'The cold-written, slightly more grounded counterpart to the blog: self-contained essays from Fractured Jaw on politics, media, and culture. Read in any order.'
 layout: layouts/section.njk
 page_type: section
 section_name: essays

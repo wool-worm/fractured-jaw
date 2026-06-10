@@ -307,6 +307,46 @@ module.exports = function (eleventyConfig) {
     Array.isArray(value) ? value.slice(0, n) : value
   );
 
+  // Derive a plain-text meta-description excerpt from a page's raw Markdown
+  // body. Used in head.njk as the middle tier of the description fallback
+  // chain (frontmatter `description:` wins; site.description is the last
+  // resort). Fed `page.rawInput` (the body only) rather than `content`,
+  // because by the time head.njk renders, `content` is the fully wrapped
+  // layout and would scrape the post header chrome (title, byline, dates,
+  // tags) before reaching prose. Strips the Markdown/Obsidian syntax we
+  // actually use, collapses whitespace, and truncates on a word boundary
+  // near `max` chars. Returns "" for empty input so the `or` chain falls
+  // through to site.description.
+  eleventyConfig.addFilter("excerpt", (raw, max = 155) => {
+    if (!raw) return "";
+    let text = String(raw)
+      .replace(/```[\s\S]*?```/g, " ")            // fenced code blocks
+      .replace(/`([^`]+)`/g, "$1")                 // inline code
+      .replace(/!\[\[[^\]]*\]\]/g, " ")            // Obsidian image embeds
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")       // Markdown images
+      .replace(/\[\[[^\]|]+\|([^\]]+)\]\]/g, "$1") // wikilink w/ caption -> caption
+      .replace(/\[\[([^\]]+)\]\]/g, "$1")          // bare wikilink -> target
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")     // Markdown link -> text
+      .replace(/^\s{0,3}#{1,6}\s+/gm, "")          // ATX headings
+      .replace(/^\s*>\s?/gm, "")                   // blockquote markers
+      .replace(/^\s*(?:[-*+]|\d+\.)\s+/gm, "")     // list markers
+      .replace(/(\*\*|__|\*|_|~~)/g, "")           // emphasis markers
+      .replace(/<[^>]*>/g, " ")                     // stray inline HTML
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#0?39;|&apos;|&rsquo;/g, "'")
+      .replace(/&nbsp;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!text) return "";
+    if (text.length <= max) return text;
+    const clipped = text.slice(0, max);
+    const lastSpace = clipped.lastIndexOf(" ");
+    return (lastSpace > 0 ? clipped.slice(0, lastSpace) : clipped).trimEnd() + "…";
+  });
+
   // Render a media review rating as filled + empty stars. Used by
   // post-meta.njk and post-card.njk for /media/ posts. Accepts:
   //   - a bare number (e.g. 4) — treated as out of 5

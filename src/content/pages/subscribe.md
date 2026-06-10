@@ -1,6 +1,6 @@
 ---
 title: Subscribe
-description: Subscribe to Fractured Jaw dispatches by email.
+description: New Fractured Jaw dispatches, now delivered to your inbox. No tracking pixels, no spam bloat, and no interference.
 graph_enabled: false
 preview_enabled: false
 ---

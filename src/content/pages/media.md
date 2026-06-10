@@ -1,6 +1,6 @@
 ---
 title: media
-description:
+description: Fractured Jaw reviews records, films, books, and any cultural artifact worth talking about. Free-form and unapologetically subjective.
 layout: layouts/section.njk
 page_type: section
 section_name: media
