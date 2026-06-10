@@ -294,7 +294,6 @@ html.zen .site-station-id::after {
 
 /* In-world stamps + glyph prefixes that read as machine chatter. */
 html.zen .post-card::before,           /* INTERCEPTED_TRANSMISSION stamp */
-html.zen blockquote::before,           /* TRANSMISSION // label */
 html.zen .home-featured h2::before,
 html.zen .home-recent h2::before,
 html.zen .home-sections h2::before,
