@@ -4,7 +4,7 @@ description: Subscribe to Fractured Jaw dispatches by email.
 graph_enabled: false
 preview_enabled: false
 ---
-New dispatches, now delivered to your inbox! When something is broadcast you get a single message with no tracking pixels, no spam bloat, and no noise. Unsubscribe any time, no questions asked.
+New dispatches, now delivered to your inbox! When something is broadcasted you get a single message with no tracking pixels, no spam bloat, and no interference. Unsubscribe any time, no questions asked.
 
 <form class="newsletter-form" action="https://buttondown.com/api/emails/embed-subscribe/wool-worm" method="post" target="_blank">
   <label class="newsletter-form-label" for="bd-email">tune your scanner</label>
