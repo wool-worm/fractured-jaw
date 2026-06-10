@@ -112,43 +112,86 @@ function parseEntry(entryBlock) {
   };
 }
 
-// Look up a post's cover image URL from search-index.json and return an
-// absolute URL Discord can fetch. Handles three shapes the `image` field
-// may take, in priority order:
+// Look up a post's cover image from search-index.json and return an absolute
+// URL Discord / email can fetch.
 //
-//   1. Already absolute ("https://..."):  returned as-is
-//   2. Resolved root-relative path ("/attachments/.../foo.png"):  current
-//      shape emitted by content.11tydata.js's `image` computed property
-//      after Eleventy resolves the wikilink. Prepend siteUrl.
-//   3. Raw wikilink ("[[_attachments/.../foo.png|alt]]"):  defensive
-//      fallback in case the search-index format ever changes back to
-//      passing the frontmatter value through verbatim. Strip the
-//      _attachments/ prefix (passthrough renames to /attachments/) and
-//      prepend siteUrl.
+// The search index stores the cover as pre-rendered <picture> markup in
+// `image_html` (the eleventy-img migration replaced the old `image` URL
+// field), e.g.:
+//   <picture><source type="image/webp" srcset="/img/<h>-400.webp 400w, ...">
+//     <img src="/img/<h>-400.jpeg" srcset="/img/<h>-400.jpeg 400w, ..."></picture>
+// So we parse it for the largest variant URL: prefer JPEG (renders in every
+// mail client + Discord), then webp, then the <img src> fallback, and make the
+// root-relative /img/ path absolute. A legacy plain `image` URL / wikilink
+// field is still honored if a future index ever carries one.
 //
-// Returns null when there's no image or the field doesn't match any of
-// the three known shapes.
+// The record lookup normalizes URLs too: the feed <id> (postUrl) is absolute
+// while search-index urls are root-relative, so we compare by pathname (a
+// strict-equal compare never matched, compounding the missing-image bug).
+//
+// Returns null when the post has no cover or nothing parseable is found.
 function imageFromSearchIndex(searchIndex, postUrl, siteUrl) {
   if (!Array.isArray(searchIndex)) return null;
-  const record = searchIndex.find((r) => r && r.url === postUrl);
-  if (!record || !record.image) return null;
 
-  const raw = String(record.image).trim();
   const base = String(siteUrl).replace(/\/+$/, "");
+  const toPath = (u) => {
+    try { return new URL(String(u || ""), base).pathname; }
+    catch (e) { return String(u || ""); }
+  };
+  const abs = (u) => {
+    const s = String(u || "").trim();
+    if (!s) return null;
+    if (/^https?:\/\//i.test(s)) return s;
+    return `${base}/${s.replace(/^\/+/, "")}`;
+  };
 
-  if (/^https?:\/\//i.test(raw)) return raw;
+  const wantPath = toPath(postUrl);
+  const record = searchIndex.find((r) => r && toPath(r.url) === wantPath);
+  if (!record) return null;
 
-  if (raw.startsWith("/")) {
-    return `${base}${raw}`;
+  // Primary: pull the largest variant out of the image_html <picture> markup.
+  const html = record.image_html ? String(record.image_html) : "";
+  if (html) {
+    // From a "url Nw, url Nw" srcset, return the highest-width url.
+    const largest = (srcset) => {
+      let best = null, bestW = -1, m;
+      const re = /([^\s,]+)\s+(\d+)w/g;
+      while ((m = re.exec(srcset)) !== null) {
+        const w = parseInt(m[2], 10);
+        if (w > bestW) { bestW = w; best = m[1]; }
+      }
+      return best;
+    };
+    // Prefer the JPEG srcset (on the <img>) for mail-client compatibility.
+    const imgSrcset = (html.match(/<img[^>]*\bsrcset="([^"]*)"/i) || [])[1];
+    if (imgSrcset && /\.jpe?g/i.test(imgSrcset)) {
+      const u = largest(imgSrcset);
+      if (u) return abs(u);
+    }
+    // Else the webp <source srcset>.
+    const sourceSrcset = (html.match(/<source[^>]*\bsrcset="([^"]*)"/i) || [])[1];
+    if (sourceSrcset) {
+      const u = largest(sourceSrcset);
+      if (u) return abs(u);
+    }
+    // Else the single <img src>.
+    const imgSrc = (html.match(/<img[^>]*\bsrc="([^"]*)"/i) || [])[1];
+    if (imgSrc) return abs(imgSrc);
   }
 
-  const m = /^\[\[([^\]|]+)(?:\|[^\]]*)?\]\]$/.exec(raw);
-  if (m) {
-    let vaultPath = m[1].trim();
-    if (vaultPath.startsWith("_attachments/")) {
-      vaultPath = "attachments/" + vaultPath.slice("_attachments/".length);
+  // Legacy fallback: a plain `image` URL or wikilink, if a future index has one.
+  if (record.image) {
+    const raw = String(record.image).trim();
+    if (/^https?:\/\//i.test(raw)) return raw;
+    if (raw.startsWith("/")) return `${base}${raw}`;
+    const m = /^\[\[([^\]|]+)(?:\|[^\]]*)?\]\]$/.exec(raw);
+    if (m) {
+      let vaultPath = m[1].trim();
+      if (vaultPath.startsWith("_attachments/")) {
+        vaultPath = "attachments/" + vaultPath.slice("_attachments/".length);
+      }
+      return `${base}/${vaultPath.replace(/^\/+/, "")}`;
     }
-    return `${base}/${vaultPath.replace(/^\/+/, "")}`;
   }
 
   return null;

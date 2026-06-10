@@ -11,6 +11,7 @@ draft: false
 exclude: false
 preview_enabled: true
 graph_enabled: true
+newsletter_enabled: true
 image: "[[_attachments/blog/not-a-keystone-not-a-gate/haunted-coast.jpg|haunted-coast]]"
 image_focus: center center
 reading_time: 3–4 min

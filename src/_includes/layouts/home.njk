@@ -45,6 +45,24 @@ layout: layouts/base.njk
 </section>
 
 <div class="feed-block">
+  {# Email subscribe (Buttondown), left of the Atom link, | separated.
+     Reuses the .feed-link styling with an envelope glyph in place of the
+     broadcast arcs. #}
+  <a class="feed-link" href="/subscribe/">
+    <svg
+      class="feed-link-icon"
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="1.8" />
+      <path d="M4 7 L12 13 L20 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <span class="feed-link-label">subscribe by email</span>
+  </a>
+  <span class="feed-sep" aria-hidden="true">|</span>
   {% set feedUrl = "/feed.xml" %}
   {% set feedLabel = "subscribe to everything (atom)" %}
   {% include "partials/feed-icon.njk" %}

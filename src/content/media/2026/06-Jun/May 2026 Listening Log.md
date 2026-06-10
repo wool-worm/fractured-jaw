@@ -11,6 +11,7 @@ draft: false
 exclude: false
 preview_enabled: true
 graph_enabled: true
+newsletter_enabled: true
 image: "[[_attachments/media/may-2026-listening-log/boogra-boy-listening-log-may2026.jpg|Collage of Album Art]]"
 image_focus: top center
 reading_time: 4–5 min

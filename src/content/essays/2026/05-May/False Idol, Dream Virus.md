@@ -1,26 +1,17 @@
 ---
 title: False Idol, Dream Virus
 date_published: 2026-06-06T03:59:10
-date_updated: 2026-06-06T01:09:56
+date_updated: 2026-06-10T09:27:16
 author: "[[authors/wool-worm|wool-worm]]"
-tags:
-  - essay
-  - flattening
-  - postcapitalism
-  - technofeudalism
-  - technology
-  - media-theory
-  - culture
-  - theory
-  - situationism
-  - self
+tags: [essay, flattening, postcapitalism, technofeudalism, technology, media-theory, culture, theory, situationism, self]
 series_name:
-description: What we're sold as immediacy may be the most mediated condition imaginable; and the roughness it sands away might be the only thing worth keeping.
+description: "What we're sold as immediacy may be the most mediated condition imaginable; and the roughness it sands away might be the only thing worth keeping."
 featured: true
 draft: false
 exclude: false
 preview_enabled: true
 graph_enabled: true
+newsletter_enabled: true
 image: "[[_attachments/essays/false-idol-dream-virus/burning-shouting.jpg|Fire with man shouting megaphone]]"
 image_focus: center center
 reading_time: 12–15 min

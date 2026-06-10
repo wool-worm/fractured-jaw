@@ -97,17 +97,20 @@ html.zen .zen-toggle-glyph {
   color: var(--bone-dim);
 }
 
-/* ── Announcements caret + panel (zen only) ─────────────────────────────────
-   The systems widget (which carries the announcements log) is hidden in zen,
-   so the caret next to the chip reveals a calm panel with the same log. The
-   caret is hidden in the full site; the panel is display:none unless BOTH
-   html.zen AND .is-open, so it can never surface outside zen. */
+/* ── Announcements caret + panel (zen, plus non-zen below the mobile
+   breakpoint) ───────────────────────────────────────────────────────────────
+   The systems widget carries the announcements log, but it's hidden in two
+   cases: in zen (any viewport), and in the full site at <=820px (where all
+   three widgets hide). In both, the caret next to the chip reveals a calm
+   panel with the same log. The caret + panel LOOK lives on the base selector
+   (display:none by default); only the `display` flip is gated, so the two
+   reveal conditions (html.zen, and html:not(.zen) <=820px) share one set of
+   styles. The panel needs BOTH a reveal condition AND .is-open to show, so it
+   can never surface on the full-site desktop where the widget already shows
+   the log (which also keeps the log from being exposed to a screen reader
+   twice). The non-zen <=820px reveal lives in a media query lower down. */
 .zen-announce-toggle {
-  display: none;   /* full site: the systems widget carries announcements */
-}
-
-html.zen .zen-announce-toggle {
-  display: inline-flex;
+  display: none;   /* hidden by default: full-site desktop has the systems widget */
   align-items: center;
   justify-content: center;
   width: 1.5rem;
@@ -122,28 +125,30 @@ html.zen .zen-announce-toggle {
   cursor: pointer;
 }
 
-html.zen .zen-announce-toggle:hover,
-html.zen .zen-announce-toggle:focus-visible {
+.zen-announce-toggle:hover,
+.zen-announce-toggle:focus-visible {
   color: var(--brass);
   border-color: var(--brass-deep);
   background: var(--void-soft);
   outline: none;
 }
 
-html.zen .zen-announce-toggle:focus-visible {
+.zen-announce-toggle:focus-visible {
   outline: 2px solid var(--brass);
   outline-offset: 2px;
 }
 
-/* Panel: hidden until opened, and only ever in zen. Rises above the chip
-   (it's the dock's first child, controls are below). Calm bone/brass; no
+/* Reveal the caret in zen (any viewport). */
+html.zen .zen-announce-toggle {
+  display: inline-flex;
+}
+
+/* Panel: carries its open-state layout on the base selector but stays
+   display:none until a reveal condition pairs with .is-open. Rises above the
+   chip (it's the dock's first child, controls are below). Calm bone/brass; no
    pulse on the head (zen kills motion and the loud ichor banner). */
 .zen-announce-panel {
   display: none;
-}
-
-html.zen .zen-announce-panel.is-open {
-  display: flex;
   flex-direction: column;
   /* 250px matches the systems-widget footprint, so the open panel sits inside
      the left gutter without overlapping the centered content column. */
@@ -152,6 +157,23 @@ html.zen .zen-announce-panel.is-open {
   padding: 0.5rem 0.6rem;
   background: var(--void);
   border: 1px solid var(--brass-deep);
+}
+
+html.zen .zen-announce-panel.is-open {
+  display: flex;
+}
+
+/* Non-zen reveal: below the mobile breakpoint (<=820px) the systems widget
+   that normally carries the log is hidden, so surface the same caret + panel
+   here too. Above 820px in the full site the caret stays display:none (the
+   widget shows the log there). Same persisted open/closed state (fj.zen.announce). */
+@media (max-width: 820px) {
+  html:not(.zen) .zen-announce-toggle {
+    display: inline-flex;
+  }
+  html:not(.zen) .zen-announce-panel.is-open {
+    display: flex;
+  }
 }
 
 .zen-announce-head {
@@ -272,7 +294,6 @@ html.zen .site-station-id::after {
 
 /* In-world stamps + glyph prefixes that read as machine chatter. */
 html.zen .post-card::before,           /* INTERCEPTED_TRANSMISSION stamp */
-html.zen blockquote::before,           /* TRANSMISSION // label */
 html.zen .home-featured h2::before,
 html.zen .home-recent h2::before,
 html.zen .home-sections h2::before,

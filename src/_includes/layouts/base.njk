@@ -61,7 +61,7 @@
     <div class="zen-announce-panel" id="zen-announce-panel" role="dialog" aria-label="Announcements">
       <div class="zen-announce-head">
         <span class="zen-announce-icon" aria-hidden="true">✉&#xFE0E;</span>
-        <span class="zen-announce-title">incoming message</span>
+        <span class="zen-announce-title">recent messages</span>
         <button
           type="button"
           class="zen-announce-close"
@@ -83,7 +83,7 @@
             </div>
           {% endfor %}
         {% else %}
-          <div class="announce-empty">&gt; no transmissions logged</div>
+          <div class="announce-empty">&gt; no messages logged</div>
         {% endif %}
       </div>
     </div>
@@ -113,7 +113,7 @@
         aria-expanded="false"
         aria-controls="zen-announce-panel"
         aria-label="Show announcements"
-        title="Incoming transmissions"
+        title="recent messages"
       >▴</button>
     </div>
   </div>

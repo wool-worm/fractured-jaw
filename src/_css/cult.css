@@ -452,23 +452,13 @@ body.is-encryption-failure .site-station-id::after {
   animation: broadcast-flicker 4.5s steps(1) infinite;
 }
 
-/* ── 12. Blockquote: intercepted transmission ───────────────────────────── */
+/* ── 12. Blockquote ─────────────────────────────────────────────────────── */
 blockquote {
   border-left: 6px solid var(--blood);
   border-right: 2px solid var(--brass-deep);
   background: rgba(92, 26, 114, 0.05);
   position: relative;
   animation: sector-pulse 6s ease-in-out infinite;
-}
-
-blockquote::before {
-  content: 'TRANSMISSION //';
-  display: block;
-  font-family: var(--font-body);
-  font-size: 0.58rem;
-  letter-spacing: 0.14em;
-  color: var(--ichor-bright);
-  margin-bottom: var(--sp-sm);
 }
 
 /* ── 13. Code: phosphor terminal — no animation (appears in readable content) */
