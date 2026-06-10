@@ -697,6 +697,7 @@ module.exports = function (eleventyConfig) {
   // is the verification token Google issued; it must be reachable at
   // /google4fac35aefa691e66.html on the live site to verify.
   eleventyConfig.addPassthroughCopy("google4fac35aefa691e66.html");
+  eleventyConfig.addPassthroughCopy("yandex_8399fd5d7f982de9.html");
 
   // ---------- Watch targets ----------
 
