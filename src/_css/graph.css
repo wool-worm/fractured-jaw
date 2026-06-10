@@ -172,6 +172,32 @@
   letter-spacing: 0.1em;
 }
 
+/* Phones: the controls panel sprawls because it's inline-flow with per-element
+   margins and no width bound, so labels + dividers + buttons wrap raggedly.
+   Switch to a compact button grid: drop the 'mode:' / 'zoom:' labels and the
+   │ dividers (all the spans), bound the panel width, and let the buttons
+   flex-wrap on an even gap so they read as a tidy block in the top-left. */
+@media (max-width: 600px) {
+  .graph-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.4rem;
+    max-width: calc(100% - 1rem);
+  }
+
+  .graph-controls span {
+    display: none;
+  }
+
+  /* gap owns the spacing now; clear the per-element right margins so the wrap
+     stays even. */
+  .graph-controls button {
+    margin-right: 0;
+  }
+}
+
 /* ── Graph widget (floating, every page) ─────────────────────────────────── */
 /* Inline <style> in graph-widget.njk has been removed; this block owns it. */
 .graph-widget {
