@@ -13,7 +13,7 @@
 //     newsletter.json to be emailed, so `newsletter_enabled: false` suppresses
 //     it). If nothing qualifies, exit 0.
 //   - Build a single HTML email body: one teaser/digest card per post (cover
-//     image + title + meta + excerpt + a "read the transmission" button + the
+//     image + title + meta + excerpt + a "read the dispatch" button + the
 //     tags), stacked in publication order. Ten posts in one deploy => one
 //     email with ten cards, not ten emails.
 //   - POST it to Buttondown's API as a DRAFT (status: "draft"). Nothing sends
@@ -136,7 +136,7 @@ function buildCard(post) {
       ${meta ? `<div style="color:${C.boneDim};font-size:13px;margin-top:9px;">${meta}</div>` : ""}
       ${desc ? `<div style="color:${C.bone};font-size:14px;line-height:1.65;margin-top:14px;">${desc}</div>` : ""}
       <div style="margin-top:18px;">
-        <a href="${url}" style="display:inline-block;background:${C.voidMid};color:${C.bone};text-decoration:none;font-family:${MONO};font-size:13px;font-weight:bold;padding:10px 18px;border:1px solid ${C.sodium};"><strong>read the transmission &#9656;</strong></a>
+        <a href="${url}" style="display:inline-block;background:${C.voidMid};color:${C.bone};text-decoration:none;font-family:${MONO};font-size:13px;font-weight:bold;padding:10px 18px;border:1px solid ${C.sodium};"><strong>read the dispatch &#9656;</strong></a>
       </div>
       ${tags ? `<div style="color:${C.brass};font-size:12px;margin-top:16px;letter-spacing:0.04em;">${tags}</div>` : ""}
     </td></tr>
@@ -163,8 +163,8 @@ function buildMasthead() {
 // sit on white. bgcolor + inline background covers the spread of mail clients.
 function buildBody(posts) {
   const label = posts.length === 1
-    ? "// new transmission"
-    : `// ${posts.length} new transmissions`;
+    ? "// new dispatch"
+    : `// ${posts.length} new dispatches`;
   const labelHtml =
     `<div style="font-family:${MONO};color:${C.brass};font-size:12px;` +
     `letter-spacing:0.12em;text-transform:uppercase;max-width:600px;` +
@@ -176,7 +176,7 @@ function buildBody(posts) {
 
 function buildSubject(posts) {
   if (posts.length === 1) return posts[0].title || "(untitled)";
-  return `${posts.length} new transmissions`;
+  return `${posts.length} new dispatches`;
 }
 
 async function createDraft(subject, body) {
