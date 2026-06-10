@@ -35,15 +35,19 @@ class NewsletterFeed {
   }
 
   render({ collections }) {
-    const urls = (collections.all_content || [])
+    const items = (collections.all_content || [])
       .filter((item) =>
         item.data.draft !== true &&
         item.data.exclude !== true &&
         item.data.newsletter_enabled !== false
       )
-      .map((item) => item.url)
-      .filter(Boolean);
-    return JSON.stringify(urls);
+      .filter((item) => item.url)
+      // { url, reading_time }: the feed/new-posts payload doesn't carry
+      // reading_time, so the sender pulls it from here to print in each card's
+      // meta line. reading_time is an Obsidian-plugin-computed frontmatter
+      // string (may be absent; the sender just omits it then).
+      .map((item) => ({ url: item.url, reading_time: item.data.reading_time || "" }));
+    return JSON.stringify(items);
   }
 }
 

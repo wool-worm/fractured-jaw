@@ -57,6 +57,7 @@ function pathOf(u) {
 const C = {
   void: "#0a0a0a",
   voidSoft: "#141414",
+  voidMid: "#1e1c1a",
   bone: "#d8d4cc",
   boneDim: "#8a857c",
   boneFaint: "#4a463f",
@@ -65,6 +66,9 @@ const C = {
   sodium: "#ffaa33",
 };
 const MONO = "'Courier New', Courier, monospace";
+// Static skull glyph for the masthead (a single still frame; email can't run
+// the site's CSS sprite animation). Absolute so mail clients can fetch it.
+const SKULL_URL = `${SITE_URL}/assets/images/skull-favicon-64.png`;
 
 function fail(msg) {
   console.error(`[post-buttondown] ${msg}`);
@@ -104,44 +108,70 @@ function buildCard(post) {
     ? "by " + esc(post.authors.join(", "))
     : "";
   const date = post.published ? esc(String(post.published).slice(0, 10)) : "";
-  const meta = [author, date].filter(Boolean).join("  &middot;  ");
+  const rt = post.reading_time ? esc(String(post.reading_time)) : "";
+  const meta = [author, date, rt].filter(Boolean).join("  &middot;  ");
   const tags = (Array.isArray(post.tags) && post.tags.length)
     ? esc(post.tags.join("  ·  "))
     : "";
 
-  const cover = post.image
-    ? `<a href="${url}" style="text-decoration:none;">` +
+  // Only emit the image row when there's a cover (no empty cell otherwise).
+  const coverRow = post.image
+    ? `<tr><td style="padding:0;">` +
+      `<a href="${url}" style="text-decoration:none;">` +
       `<img src="${esc(post.image)}" alt="${title}" width="600" ` +
       `style="display:block;width:100%;max-width:600px;height:auto;border:0;border-bottom:1px solid ${C.brassDeep};" />` +
-      `</a>`
+      `</a></td></tr>`
     : "";
 
+  // Title + button wrap their text in <strong> as well as the inline
+  // font-weight, so the bold survives Buttondown styling links/buttons. The
+  // button is a dark fill with a sodium border (the account's link colour is
+  // set to bone, which needs a dark background to read).
   return `
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
          style="max-width:600px;margin:0 auto 20px auto;background:${C.voidSoft};border:1px solid ${C.brassDeep};">
-    <tr><td style="padding:0;">${cover}</td></tr>
+    ${coverRow}
     <tr><td style="padding:20px 22px;font-family:${MONO};">
-      <a href="${url}" style="color:${C.brass};text-decoration:none;font-size:18px;font-weight:bold;line-height:1.3;">${title}</a>
-      ${meta ? `<div style="color:${C.boneDim};font-size:12px;margin-top:8px;">${meta}</div>` : ""}
+      <a href="${url}" style="color:${C.bone};text-decoration:none;font-size:19px;font-weight:bold;line-height:1.3;"><strong>${title}</strong></a>
+      ${meta ? `<div style="color:${C.boneDim};font-size:13px;margin-top:9px;">${meta}</div>` : ""}
       ${desc ? `<div style="color:${C.bone};font-size:14px;line-height:1.65;margin-top:14px;">${desc}</div>` : ""}
       <div style="margin-top:18px;">
-        <a href="${url}" style="display:inline-block;background:${C.sodium};color:${C.void};text-decoration:none;font-family:${MONO};font-size:13px;font-weight:bold;padding:9px 16px;border:1px solid ${C.sodium};">read the transmission &#9656;</a>
+        <a href="${url}" style="display:inline-block;background:${C.voidMid};color:${C.bone};text-decoration:none;font-family:${MONO};font-size:13px;font-weight:bold;padding:10px 18px;border:1px solid ${C.sodium};"><strong>read the transmission &#9656;</strong></a>
       </div>
-      ${tags ? `<div style="color:${C.boneFaint};font-size:11px;margin-top:16px;letter-spacing:0.04em;">${tags}</div>` : ""}
+      ${tags ? `<div style="color:${C.brass};font-size:12px;margin-top:16px;letter-spacing:0.04em;">${tags}</div>` : ""}
     </td></tr>
   </table>`;
 }
 
-// The whole email body: a thin label line over the stacked cards.
+// Email masthead: a static skull glyph over the wordmark. Email clients don't
+// run CSS animation, so the skull is a still image; the loud brutalist wordmark
+// font can't load in mail either, so the wordmark is large letter-spaced
+// monospace (an evocation, not a pixel match).
+function buildMasthead() {
+  return `
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr><td align="center" style="padding:4px 0 2px;">
+      <img src="${SKULL_URL}" width="56" height="56" alt="" style="display:block;margin:0 auto 8px auto;width:56px;height:56px;border:0;" />
+      <div style="font-family:${MONO};color:${C.brass};font-size:24px;letter-spacing:0.2em;font-weight:bold;"><strong>FRACTURED&nbsp;JAW</strong></div>
+    </td></tr>
+  </table>`;
+}
+
+// The whole email body: masthead + a thin label line over the stacked cards,
+// all on a dark canvas. The dark wrapper is load-bearing: the account's email
+// template is light, so without it the masthead + the gaps between cards would
+// sit on white. bgcolor + inline background covers the spread of mail clients.
 function buildBody(posts) {
   const label = posts.length === 1
     ? "// new transmission"
     : `// ${posts.length} new transmissions`;
-  const header =
-    `<div style="font-family:${MONO};color:${C.brassDeep};font-size:12px;` +
+  const labelHtml =
+    `<div style="font-family:${MONO};color:${C.brass};font-size:12px;` +
     `letter-spacing:0.12em;text-transform:uppercase;max-width:600px;` +
-    `margin:0 auto 14px auto;">${label}</div>`;
-  return header + posts.map(buildCard).join("\n");
+    `margin:18px auto 14px auto;">${label}</div>`;
+  const inner = buildMasthead() + labelHtml + posts.map(buildCard).join("\n");
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.void};">` +
+    `<tr><td bgcolor="${C.void}" style="background:${C.void};padding:22px 14px;">${inner}</td></tr></table>`;
 }
 
 function buildSubject(posts) {
@@ -182,10 +212,17 @@ async function main() {
   }
   // Fail-closed: only email posts present in the allowlist. Compare by
   // pathname since the feed urls are absolute and the allowlist is relative.
-  const eligiblePaths = new Set(
-    (Array.isArray(allowlist) ? allowlist : []).map(pathOf)
-  );
-  const posts = newPosts.filter((p) => p && p.url && eligiblePaths.has(pathOf(p.url)));
+  // Allowlist entries are { url, reading_time } objects (legacy bare-string
+  // urls are still accepted), so we also pull reading_time across here: the
+  // feed payload doesn't carry it, the allowlist does.
+  const eligible = new Map();
+  for (const e of (Array.isArray(allowlist) ? allowlist : [])) {
+    if (typeof e === "string") eligible.set(pathOf(e), {});
+    else if (e && e.url) eligible.set(pathOf(e.url), { reading_time: e.reading_time });
+  }
+  const posts = newPosts
+    .filter((p) => p && p.url && eligible.has(pathOf(p.url)))
+    .map((p) => ({ ...p, reading_time: (eligible.get(pathOf(p.url)) || {}).reading_time }));
 
   if (posts.length === 0) {
     console.log("[post-buttondown] no newsletter-eligible new posts; nothing to draft");
