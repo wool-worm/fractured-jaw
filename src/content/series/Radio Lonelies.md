@@ -8,6 +8,7 @@ draft: false
 exclude: false
 preview_enabled: true
 graph_enabled: true
+newsletter_enabled: true
 image: "[[_attachments/series/radio-lonelies/radio-tower.jpg|Black and wite radio tower]]"
 image_focus: center center
 ---

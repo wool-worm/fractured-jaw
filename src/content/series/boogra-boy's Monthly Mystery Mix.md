@@ -8,6 +8,7 @@ draft: false
 exclude: false
 preview_enabled: true
 graph_enabled: true
+newsletter_enabled: true
 image:
 image_focus: center center
 ---
