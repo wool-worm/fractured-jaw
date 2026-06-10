@@ -113,6 +113,19 @@ jobs:
           path: new-posts.json
           retention-days: 1
 
+      # Newsletter eligibility allowlist (post URLs not opted out via
+      # `newsletter_enabled: false`). Emitted every build by
+      # src/newsletter-feed.11ty.js; the Buttondown sender in the deploy job
+      # intersects it with new-posts.json so a suppressed post is never
+      # drafted. Only needed downstream on main.
+      - name: Upload newsletter allowlist
+        if: success() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: newsletter
+          path: _site/newsletter.json
+          retention-days: 1
+
       # Diff the live /announcements.json snapshot vs the freshly-built one,
       # emit new-announcements.json. Baseline-safe: a missing/invalid previous
       # snapshot announces nothing (see detect-new-announcements.js).
@@ -215,6 +228,28 @@ jobs:
         env:
           DISCORD_WEBHOOK_DISPATCHES: ${{ secrets.DISCORD_WEBHOOK_DISPATCHES }}
         run: node .github/scripts/post-dispatches.js new-posts.json
+
+      # Best-effort download of the newsletter allowlist (same shape pattern
+      # as the new-posts download above).
+      - name: Download newsletter allowlist
+        if: steps.deployment.outcome == 'success'
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: newsletter
+
+      # Draft ONE Buttondown email containing a stacked digest of every new,
+      # newsletter-eligible post from this deploy (N posts => 1 email with N
+      # cards, not N emails). Draft status only: it lands in the Buttondown
+      # dashboard for manual review + send, nothing goes out automatically.
+      # continue-on-error so a Buttondown outage doesn't fail the workflow
+      # after the deploy already succeeded. Needs both payloads present.
+      - name: Draft newsletter email to Buttondown
+        if: steps.deployment.outcome == 'success' && hashFiles('new-posts.json') != '' && hashFiles('newsletter.json') != ''
+        continue-on-error: true
+        env:
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+        run: node .github/scripts/post-buttondown.js new-posts.json newsletter.json
 
       # Best-effort download of the new-announcements payload, same shape as
       # the new-posts download above.
