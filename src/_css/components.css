@@ -1103,25 +1103,26 @@ body.search-modal-open {
   max-width: 34rem;
 }
 
+/* Stacked field: label above a full-width control. */
+.newsletter-form-field {
+  margin-bottom: var(--sp-md);
+}
+
 .newsletter-form-label {
   display: block;
   font-family: var(--font-body);
   font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   color: var(--brass-deep);
-  margin-bottom: var(--sp-sm);
+  margin-bottom: var(--sp-xs);
+  line-height: 1.4;
 }
 
-.newsletter-form-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-sm);
-}
-
+/* Email input + select share the same dark box treatment. */
 .newsletter-form-input {
-  flex: 1 1 14rem;
-  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
   background: var(--void-soft);
   border: 1px solid var(--bone-faint);
   color: var(--bone);
@@ -1139,8 +1140,58 @@ body.search-modal-open {
   color: var(--bone-faint);
 }
 
-.newsletter-form-button {
+/* Drop the native select chrome and draw a brass caret (two gradients form the
+   triangle) so the control reads on-brand on the dark field. */
+select.newsletter-form-input {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 2rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--brass) 50%),
+    linear-gradient(135deg, var(--brass) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.05rem) calc(50% - 2px),
+    calc(100% - 0.75rem) calc(50% - 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+/* "optional" divider above the metadata questions. */
+.newsletter-form-hint {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--bone-faint);
+  margin: var(--sp-md) 0 var(--sp-sm);
+  padding-top: var(--sp-sm);
+  border-top: 1px solid var(--bone-faint);
+}
+
+/* Checkbox rows (Discord / contributor). */
+.newsletter-form-check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-sm);
+  margin-bottom: var(--sp-sm);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--bone-dim);
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.newsletter-form-check input[type="checkbox"] {
   flex: 0 0 auto;
+  margin-top: 0.1rem;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--brass);
+}
+
+.newsletter-form-button {
+  margin-top: var(--sp-md);
   background: var(--void-mid);
   border: 1px solid var(--brass);
   color: var(--bone);
@@ -1155,6 +1206,69 @@ body.search-modal-open {
 
 .newsletter-form-button:hover,
 .newsletter-form-button:focus-visible {
+  color: var(--sodium);
+  border-color: var(--sodium);
+  background: var(--void);
+  outline: none;
+}
+
+/* ── Subscribe success modal (shown by subscribe.js after a submit) ─────── */
+.subscribe-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9600;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-md);
+  background: rgba(10, 10, 10, 0.82);
+}
+
+.subscribe-modal.is-open {
+  display: flex;
+}
+
+.subscribe-modal-panel {
+  width: 100%;
+  max-width: 26rem;
+  background: var(--void);
+  border: 1px solid var(--brass);
+  box-shadow: 4px 4px 0 var(--brass-deep);
+  padding: var(--sp-lg);
+}
+
+.subscribe-modal-title {
+  font-family: var(--font-display, var(--font-body));
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--brass);
+  margin: 0 0 var(--sp-sm);
+}
+
+.subscribe-modal-text {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--bone);
+  margin: 0 0 var(--sp-md);
+}
+
+.subscribe-modal-close {
+  background: var(--void-mid);
+  border: 1px solid var(--brass);
+  color: var(--bone);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 0.55rem 1.4rem;
+  cursor: pointer;
+  transition: color 0.1s, border-color 0.1s, background 0.1s;
+}
+
+.subscribe-modal-close:hover,
+.subscribe-modal-close:focus-visible {
   color: var(--sodium);
   border-color: var(--sodium);
   background: var(--void);
