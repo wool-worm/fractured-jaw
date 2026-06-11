@@ -40,6 +40,14 @@
     s.zIndex = "1000";
     s.display = "none";
     s.maxWidth = "320px";
+    // Cap the height so a tall preview can't grow past the space beside the
+    // link and get clamped back over the anchor. The image is banded and the
+    // description line-clamped (in render) so everything fits without a
+    // scrollbar; overflow:hidden just clips any pathological overflow.
+    // 340px holds the worst case (2-line title + banded image + 4-line
+    // description + date, ~314px) with headroom.
+    s.maxHeight = "340px";
+    s.overflow = "hidden";
     s.padding = "0.5rem 0.75rem";
     s.background = "#fff";
     s.color = "#000";
@@ -88,8 +96,10 @@
       );
     }
     if (data.title) {
+      // Clamp to two lines with an ellipsis: long titles stay within the
+      // height budget (a third line would push the date off the bottom).
       parts.push(
-        '<h3 class="wikilink-preview-title" style="margin:0 0 0.25rem;font-size:1rem;font-weight:bold;">' +
+        '<h3 class="wikilink-preview-title" style="margin:0 0 0.25rem;font-size:1rem;font-weight:bold;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;">' +
           escapeHtml(data.title) +
           "</h3>"
       );
@@ -98,11 +108,21 @@
       // data.image_html is the full <picture>...</picture> markup
       // pre-rendered by src/preview-index.11ty.js, including inline styles
       // so the tooltip layout works without depending on stylesheet rules.
-      parts.push(data.image_html);
+      // Wrap it in a fixed-height, clipped band so a tall/near-square source
+      // (e.g. the media contact-sheet hero) can't eat the whole 320px height
+      // budget and force a scrollbar. The image keeps its own width:100%, we
+      // just show the top band of it.
+      parts.push(
+        '<div class="wikilink-preview-image-wrap" style="max-height:140px;overflow:hidden;margin:0.25rem 0;">' +
+          data.image_html +
+          "</div>"
+      );
     }
     if (data.description) {
+      // Clamp to a few lines with an ellipsis so a long description can't
+      // push the tooltip past its height budget (no scrollbar).
       parts.push(
-        '<p class="wikilink-preview-description" style="margin:0;">' +
+        '<p class="wikilink-preview-description" style="margin:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden;">' +
           escapeHtml(data.description) +
           "</p>"
       );
