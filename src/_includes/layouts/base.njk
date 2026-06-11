@@ -120,5 +120,10 @@
   <script src="{{ assets['zen-toggle.js'] }}" defer></script>
   {% include "partials/search-modal.njk" %}
   <script src="{{ assets['search.js'] }}" defer></script>
+  {# Subscribe form enhancement: only on /subscribe/. Progressive, the form
+     works without it (plain POST to Buttondown). #}
+  {% if page.url == "/subscribe/" %}
+    <script src="{{ assets['subscribe.js'] }}" defer></script>
+  {% endif %}
 </body>
 </html>

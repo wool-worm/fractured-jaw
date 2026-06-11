@@ -1,5 +1,14 @@
 ---
-neighbors: []
+neighbors:
+  - name: Neon Dystopia Network
+    url: https://www.neondystopia.com/
+    description: NDN is a beautiful aggregator of several cyberpunk themed projects including podcasts, fiction, and cultural commentary.
+  - name: Futurism Restated
+    url: https://futurismrestated.substack.com/
+    description: Excellent music blog covering ambient, dub, experimental electronic and the avante garde. Author is co-founder of Balmat records, iykyk.
+  - name: Cyber Celibate
+    url: https://www.cybercelibate.com/
+    description: A pseudo-neo-luddism blog. Proponent of blowing up your TV and other 21st century fantasies.
 rings:
   - name: Hotline Webring
     url: https://hotlinewebring.club/
