@@ -66,7 +66,7 @@
 
 .systems-widget-label {
   color: var(--brass);
-  font-size: 0.7rem;
+  font-size: 0.73rem;
   letter-spacing: 0.06em;
 }
 
@@ -122,7 +122,7 @@
   align-items: center;
   text-align: center;
   gap: 0.05rem;
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   line-height: 1.2;
   letter-spacing: 0.02em;
 }
@@ -132,11 +132,11 @@
   text-transform: lowercase;
 }
 
-/* Small enough that the longest state ("BROADCASTING", 12 chars) fits one
+/* Small enough that the longest state ("SENDING", 12 chars) fits one
    line in a ~55px cell; overflow-wrap is a safety net so an unexpectedly
    wide glyph run breaks cleanly instead of overflowing into the neighbor. */
 .antenna-state {
-  font-size: 0.46rem;
+  font-size: 0.6rem;
   letter-spacing: 0.01em;
   color: var(--bone-dim);
   line-height: 1.15;
@@ -145,7 +145,7 @@
 
 /* State-specific colors. Switches when systems-widget.js updates
    data-state on the element. */
-.antenna-state[data-state="BROADCASTING"] { color: var(--sodium); }
+.antenna-state[data-state="SENDING"] { color: var(--sodium); }
 .antenna-state[data-state="RECEIVING"]    { color: var(--verdigris-bright); }
 .antenna-state[data-state="CORRUPTED"]    { color: var(--blood-bright); animation: state-corrupt-flicker 1.4s steps(1) infinite; }
 .antenna-state[data-state="STANDBY"]      { color: var(--bone-faint); }
@@ -171,8 +171,9 @@
 }
 
 .bar-label {
-  flex: 0 0 3.5rem;
+  flex: 0 0 4.25rem;
   color: var(--bone-dim);
+  font-size: 0.7rem;
 }
 
 .bar-track {
@@ -221,10 +222,10 @@
 }
 
 .bar-percent {
-  flex: 0 0 1.8rem;
+  flex: 0 0 2rem;
   text-align: right;
   color: var(--bone-faint);
-  font-size: 0.55rem;
+  font-size: 0.7rem;
 }
 
 /* ── Buffer spinner ─────────────────────────────────────────────────────── */
@@ -241,7 +242,7 @@
 .buffer-count {
   flex: 1;
   color: var(--bone-faint);
-  font-size: 0.58rem;
+  font-size: 0.7rem;
 }
 
 /* ── Encryption status ──────────────────────────────────────────────────── */
@@ -250,7 +251,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   letter-spacing: 0.04em;
   line-height: 1.5;
   transition: background 0.25s;
@@ -265,7 +266,7 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: lowercase;
 }
@@ -370,7 +371,7 @@ body.is-encryption-failure .systems-failure-banner {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   line-height: 1.5;
   letter-spacing: 0.04em;
 }
@@ -394,7 +395,7 @@ body.is-encryption-failure .systems-failure-banner {
 
 .origin-title {
   color: var(--bone-faint);
-  font-size: 0.55rem;
+  font-size: 0.6rem;
   letter-spacing: 0.1em;
   text-align: center;
   text-transform: lowercase;
@@ -411,7 +412,7 @@ body.is-encryption-failure .systems-failure-banner {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.58rem;
+  font-size: 0.7rem;
   line-height: 1.4;
 }
 
@@ -451,7 +452,7 @@ body.is-encryption-failure .systems-failure-banner {
   flex: 0 0 1.4rem;
   text-align: right;
   color: var(--bone-faint);
-  font-size: 0.55rem;
+  font-size: 0.7rem;
 }
 
 /* Auto-fold in the medium-wide zone (1001–1455px) is driven by JS
@@ -499,7 +500,7 @@ body.is-encryption-failure .systems-failure-banner {
   border: 1px solid var(--brass);
   background: var(--void);
   color: var(--brass);
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   letter-spacing: 0.1em;
   text-transform: lowercase;
   line-height: 1.4;

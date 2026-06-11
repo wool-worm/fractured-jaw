@@ -51,7 +51,7 @@
     if (!announceBtn || !announcePanel) return;
     announcePanel.classList.toggle("is-open", open);
     announceBtn.setAttribute("aria-expanded", open ? "true" : "false");
-    announceBtn.setAttribute("title", open ? "Hide messages" : "recent messages");
+    announceBtn.setAttribute("title", open ? "Hide messages" : "Show messages");
     announceBtn.textContent = open ? "▾" : "▴";
     // Persist so the open/closed state survives navigation within a tab
     // session (same lifecycle as zen itself; see STORAGE_KEY note above).
