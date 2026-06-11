@@ -532,13 +532,35 @@ module.exports = function (eleventyConfig) {
   // Author records — each file at src/content/authors/<Name>.md is a real,
   // navigable author page (/authors/<slug>/) with full frontmatter (title
   // = display name, description, optional image) and an optional bio body.
-  // Mirrors the `series` collection shape. Sorted alphabetically by slug
-  // so /authors/ renders in a stable order regardless of join date.
+  // Mirrors the `series` collection shape. Sorted by most recent published
+  // post (newest contributor first) so /authors/ leads with whoever posted
+  // most recently; authors with no posts fall to the end, alphabetical
+  // tiebreak for determinism.
   eleventyConfig.addCollection("authors", (api) => {
     const items = api.getFilteredByGlob(AUTHORS_GLOB);
     validateCollection(items, "authors");
     detectCollisions(items, "authors");
+
+    // Most-recent post date per author URL, computed the same way the
+    // authorPosts membership map is (same glob + author-field parsing), so
+    // the sort key matches the "last published date" the page renders from
+    // authorPosts[url][0].
+    const newestByUrl = new Map();
+    for (const post of api.getFilteredByGlob(CONTENT_GLOBS)) {
+      const parsed = parseAuthorField(post.data.author, CONTENT_ROOT);
+      if (parsed.kind === "empty") continue;
+      const ms = toMillis(post.data.date_published);
+      for (const entry of parsed.entries) {
+        if (entry.kind !== "wikilink") continue;
+        const prev = newestByUrl.get(entry.url);
+        if (prev === undefined || ms > prev) newestByUrl.set(entry.url, ms);
+      }
+    }
+
     return [...items].sort((a, b) => {
+      const av = newestByUrl.has(a.url) ? newestByUrl.get(a.url) : -Infinity;
+      const bv = newestByUrl.has(b.url) ? newestByUrl.get(b.url) : -Infinity;
+      if (av !== bv) return bv - av; // newest first
       const an = (a.data && a.data.title) || "";
       const bn = (b.data && b.data.title) || "";
       return String(an).localeCompare(String(bn));
