@@ -132,7 +132,7 @@
   text-transform: lowercase;
 }
 
-/* Small enough that the longest state ("SENDING", 12 chars) fits one
+/* Small enough that the longest state ("RECEIVING", 9 chars) fits one
    line in a ~55px cell; overflow-wrap is a safety net so an unexpectedly
    wide glyph run breaks cleanly instead of overflowing into the neighbor. */
 .antenna-state {

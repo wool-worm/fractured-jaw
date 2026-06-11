@@ -3,8 +3,8 @@ neighbors: []
 rings:
   - name: Hotline Webring
     url: https://hotlinewebring.club/
-    prev: https://hotlinewebring.club/YOUR-SLUG/previous
-    next: https://hotlinewebring.club/YOUR-SLUG/next
+    prev: https://hotlinewebring.club/fractured-jaw/previous
+    next: https://hotlinewebring.club/fractured-jaw/next
     # random: https://hotlinewebring.club/YOUR-SLUG/random   # optional
 ---
 
