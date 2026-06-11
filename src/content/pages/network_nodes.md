@@ -1,6 +1,6 @@
 ---
 title: network_nodes
-description:
+description: 'Run the network: a force-directed graph of every Fractured Jaw post, wired by wikilinks and shared tags. Zoom, click, and explore.'
 layout: layouts/graph.njk
 page_type: top
 graph_enabled: false

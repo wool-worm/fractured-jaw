@@ -1,6 +1,6 @@
 ---
 title: Fractured Jaw
-description:
+description: Fractured Jaw is a collaborative zine and blog. Cultural criticism, media commentary. Anonymous and built for reading under the searing light of a sodium lamp.
 layout: layouts/home.njk
 graph_enabled: false
 preview_enabled: false

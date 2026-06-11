@@ -17,8 +17,16 @@
     } catch (e) {}
   })();
 </script>
-<title>{% if title and title != site.title %}{{ title }} :: {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
-<meta name="description" content="{{ description or site.description }}">
+{# Title: interior pages prefix their own title; the homepage (whose title
+   equals site.title) appends site.tagline so the <title> isn't a bare,
+   too-short brand name. Falls back to bare site.title if no tagline set. #}
+<title>{% if title and title != site.title %}{{ title }} :: {{ site.title }}{% elif page.url == "/" and site.tagline %}{{ site.title }} :: {{ site.tagline }}{% else %}{{ site.title }}{% endif %}</title>
+{# Description fallback chain: per-page frontmatter `description:` is best;
+   otherwise derive a plain-text excerpt from the page body; site.description
+   is the last resort. Keep og:/twitter: description (below) using the same
+   `_description` so the three stay in sync. #}
+{% set _description = description or (page.rawInput | excerpt) or site.description %}
+<meta name="description" content="{{ _description }}">
 {# HTML5 <meta name="author"> is single-valued. For array authors, join
    with commas so the meta tag holds the full byline as one string.
    Wikilink `author:` frontmatter is resolved to display names via the
@@ -46,7 +54,7 @@
 
 {# Open Graph (used by Discord, Slack, Mastodon, Facebook, etc. when links are shared) #}
 <meta property="og:title" content="{{ title or site.title }}">
-<meta property="og:description" content="{{ description or site.description }}">
+<meta property="og:description" content="{{ _description }}">
 <meta property="og:type" content="{% if _isArticle %}article{% else %}website{% endif %}">
 <meta property="og:url" content="{{ site.url }}{{ page.url }}">
 <meta property="og:site_name" content="{{ site.title }}">
@@ -71,7 +79,7 @@
 {# Twitter card #}
 <meta name="twitter:card" content="{{ card_type or site.defaultCardType }}">
 <meta name="twitter:title" content="{{ title or site.title }}">
-<meta name="twitter:description" content="{{ description or site.description }}">
+<meta name="twitter:description" content="{{ _description }}">
 <meta name="twitter:image" content="{{ _ogImage }}">
 {% if _isDefaultImage %}
 <meta name="twitter:image:width" content="{{ site.defaultImageWidth }}">

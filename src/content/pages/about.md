@@ -1,6 +1,6 @@
 ---
 title: About
-description:
+description: Fractured Jaw is an anonymous zine reintroducing the weird and the wondrous to a flattened internet. Politics, fiction, media, criticism.
 graph_enabled: false
 preview_enabled: false
 ---

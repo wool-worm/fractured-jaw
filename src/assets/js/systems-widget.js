@@ -67,11 +67,11 @@
   // (band, time-bucket). Same bucket → same state across visits in that
   // window, so the panel doesn't strobe but also doesn't stagnate.
   var ANTENNA_TICK_MS = 4500;
-  var ANTENNA_STATES = ["BROADCASTING", "RECEIVING", "CORRUPTED", "STANDBY", "WAITING"];
+  var ANTENNA_STATES = ["SENDING", "RECEIVING", "CORRUPTED", "STANDBY", "WAITING"];
 
   // Weight distribution: most antennae sit in benign states, with
   // CORRUPTED rare and dramatic.
-  // index   0=BROADCASTING 1=RECEIVING 2=CORRUPTED 3=STANDBY 4=WAITING
+  // index   0=SENDING 1=RECEIVING 2=CORRUPTED 3=STANDBY 4=WAITING
   var ANTENNA_WEIGHTS = [25, 30, 8, 25, 12];
 
   function pickAntennaState(band, bucket) {

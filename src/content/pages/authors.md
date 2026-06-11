@@ -1,6 +1,6 @@
 ---
 title: authors
-description:
+description: Every byline on Fractured Jaw is listed here. Each contributor gets their own page and Atom feed, all writing under anonymous handles.
 layout: layouts/authors-index.njk
 graph_enabled: false
 preview_enabled: false

@@ -1,6 +1,6 @@
 ---
 title: series
-description:
+description: 'Linked threads from Fractured Jaw: from shared-theme collections to episodic short stories. Entries cross sections and each series has its own feed.'
 layout: layouts/series-index.njk
 graph_enabled: false
 preview_enabled: false

@@ -1,12 +1,13 @@
 ---
 layout: layouts/base.njk
 ---
-{# Webring landing (/webring/). Renders neighbors from the global
-   `webring` data (src/_data/webring.js → src/content/_data/webring.md).
-   Each entry is a small card with name, optional description, and an
-   outbound link. Empty-state copy stays in-world. Visual shape mirrors
-   layouts/series-index.njk so the page reads as part of the same
-   section-page family. #}
+{# Webring landing (/webring/). Two sections from the global `webring`
+   data (src/_data/webring.js → src/content/_data/webring.md):
+   "Webrings" (ring memberships — inline prev/next rows or iframe embeds)
+   then "Hypernet Neighbors" (a blogroll of outbound cards). The Webrings
+   header + trailing divider only render when there are rings; the
+   Neighbors header always renders (empty-state copy stays in-world).
+   Card visual shape mirrors layouts/series-index.njk. #}
 
 <section class="section-page section-webring">
   <header class="section-header">
@@ -19,14 +20,54 @@ layout: layouts/base.njk
     {% endif %}
   </header>
 
+  {# Webring memberships, grouped in one section regardless of style.
+     Bare prev/next entries render as one inline nav row
+     (← previous | name | next →) so the links sit on a single line
+     instead of stacking the way raw markdown links would. An entry with
+     an `embed:` instead renders that raw widget HTML in place, so iframe
+     rings interleave with bare ones in list order. `url`/`random` are
+     optional on bare entries. #}
+  {% if webring.rings and webring.rings.length %}
+    <h2 class="webring-section-title">Webrings</h2>
+    <ul class="webring-memberships">
+      {% for r in webring.rings %}
+        {% if r.embed %}
+          <li class="webring-membership webring-membership-embed">
+            {{ r.embed | safe }}
+          </li>
+        {% else %}
+          <li class="webring-membership">
+            <nav class="webring-nav" aria-label="{{ r.name }} navigation">
+              <a class="webring-nav-link" href="{{ r.prev }}" rel="external noopener">← previous</a>
+              <span class="webring-sep" aria-hidden="true">|</span>
+              {% if r.url %}
+                <a class="webring-nav-name" href="{{ r.url }}" rel="external noopener">{{ r.name }}</a>
+              {% else %}
+                <span class="webring-nav-name">{{ r.name }}</span>
+              {% endif %}
+              {% if r.random %}
+                <span class="webring-sep" aria-hidden="true">|</span>
+                <a class="webring-nav-link" href="{{ r.random }}" rel="external noopener">random</a>
+              {% endif %}
+              <span class="webring-sep" aria-hidden="true">|</span>
+              <a class="webring-nav-link" href="{{ r.next }}" rel="external noopener">next →</a>
+            </nav>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+    <hr class="webring-divider">
+  {% endif %}
+
+  <h2 class="webring-section-title">Hypernet Neighbors</h2>
   {% if webring.neighbors and webring.neighbors.length %}
     <ul class="webring-grid">
       {% for n in webring.neighbors %}
         <li class="webring-card">
           <article>
-            <h2 class="webring-card-title">
+            <h3 class="webring-card-title">
               <a href="{{ n.url }}" rel="external noopener">{{ n.name }}</a>
-            </h2>
+            </h3>
             {% if n.description %}
               <p class="webring-card-description">{{ n.description }}</p>
             {% endif %}
@@ -38,6 +79,6 @@ layout: layouts/base.njk
       {% endfor %}
     </ul>
   {% else %}
-    <p class="section-empty">No neighbors on the wire yet. The dial is open.</p>
+    <p class="section-empty">No neighbors yet. Send us a <a href="mailto:dispatch@fractured-jaw.com">dispatch</a>, we're friendly!</p>
   {% endif %}
 </section>
