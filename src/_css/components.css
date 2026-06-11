@@ -614,6 +614,23 @@
   color: var(--sodium);
 }
 
+/* ── Webring section headers + divider ──────────────────────────────────── */
+/* The /webring/ page splits into "Webrings" (memberships) and "Hypernet
+   Neighbors" (blogroll). Static h2 headers label each; an <hr> closes the
+   memberships block when rings are present. */
+.webring-section-title {
+  font-family: var(--font-title);
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  color: var(--bone);
+  margin: var(--sp-lg) 0 0.75rem;
+}
+
+.webring-divider {
+  border: 0;
+  border-top: 1px solid var(--bone-faint);
+  margin: var(--sp-lg) 0;
+}
+
 /* ── Webring grid (/webring/ landing) ───────────────────────────────────── */
 /* Borrows the series-card visual shape — same grid, same card frame — with
    a tighter card body since neighbors don't carry images or tag chips. */
@@ -699,6 +716,72 @@
 
 .webring-card-url a:hover {
   color: var(--sodium);
+}
+
+/* ── Webring memberships (inline ring nav) ──────────────────────────────── */
+/* Each ring renders as a single horizontal row: ← previous | name | next →.
+   flex + wrap keeps it on one line on desktop and folds gracefully on
+   narrow screens, instead of stacking like raw markdown prev/next links. */
+.webring-memberships {
+  list-style: none;
+  margin: 0 0 var(--sp-lg);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.webring-membership {
+  background: var(--void-soft);
+  border: 1px solid var(--bone-faint);
+  border-left: 3px solid var(--brass-deep);
+  padding: 0.6rem 0.9rem;
+}
+
+.webring-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+}
+
+.webring-nav-name {
+  font-family: var(--font-title);
+  color: var(--bone);
+  border-bottom: none;
+}
+
+.webring-nav-name:hover {
+  color: var(--sodium);
+}
+
+.webring-nav-link {
+  color: var(--brass-deep);
+  border-bottom: none;
+  white-space: nowrap;
+}
+
+.webring-nav-link:hover {
+  color: var(--sodium);
+}
+
+.webring-sep {
+  color: var(--bone-faint);
+  user-select: none;
+}
+
+/* Iframe/widget ring entries. Tighter padding so the embedded widget sits
+   close to the frame; constrain the iframe so it never overflows on mobile.
+   The widget brings the ring's own styling — we only contain it. */
+.webring-membership-embed {
+  padding: 0.5rem 0.9rem;
+}
+
+.webring-membership-embed iframe {
+  display: block;
+  max-width: 100%;
 }
 
 /* ── Individual post layout ─────────────────────────────────────────────── */
