@@ -6,7 +6,7 @@ preview_enabled: false
 ---
 New dispatches, now delivered to your inbox! When something is broadcasted you get a single message with no tracking pixels, no spam bloat, and no interference. Unsubscribe any time, no questions asked.
 
-<form class="newsletter-form" action="https://buttondown.com/api/emails/embed-subscribe/wool-worm" method="post" target="_blank">
+<form class="newsletter-form" action="https://buttondown.com/api/emails/embed-subscribe/wool-worm" method="post">
   <div class="newsletter-form-field">
     <label class="newsletter-form-label" for="bd-email">tune your scanner</label>
     <input class="newsletter-form-input" id="bd-email" type="email" name="email" placeholder="you@example.com" required autocomplete="email" />

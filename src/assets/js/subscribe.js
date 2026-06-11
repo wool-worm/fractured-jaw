@@ -1,23 +1,29 @@
-// Subscribe form enhancement (progressive enhancement, first-party vanilla JS).
+// Subscribe confirmation modal (first-party vanilla JS).
 //
-// The /subscribe/ form is a plain HTML POST to Buttondown. We deliberately do
-// NOT intercept it with fetch: Buttondown's firewall can answer a borderline
-// signup with a CAPTCHA / "needs-capture" challenge, and that challenge lives in
-// the HTTP RESPONSE. A background fetch (no-cors) throws the response away, so
-// the reader never sees the challenge and the subscriber gets flagged/blocked.
+// The /subscribe/ form is a plain SAME-TAB HTML POST to Buttondown's public
+// embed endpoint. We deliberately do NOT intercept it: Buttondown handles the
+// signup (including any firewall CAPTCHA, which needs a visible page), then
+// redirects back here.
 //
-// Instead we let the native submit run: target=_blank opens Buttondown's
-// response (including any CAPTCHA) in a new tab, and on the current tab we add
-// the nice-to-haves, clear the fields and show a small "check your email" modal.
-// The reset is deferred to the next tick so the browser serializes + sends the
-// data before we wipe it. With JS off, the plain form still works.
+// Set Buttondown's "after subscribing" redirect to the bare page URL
+// (https://fractured-jaw.com/subscribe/). Buttondown appends its own
+// `?email_address=<email>` to that redirect, and we use the presence of that
+// param as the "just subscribed" signal to show the modal. We then strip the
+// whole query string via replaceState so the email doesn't linger in the URL,
+// the history, or a shared link.
+//
+// Do NOT put your own ?query on the redirect: Buttondown appends with `?`
+// rather than `&`, which produces a malformed `?a=1?email_address=...` URL.
+//
+// `?subscribed=1` is also accepted so you can preview the modal directly without
+// signing up. With JS off the signup still works; the reader just doesn't get
+// the modal (the confirmation email is the real signal either way).
 
 (function () {
   "use strict";
 
-  var form = document.querySelector(".newsletter-form");
   var modal = document.getElementById("subscribe-modal");
-  if (!form || !modal) return;
+  if (!modal) return;
 
   var closeBtn = modal.querySelector(".subscribe-modal-close");
 
@@ -29,15 +35,15 @@
     modal.classList.remove("is-open");
   }
 
-  // No preventDefault: the native POST goes to Buttondown (new tab) so its
-  // firewall challenge can render. Defer the reset + modal to the next tick,
-  // after the browser has serialized and submitted the form.
-  form.addEventListener("submit", function () {
-    setTimeout(function () {
-      form.reset();
+  // Show the modal on the return from Buttondown, then strip the query so the
+  // email isn't left in the URL / history (or re-triggered on refresh).
+  try {
+    var params = new URLSearchParams(window.location.search);
+    if (params.has("email_address") || params.get("subscribed") === "1") {
       openModal();
-    }, 0);
-  });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  } catch (e) {}
 
   if (closeBtn) {
     closeBtn.addEventListener("click", closeModal);
