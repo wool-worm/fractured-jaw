@@ -152,14 +152,37 @@ module.exports = function (eleventyConfig) {
       }
     }
 
+    // Bad ids route through reportIssue (not throw) so a broken embed
+    // joins the aggregated end-of-build error list instead of halting
+    // the render pass on the first offender — same one-pass philosophy
+    // as the wikilink/frontmatter validators. Emitting nothing keeps
+    // the page rendering around the missing player in dev.
     var id = opts.album || opts.track;
     if (!id || !/^\d+$/.test(String(id))) {
-      throw new Error(
-        "bandcamp shortcode: album or track id must be a numeric string (got " +
-        JSON.stringify(id) + ")"
-      );
+      reportIssue({
+        kind: "bandcamp-shortcode",
+        file: (this.page && this.page.inputPath) || "(bandcamp shortcode call)",
+        offending: "id: " + JSON.stringify(id),
+        reason: "album or track id must be a numeric string",
+        isDraft: false,
+        isExcluded: false,
+      });
+      return "";
     }
-    var embed = buildBandcampEmbed(opts);
+    var embed;
+    try {
+      embed = buildBandcampEmbed(opts);
+    } catch (e) {
+      reportIssue({
+        kind: "bandcamp-shortcode",
+        file: (this.page && this.page.inputPath) || "(bandcamp shortcode call)",
+        offending: JSON.stringify(opts.preset || "(default preset)"),
+        reason: e.message,
+        isDraft: false,
+        isExcluded: false,
+      });
+      return "";
+    }
     // Width override: when opts.width is set, constrain the iframe via a
     // max-width inline style (the actual width still scales down on
     // narrower viewports). Without it, the iframe takes the full column.
@@ -243,14 +266,33 @@ module.exports = function (eleventyConfig) {
       }
     }
 
+    // Same aggregated-error treatment as the bandcamp shortcode above.
     var id = opts.album || opts.track;
     if (!id || !/^[A-Za-z0-9]{16,}$/.test(String(id))) {
-      throw new Error(
-        "spotify shortcode: album or track id must be a base62 alphanumeric string (Spotify ids are typically 22 chars; got " +
-        JSON.stringify(id) + ")"
-      );
+      reportIssue({
+        kind: "spotify-shortcode",
+        file: (this.page && this.page.inputPath) || "(spotify shortcode call)",
+        offending: "id: " + JSON.stringify(id),
+        reason: "album or track id must be a base62 alphanumeric string (Spotify ids are typically 22 chars)",
+        isDraft: false,
+        isExcluded: false,
+      });
+      return "";
     }
-    var sEmbed = buildSpotifyEmbed(opts);
+    var sEmbed;
+    try {
+      sEmbed = buildSpotifyEmbed(opts);
+    } catch (e) {
+      reportIssue({
+        kind: "spotify-shortcode",
+        file: (this.page && this.page.inputPath) || "(spotify shortcode call)",
+        offending: JSON.stringify(opts.variant || "(default variant)"),
+        reason: e.message,
+        isDraft: false,
+        isExcluded: false,
+      });
+      return "";
+    }
     var sHeight = opts.height || sEmbed.height;
     var sWidthAttr = opts.width ? ' width="' + opts.width + '"' : ' width="100%"';
     var sStyle = 'border:0;' + (opts.width ? 'max-width:' + opts.width + 'px;' : '');

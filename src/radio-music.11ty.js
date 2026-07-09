@@ -60,6 +60,70 @@ function readTargetFrontmatter(vaultPath) {
   return data;
 }
 
+// ── Station-coordinate validation ────────────────────────────────────────
+// signalAt() in the radio widget assigns every (band, index) a signal type
+// via an FNV-1a hash roll, and a populated bandcamp station is only allowed
+// to override a coord whose roll is carrier_wave. Parking a station on a
+// lock/numbers/compromised/haunted coord would silently shift the
+// round-robin passage assignment of every later channel of that type (the
+// widget caches channel order), and the FJR coordinate is pinned outright.
+// This duplicates the hash + weights from src/assets/js/radio-widget.js
+// (hash(), SIGNAL_TYPES, FJR_BAND/FJR_INDEX) — KEEP THE THREE IN SYNC.
+const RADIO_BANDS = ["ALPHA", "BETA", "GAMMA", "DELTA"];
+const RADIO_STEPS = 64;
+const FJR_BAND = "GAMMA";
+const FJR_INDEX = 0x14;
+const SIGNAL_WEIGHTS = [
+  ["dead_air", 61],
+  ["carrier_wave", 15],
+  ["pirate_signal", 3],
+  ["numbers", 9],
+  ["lock", 5],
+  ["compromised", 5],
+  ["haunted", 2],
+];
+
+function fnv1a(str) {
+  let h = 0x811c9dc5 >>> 0;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return h;
+}
+
+// The signal type the hash roll assigns a coord BEFORE any bandcamp
+// override — i.e. what the slot would broadcast if this station weren't
+// parked there.
+function baseSignalAt(band, index) {
+  const roll = fnv1a(band + ":" + index) % 100;
+  let acc = 0;
+  for (const [name, weight] of SIGNAL_WEIGHTS) {
+    acc += weight;
+    if (roll < acc) return name;
+  }
+  return "dead_air";
+}
+
+// Validate a pointer's coordinate. Returns null when OK, or a
+// human-readable reason string for reportIssue.
+function coordProblem(band, freq) {
+  if (RADIO_BANDS.indexOf(band) < 0) {
+    return `band must be one of ${RADIO_BANDS.join("/")} (got ${JSON.stringify(band)})`;
+  }
+  if (!Number.isInteger(freq) || freq < 0 || freq >= RADIO_STEPS) {
+    return `frequency must be an integer 0-${RADIO_STEPS - 1} (got ${JSON.stringify(freq)})`;
+  }
+  if (band === FJR_BAND && freq === FJR_INDEX) {
+    return "that coordinate is the pinned Fractured Jaw Radio channel";
+  }
+  const base = baseSignalAt(band, freq);
+  if (base !== "carrier_wave") {
+    return `coordinate hash-rolls "${base}"; stations may only occupy carrier_wave slots (a ${base} slot would silently shift that type's round-robin channel assignments)`;
+  }
+  return null;
+}
+
 // js-yaml turns unquoted ISO dates into JS Date objects, quoted ones into
 // strings. Normalize both to YYYY-MM-DD so the public JSON is uniform and
 // the build's local timezone never leaks (Date.toISOString() is UTC).
@@ -207,6 +271,20 @@ class RadioMusic {
     const populated = [];
     for (const s of all) {
       if (!s || !s.album) continue;  // empty slot, stays carrier_wave on its coord
+      const band = s.band != null ? s.band : s.station_band;
+      const freq = s.frequency != null ? s.frequency : s.station_freq;
+      const problem = coordProblem(band, freq);
+      if (problem) {
+        reportIssue({
+          kind: "radio-station-coord",
+          file: HOST_FILE,
+          offending: `band: ${JSON.stringify(band)}, frequency: ${JSON.stringify(freq)}`,
+          reason: problem,
+          isDraft: false,
+          isExcluded: false,
+        });
+        continue;
+      }
       const resolved = resolveAlbumLink(s.album, HOST_FILE, CONTENT_ROOT);
       if (!resolved) continue;
       const fm = resolved.frontmatter;
@@ -244,3 +322,7 @@ class RadioMusic {
 }
 
 module.exports = RadioMusic;
+// Exposed for the validation test harness only; not part of the
+// Eleventy contract.
+module.exports._coordProblem = coordProblem;
+module.exports._baseSignalAt = baseSignalAt;

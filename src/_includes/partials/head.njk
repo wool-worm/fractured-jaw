@@ -106,3 +106,27 @@
 {% if section == "authors" and page.url != "/authors/" %}
 <link rel="alternate" type="application/atom+xml" href="{{ page.url }}feed.xml" title="{{ site.title }} — {{ title }}">
 {% endif %}
+
+{# JSON-LD Article schema — structured metadata for search engines
+   (richer SERP rendering: headline, dates, author). Inert data, no
+   requests, no runtime code; built entirely from the values this file
+   already computed (_description, _ogImage, _headAuthors). Article
+   pages only, matching the og:type gate above. `dump` JSON-encodes each
+   value (quotes, newlines); `safe` stops autoescape from HTML-escaping
+   the quotes inside the script block. #}
+{% if _isArticle and date_published %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ (title or site.title) | dump | safe }},
+  "description": {{ _description | dump | safe }},
+  "mainEntityOfPage": {{ (site.url + page.url) | dump | safe }},
+  "datePublished": {{ (date_published | isoDate) | dump | safe }},
+  "dateModified": {{ ((date_updated or date_published) | isoDate) | dump | safe }},
+  "image": {{ _ogImage | dump | safe }},
+  "author": [{% for a in _headAuthors %}{ "@type": "Person", "name": {{ a.displayName | dump | safe }}, "url": {{ (site.url + a.url) | dump | safe }} }{% if not loop.last %}, {% endif %}{% endfor %}],
+  "publisher": { "@type": "Organization", "name": {{ site.title | dump | safe }}, "logo": { "@type": "ImageObject", "url": {{ (site.defaultImage | absoluteUrl(site.url)) | dump | safe }} } }
+}
+</script>
+{% endif %}

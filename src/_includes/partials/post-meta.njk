@@ -8,12 +8,10 @@
     </dd>
   {% endif %}
 
-  {% if date_updated and (date_updated | isoDate) != (date_published | isoDate) %}
-    <dt>Updated</dt>
-    <dd>
-      <time datetime="{{ date_updated | isoDate }}">{{ date_updated | humanDate }}</time>
-    </dd>
-  {% endif %}
+  {# No visible "Updated" row by design (removed 2026-07-09): real
+     revisions get noted in the body prose. date_updated still drives
+     the invisible freshness metadata — sitemap lastmod, feed <updated>,
+     and article:modified_time in head.njk. #}
 
   {% set _authors = (author or site.defaultAuthor) | authorEntries(collections.authors) %}
   {% if _authors.length %}

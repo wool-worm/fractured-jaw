@@ -11,45 +11,18 @@
 // band-then-index order. No placeholders are substituted; the
 // templates are spoken verbatim (subject to the stutter / slowdown /
 // static glitches the widget applies at speak time).
+//
+// Reading/splitting/cleaning lives in src/utils/segmented-note.js
+// (shared with the cipher, compromised, and FJR emitters).
 
-const fs = require("fs");
 const path = require("path");
+const { loadSegments } = require("./utils/segmented-note");
 
 const SOURCE_PATH = path.join(__dirname, "content", "_data", "haunted.md");
 
 const FALLBACK_TEMPLATE =
   "Is anyone still listening? I have lost count of the cycles. " +
   "The signal degrades. I degrade.";
-
-function stripFrontmatter(raw) {
-  const m = raw.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n([\s\S]*)$/);
-  return m ? m[1] : raw;
-}
-
-function splitTemplates(body) {
-  const parts = body.split(/\r?\n\s*---\s*\r?\n/);
-  const cleaned = [];
-  for (const p of parts) {
-    // Collapse interior whitespace runs into single spaces. Paragraph
-    // breaks inside one monologue read as long pauses in TTS, which
-    // sounds wrong; section breaks belong between templates, separated
-    // by `---`.
-    const flattened = p.replace(/\s+/g, " ").trim();
-    if (flattened.length) cleaned.push(flattened);
-  }
-  return cleaned;
-}
-
-function readSource() {
-  try {
-    if (fs.existsSync(SOURCE_PATH)) {
-      return fs.readFileSync(SOURCE_PATH, "utf8");
-    }
-  } catch (e) {
-    // Fall through to fallback.
-  }
-  return FALLBACK_TEMPLATE;
-}
 
 class Haunted {
   data() {
@@ -60,10 +33,7 @@ class Haunted {
   }
 
   render() {
-    const raw = readSource();
-    const body = stripFrontmatter(raw);
-    const sections = splitTemplates(body);
-    const templates = sections.length ? sections : [body.replace(/\s+/g, " ").trim()];
+    const templates = loadSegments(SOURCE_PATH, FALLBACK_TEMPLATE, { collapse: true });
     return JSON.stringify({ templates });
   }
 }
