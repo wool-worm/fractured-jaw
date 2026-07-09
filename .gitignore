@@ -23,6 +23,10 @@ desktop.ini
 # these at the cwd)
 *.stackdump
 
+# Music Embed Wizard writes a .bak safety copy next to radio-music.md
+# before every station write; backups must never ride a content commit
+src/content/_data/*.bak
+
 # Editor scratch
 .vscode/
 .idea/
