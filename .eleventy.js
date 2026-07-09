@@ -441,6 +441,18 @@ module.exports = function (eleventyConfig) {
     });
   }
 
+  // Top-level pages (/, /about/, section landings, ...). Exists primarily
+  // so pages get the same safety net as everything else: required-field
+  // validation (title-only for pages; see requiredFieldsFor) and URL
+  // collision detection. Without this, two page files whose names slugify
+  // identically would silently overwrite each other on disk.
+  eleventyConfig.addCollection("pages", (api) => {
+    const items = api.getFilteredByGlob("src/content/pages/**/*.md");
+    validateCollection(items, "pages");
+    detectCollisions(items, "pages");
+    return items;
+  });
+
   // Cross-section feed of every published post.
   eleventyConfig.addCollection("all_content", (api) => {
     const items = api.getFilteredByGlob(CONTENT_GLOBS);

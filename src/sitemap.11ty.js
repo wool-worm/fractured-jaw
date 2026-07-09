@@ -41,6 +41,28 @@ class Sitemap {
       });
     }
 
+    // Per-tag pages. They're pagination output from src/tag.njk, which is
+    // eleventyExcludeFromCollections (so it stays out of the content
+    // collections) — meaning they never appear in `collections.all` above
+    // and have to be added from tagList explicitly. lastmod is the newest
+    // date across the tag's member posts, since that's when the tag page's
+    // content last changed.
+    const tagList = (collections && collections.tagList) || [];
+    for (const entry of tagList) {
+      let newest = null;
+      for (const post of entry.posts) {
+        const d = toIso(
+          (post.data && (post.data.date_updated || post.data.date_published)) ||
+            post.date
+        );
+        if (d && (!newest || d > newest)) newest = d;
+      }
+      urls.push({
+        loc: site.url.replace(/\/$/, "") + `/tags/${entry.tag}/`,
+        lastmod: newest,
+      });
+    }
+
     // Stable ordering — alphabetical by loc — so successive builds produce
     // identical sitemaps when nothing changed.
     urls.sort((a, b) => a.loc.localeCompare(b.loc));
