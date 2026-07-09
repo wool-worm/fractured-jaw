@@ -835,12 +835,6 @@
   line-height: 1.8;
 }
 
-/* Section-specific accent colours on post cards */
-.post-blog     .post-card { border-left-color: #0a0; }
-.post-essay    .post-card { border-left-color: #06c; }
-.post-fragment .post-card { border-left-color: #c0c; }
-.post-media    .post-card { border-left-color: #c80; }
-
 /* ── Accessibility helper ───────────────────────────────────────────────── */
 .visually-hidden {
   position: absolute;

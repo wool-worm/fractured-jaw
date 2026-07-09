@@ -125,6 +125,10 @@
    continuously. Use sparingly for decorative unreadable ambient text.
    Mark decorative uses with aria-hidden="true". */
 .baffle-forever {
+  /* position:relative anchors the ::before flicker overlay below to THIS
+     element; without it the overlay attaches to the nearest positioned
+     ancestor (e.g. the whole footer). */
+  position: relative;
   font-family: var(--font-body);
   color: var(--bone-faint);
   letter-spacing: 0.1em;

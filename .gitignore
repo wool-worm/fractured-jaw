@@ -19,6 +19,10 @@ yarn-error.log*
 Thumbs.db
 desktop.ini
 
+# Cygwin/MSYS crash dumps (Git Bash grep occasionally aborts and drops
+# these at the cwd)
+*.stackdump
+
 # Editor scratch
 .vscode/
 .idea/

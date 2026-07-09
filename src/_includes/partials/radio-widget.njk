@@ -1,10 +1,12 @@
 {# Pirate-radio tuner widget. Pinned bottom-right of the viewport on every page
    (mirroring graph-widget.njk, which sits top-right). Behavior:
-     - Four "bands" (ALPHA / BETA / GAMMA / DELTA), each with 256 hex frequencies
-       displayed as 0xXX.XX.
-     - Most frequencies are dead_air (static); a minority carry carrier_wave,
-       transmission, or lock signals. Signal type per frequency is deterministic
-       (hash of band+index) so the same dial position always sounds the same.
+     - Four "bands" (ALPHA / BETA / GAMMA / DELTA), each with 64 channels
+       displayed as 0x00–0x3F.
+     - Most channels are dead_air (static); the rest carry carrier waves,
+       drones, numbers stations, ciphers, compromised broadcasts, haunted
+       monologues, bandcamp stations, or the pinned FJR channel. Signal type
+       per channel is deterministic (hash of band+index) so the same dial
+       position always sounds the same.
      - Audio is gated behind the power toggle to satisfy browser autoplay policy:
        the first user gesture (clicking power) unlocks AudioContext / speechSynthesis.
    JS lives at /assets/js/radio-widget.js. CSS in src/_css/radio.css. #}

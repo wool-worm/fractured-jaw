@@ -59,11 +59,23 @@ function hash8(str) {
 // Relative url(...) references inside the modules (e.g. fonts.css -> 'fonts/..')
 // resolve against the bundle's directory (/assets/css/), which is unchanged by
 // the filename hash, so fonts keep resolving.
+//
+// The bundle is lightly minified: comments stripped, per-line indentation
+// trimmed, blank lines dropped. Deliberately conservative and dependency-
+// free — no token-level rewriting, so string values (the ticker's content:
+// text, font names) can't be mangled. The authoring modules in src/_css/
+// keep their comments; only the shipped bundle loses them (~40% smaller).
+// CSS strings cannot span lines unescaped, so per-line trimming is safe.
 function buildCss() {
-  return CSS_MODULES.map((name) => {
-    const contents = fs.readFileSync(path.join(CSS_DIR, name), "utf8");
-    return `/* ===== ${name} ===== */\n${contents}`;
-  }).join("\n\n");
+  const bundle = CSS_MODULES.map((name) =>
+    fs.readFileSync(path.join(CSS_DIR, name), "utf8")
+  ).join("\n");
+  return bundle
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length)
+    .join("\n");
 }
 
 // Memoized so the data file, the CSS template, and the JS template all see the

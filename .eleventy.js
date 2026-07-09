@@ -416,6 +416,22 @@ module.exports = function (eleventyConfig) {
     return str;
   });
 
+  // Return the LATER of two date values as a UTC ISO string (empty string
+  // when both are missing). Used by head.njk to clamp article:modified_time
+  // and JSON-LD dateModified: the vault plugin maintains date_updated as
+  // file-mtime, which can legitimately precede a forward-dated
+  // date_published — but "modified before published" is nonsense to
+  // consumers, so freshness metadata never reports earlier than publish.
+  // The Atom feed and sitemap apply the same clamp in their own renderers.
+  eleventyConfig.addFilter("newerOf", (a, b) => {
+    const ma = toMillis(a);
+    const mb = toMillis(b);
+    if (!ma && !mb) return "";
+    const winner = ma >= mb ? a : b;
+    const dt = toDateTime(winner);
+    return dt && dt.isValid ? dt.toUTC().toISO() : "";
+  });
+
   // Promote a possibly-relative URL to an absolute one by prefixing site.url.
   // Used in head.njk for og:image (Open Graph rejects relative paths). Passes
   // through any value that already starts with http:// or https://.
@@ -525,8 +541,14 @@ module.exports = function (eleventyConfig) {
 
   // Tag index: every unique tag (case-normalized) with the posts that carry it.
   // Each entry: { tag, displayName, count, posts: [...] }.
+  //
+  // Series parents + author records are included alongside the four content
+  // sections: their pages render tag chips linking to /tags/<slug>/, so any
+  // tag carried ONLY by a parent (e.g. "series") must still produce a tag
+  // page or those chips 404. On the tag page they group under their own
+  // section headings ("authors"/"series", after the canonical four).
   eleventyConfig.addCollection("tagList", (api) => {
-    const all = api.getFilteredByGlob(CONTENT_GLOBS);
+    const all = api.getFilteredByGlob([...CONTENT_GLOBS, SERIES_GLOB, AUTHORS_GLOB]);
     const map = new Map();
     for (const item of all) {
       const raw = item.data.tags;
@@ -802,7 +824,24 @@ module.exports = function (eleventyConfig) {
   // plugin (and hand-placement) writes files at
   //   src/content/_attachments/<section>/<slug>/<file>
   // which exactly mirrors the post's published URL path.
-  eleventyConfig.addPassthroughCopy({ "src/content/_attachments": "attachments" });
+  //
+  // _attachments/_data/ is EXCLUDED: it holds the album-cover images the
+  // music-embed wizard manages for vault-side reference. Nothing published
+  // references them (the radio widget plays Bandcamp iframes; review embeds
+  // are iframes too), and they were ~30% of the deployed site by weight.
+  // Subdirs are discovered at config time so new sections need no edit here.
+  // NOTE: if a post's `image:` frontmatter ever points into _attachments/
+  // _data/, the build's exists-check passes (file is on disk) but the
+  // published og:image URL would 404 — keep post covers out of _data.
+  for (const entry of require("fs").readdirSync(
+    pathModule.join(CONTENT_ROOT_ABS, "_attachments"),
+    { withFileTypes: true }
+  )) {
+    if (!entry.isDirectory() || entry.name === "_data") continue;
+    eleventyConfig.addPassthroughCopy({
+      [`src/content/_attachments/${entry.name}`]: `attachments/${entry.name}`,
+    });
+  }
   eleventyConfig.addPassthroughCopy("CNAME");
   // Crawler hints — robots.txt is the conventional signal, ai.txt is the
   // emerging Spawning-style opt-out for AI training crawlers. Both live

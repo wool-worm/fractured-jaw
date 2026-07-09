@@ -30,10 +30,18 @@ class Sitemap {
       // Honor explicit opt-out.
       if (item.data && item.data.sitemap_enabled === false) continue;
 
-      const lastmod = toIso(
-        (item.data && (item.data.date_updated || item.data.date_published)) ||
-          item.date
+      // lastmod: the LATER of updated/published — the vault plugin's
+      // date_updated is file-mtime and can precede a forward-dated
+      // date_published; a lastmod older than the publish date reads as
+      // nonsense to crawlers. ISO date strings compare safely as strings.
+      const updated = toIso(item.data && item.data.date_updated);
+      const published = toIso(
+        (item.data && item.data.date_published) || item.date
       );
+      const lastmod =
+        updated && published
+          ? (updated > published ? updated : published)
+          : updated || published;
 
       urls.push({
         loc: site.url.replace(/\/$/, "") + item.url,

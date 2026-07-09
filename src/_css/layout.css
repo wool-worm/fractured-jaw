@@ -28,10 +28,9 @@ main {
 
    BELOW 1280px the gutter-hold releases but the column stays FROZEN at the
    720px handoff width (see the base rule) rather than snapping back to 100ch;
-   it slides left as the viewport narrows. The systems widget auto-folds at the
-   handoff (systems-widget.js AUTOFOLD_MQ, 1031–1279px); the right widgets keep
-   their own fold thresholds for now (overlap point still being tuned), then the
-   mobile collapse. */
+   it slides left as the viewport narrows. All three widgets auto-fold
+   together at the handoff (each widget JS's AUTOFOLD_MQ, 821–1279px), then
+   hide at the 820px mobile switchover. */
 @media (min-width: 1280px) {
   main,
   .site-header-inner {
@@ -166,8 +165,8 @@ main {
 }
 
 /* ── Mobile nav toggle (hamburger) ──────────────────────────────────────── */
-/* Hidden at desktop widths via display:none. The 720px media query at the
-   bottom of this file flips it to display:flex and collapses .site-nav
+/* Hidden at desktop widths via display:none. The 820px media query at the
+   bottom of this file flips it to display:block and collapses .site-nav
    into a dropdown panel. Brutalist three-bar glyph rendered in CSS (no
    SVG), bars morph to an X when aria-expanded="true". */
 .site-nav-toggle {
