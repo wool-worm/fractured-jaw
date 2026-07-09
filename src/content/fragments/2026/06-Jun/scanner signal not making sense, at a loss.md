@@ -2,7 +2,7 @@
 title: scanner signal not making sense, at a loss
 date_published: 2026-06-01T23:03:34
 date_updated: 2026-06-02T00:48:44
-author: ["[[authors/seize-the-light|seize-the-light]]"]
+author: "[[authors/seize-the-light|seize-the-light]]"
 tags: [fragment]
 series_name: "[[series/Radio Lonelies|Radio Lonelies]]"
 description:
