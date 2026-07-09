@@ -1,7 +1,7 @@
 ---
 title: Two Fresh Tracks & A Surprise Album Drop
 date_published: 2026-07-08T20:48:41
-date_updated: 2026-07-09T08:41:11
+date_updated: 2026-07-09T10:36:07
 author: "[[authors/wool-worm|wool-worm]]"
 tags: [media, review, electronic, dub, techno, experimental]
 series_name:
