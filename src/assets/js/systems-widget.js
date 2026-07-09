@@ -107,8 +107,16 @@
   var spinnerIdx = 0;
   var spinnerEl = document.getElementById("systems-spinner");
 
+  // The spinner is JS-driven (120ms interval), so the CSS reduced-motion
+  // kill switch can't reach it; check the media query live each tick so
+  // toggling the OS setting takes effect without a reload. The slower
+  // text swaps (antenna states, buffer count) stay — they're status
+  // updates, not motion.
+  var REDUCED_MOTION_MQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+
   function tickSpinner() {
     if (folded) return; // pause while folded — save CPU
+    if (REDUCED_MOTION_MQ.matches) return;
     if (!spinnerEl) return;
     spinnerEl.textContent = SPINNER_FRAMES[spinnerIdx];
     spinnerIdx = (spinnerIdx + 1) % SPINNER_FRAMES.length;

@@ -102,6 +102,20 @@
   // name).
   var disabledSections = new Set();
 
+  // ── Settle / pause ──────────────────────────────────────────────────────
+  // Mirrors graph-widget.js: the rAF loop self-suspends once every node's
+  // speed stays under SETTLE_SPEED_SQ for SETTLE_FRAMES consecutive frames.
+  // Force-changing events (mode/legend toggles, scramble, node drags) call
+  // wake(); view-only events (hover, pan, zoom) call repaint() for a single
+  // draw. Under prefers-reduced-motion, wake() settles synchronously and
+  // draws once — the graph works normally, it just never animates.
+  var running = false;
+  var settleFrames = 0;
+  var SETTLE_SPEED_SQ = 0.0004; // speed < 0.02px/frame
+  var SETTLE_FRAMES = 30;
+  var REDUCED_SETTLE_STEPS = 240;
+  var REDUCED_MOTION_MQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+
   function resize() {
     // Scale to the device pixel ratio so the lines stay crisp on hi-dpi
     // displays. We render in CSS pixels but the backing buffer is larger.
@@ -134,7 +148,7 @@
     byId = new Map(nodes.map(function (n) { return [n.id, n]; }));
 
     setupListeners();
-    rafHandle = requestAnimationFrame(tick);
+    wake();
   }
 
   function activeEdges() {
@@ -212,6 +226,7 @@
 
     // Integrate, except for the node currently being dragged (it's pinned
     // to the cursor, so applying velocity to it would fight the drag).
+    var maxSpeedSq = 0;
     for (var p = 0; p < visible.length; p++) {
       var node = visible[p];
       if (node === dragging) continue;
@@ -219,7 +234,11 @@
       node.vy *= DAMPING;
       node.x += node.vx;
       node.y += node.vy;
+      var sq = node.vx * node.vx + node.vy * node.vy;
+      if (sq > maxSpeedSq) maxSpeedSq = sq;
     }
+
+    return maxSpeedSq;
   }
 
   function draw() {
@@ -368,9 +387,45 @@
   }
 
   function tick() {
-    simulate();
+    if (!nodes.length) {
+      running = false;
+      return;
+    }
+    var maxSpeedSq = simulate();
     draw();
+    if (maxSpeedSq < SETTLE_SPEED_SQ) {
+      settleFrames++;
+      if (settleFrames >= SETTLE_FRAMES) {
+        running = false;
+        return;
+      }
+    } else {
+      settleFrames = 0;
+    }
     rafHandle = requestAnimationFrame(tick);
+  }
+
+  function wake() {
+    settleFrames = 0;
+    if (!nodes.length) return;
+    if (REDUCED_MOTION_MQ.matches) {
+      // A drag calls wake() on every mousemove — one step per event tracks
+      // the cursor without burning a full synchronous settle each time.
+      // Everything else (init, mode/legend toggles, scramble) settles in
+      // one shot so the layout appears in place of animating there.
+      var steps = dragging ? 1 : REDUCED_SETTLE_STEPS;
+      for (var i = 0; i < steps; i++) simulate();
+      draw();
+      running = false;
+      return;
+    }
+    if (running) return;
+    running = true;
+    rafHandle = requestAnimationFrame(tick);
+  }
+
+  function repaint() {
+    if (!running && nodes.length) draw();
   }
 
   function getPos(e) {
@@ -411,6 +466,8 @@
         buttons[i].dataset.mode === mode ? "true" : "false"
       );
     }
+    // Different edge set = different forces; restart the simulation.
+    wake();
   }
 
   function setupListeners() {
@@ -438,12 +495,18 @@
         dragging.y = pos.y;
         dragging.vx = 0;
         dragging.vy = 0;
+        // Moving a node injects real forces — restart the loop so the
+        // neighborhood responds even if the layout had settled.
+        wake();
       } else if (panning) {
         panX = panStart.panX + (e.clientX - panStart.mx);
         panY = panStart.panY + (e.clientY - panStart.my);
+        repaint();
       } else {
+        var prevHover = hoverNode;
         hoverNode = nodeAt(pos.x, pos.y);
         canvas.style.cursor = hoverNode ? "pointer" : "grab";
+        if (hoverNode !== prevHover) repaint();
       }
     });
 
@@ -471,6 +534,7 @@
       panning = false;
       panStart = null;
       canvas.classList.remove("is-grabbing");
+      repaint();
     });
 
     // Wheel zoom. preventDefault() requires the listener to be non-passive
@@ -479,6 +543,7 @@
       e.preventDefault();
       var factor = e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
       zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom * factor));
+      repaint();
     }, { passive: false });
 
     var buttons = document.querySelectorAll(".graph-controls button[data-mode]");
@@ -490,8 +555,8 @@
 
     // Zoom buttons share the same step + clamp as the wheel handler.
     // "reset" snaps zoom back to 1x AND clears any pan offset so the
-    // graph re-centers. The draw loop already runs on
-    // requestAnimationFrame so no explicit redraw is needed.
+    // graph re-centers. repaint() covers the settled-loop case; while
+    // the loop runs, its own draw picks the new transform up.
     var zoomButtons = document.querySelectorAll(".graph-controls button[data-zoom]");
     for (var z = 0; z < zoomButtons.length; z++) {
       zoomButtons[z].addEventListener("click", function (ev) {
@@ -505,6 +570,7 @@
           panX = 0;
           panY = 0;
         }
+        repaint();
       });
     }
 
@@ -527,6 +593,8 @@
           disabledSections.add(section);
           btn.setAttribute("aria-pressed", "false");
         }
+        // Node set changed — the remaining nodes re-balance.
+        wake();
       });
     }
 
@@ -549,11 +617,15 @@
             nodes[i].vx = 0;
             nodes[i].vy = 0;
           }
+          wake();
         }
       });
     }
 
-    window.addEventListener("resize", resize);
+    window.addEventListener("resize", function () {
+      resize();
+      repaint();
+    });
   }
 
   function boot() {

@@ -108,6 +108,25 @@
   var pressNode = null;
   var CLICK_THRESHOLD = 4;
 
+  // ── Settle / pause ──────────────────────────────────────────────────────
+  // The rAF loop self-suspends instead of running forever: once every
+  // visible node's speed stays under SETTLE_SPEED_SQ for SETTLE_FRAMES
+  // consecutive frames (sub-pixel drift, invisible), the loop stops
+  // scheduling itself. Force-changing events call wake() to restart it;
+  // view-only events (hover, pan, zoom) call repaint() for a single draw.
+  // Folding also stops the loop — the canvas is off-screen.
+  //
+  // prefers-reduced-motion: instead of animating to equilibrium, wake()
+  // runs the simulation synchronously (REDUCED_SETTLE_STEPS iterations)
+  // and draws the settled layout once. The graph stays fully functional,
+  // it just never moves on its own.
+  var running = false;
+  var settleFrames = 0;
+  var SETTLE_SPEED_SQ = 0.0004; // speed < 0.02px/frame
+  var SETTLE_FRAMES = 30;
+  var REDUCED_SETTLE_STEPS = 240;
+  var REDUCED_MOTION_MQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+
   // Truncate long titles in the hover label so they don't overflow the
   // small widget canvas. Mirrors the helper in graph.js.
   var MAX_TITLE_CHARS = 28;
@@ -284,7 +303,7 @@
     }
 
     setupListeners();
-    requestAnimationFrame(tick);
+    wake();
   }
 
   // Active set helpers — depend on the current mode toggle.
@@ -337,6 +356,7 @@
 
     var cx = canvas.clientWidth / 2;
     var cy = canvas.clientHeight / 2;
+    var maxSpeedSq = 0;
     for (var m = 0; m < visible.length; m++) {
       var n = visible[m];
       var g = anchorIds.has(n.id) ? ANCHOR_GRAVITY : GRAVITY;
@@ -346,6 +366,14 @@
       n.vy *= DAMPING;
       n.x += n.vx;
       n.y += n.vy;
+      // The pinned node is excluded from the settle measurement: it
+      // accumulates repulsion velocity here every frame and is then
+      // hard-zeroed below, so its pre-zero speed never decays and would
+      // keep an otherwise-settled content-mode layout "hot" forever.
+      if (n.id !== pinnedId) {
+        var sq = n.vx * n.vx + n.vy * n.vy;
+        if (sq > maxSpeedSq) maxSpeedSq = sq;
+      }
     }
 
     // Hard-pin (content mode) — set after integration so nothing budges
@@ -359,6 +387,8 @@
         pinned.vy = 0;
       }
     }
+
+    return maxSpeedSq;
   }
 
   function colorFor(n) {
@@ -427,9 +457,45 @@
   }
 
   function tick() {
-    simulate();
+    if (!nodes.length || folded) {
+      running = false;
+      return;
+    }
+    var maxSpeedSq = simulate();
     draw();
+    if (maxSpeedSq < SETTLE_SPEED_SQ) {
+      settleFrames++;
+      if (settleFrames >= SETTLE_FRAMES) {
+        running = false;
+        return;
+      }
+    } else {
+      settleFrames = 0;
+    }
     requestAnimationFrame(tick);
+  }
+
+  // Restart the physics loop after a force-changing event (init, edge-mode
+  // toggle, unfold). Under prefers-reduced-motion this settles the layout
+  // synchronously and draws once instead of animating.
+  function wake() {
+    settleFrames = 0;
+    if (!nodes.length || folded) return;
+    if (REDUCED_MOTION_MQ.matches) {
+      for (var i = 0; i < REDUCED_SETTLE_STEPS; i++) simulate();
+      draw();
+      running = false;
+      return;
+    }
+    if (running) return;
+    running = true;
+    requestAnimationFrame(tick);
+  }
+
+  // One draw for view-only changes (hover label, pan, zoom) when the loop
+  // is suspended. While it runs, the loop's own draw covers these.
+  function repaint() {
+    if (!running && nodes.length) draw();
   }
 
   function getPos(e) {
@@ -468,6 +534,9 @@
         buttons[i].dataset.mode === mode ? "true" : "false"
       );
     }
+    // Different edge set = different forces; restart the (possibly
+    // settled) simulation so the layout re-balances.
+    wake();
   }
 
   // ── Fold ──────────────────────────────────────────────────────────────
@@ -512,6 +581,9 @@
     folded = next;
     applyFoldDOM();
     saveFoldedState();
+    // tick() halts itself while folded; unfolding needs an explicit
+    // restart (and a fresh draw) or the canvas stays frozen.
+    if (!folded) wake();
   }
 
   // Auto-fold viewport range. Folds at the 1280px handoff alongside the
@@ -544,6 +616,7 @@
     } else {
       applyFoldDOM();
     }
+    if (!folded) wake();
   }
 
   function onAutofoldMQChange() { syncFoldedState(false); }
@@ -583,12 +656,15 @@
           var maxPanY = canvas.clientHeight / 2;
           panX = Math.max(-maxPanX, Math.min(maxPanX, panStart.panX + dx));
           panY = Math.max(-maxPanY, Math.min(maxPanY, panStart.panY + dy));
+          repaint();
         }
         return;
       }
       var pos = getPos(e);
+      var prevHover = hoverNode;
       hoverNode = nodeAt(pos.x, pos.y);
       canvas.style.cursor = hoverNode && hoverNode.id !== pinnedId ? "pointer" : "default";
+      if (hoverNode !== prevHover) repaint();
     });
 
     canvas.addEventListener("mouseup", function () {
@@ -607,6 +683,7 @@
       panStart = null;
       pressNode = null;
       canvas.style.cursor = "default";
+      repaint();
     });
 
     // Wheel zoom. preventDefault() requires the listener be non-passive
@@ -615,6 +692,7 @@
       e.preventDefault();
       var factor = e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
       zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom * factor));
+      repaint();
     }, { passive: false });
 
     var buttons = shell.querySelectorAll(".graph-widget-toggle button[data-mode]");
@@ -624,7 +702,10 @@
       });
     }
 
-    window.addEventListener("resize", resize);
+    window.addEventListener("resize", function () {
+      resize();
+      repaint();
+    });
   }
 
   function boot() {

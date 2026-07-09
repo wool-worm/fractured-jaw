@@ -94,6 +94,31 @@
         if (m && !m.hidden) closeModal();
       }
     });
+    // Focus trap: while the dialog is open, Tab cycles within it instead
+    // of escaping into the page behind the backdrop (role="dialog" +
+    // aria-modal promise exactly that). Focusables are queried live so
+    // this needs no bookkeeping as the modal's markup evolves.
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Tab") return;
+      var m = getModal();
+      if (!m || m.hidden) return;
+      var focusables = m.querySelectorAll(
+        'button, input, select, textarea, [href], [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusables.length) return;
+      var first = focusables[0];
+      var last = focusables[focusables.length - 1];
+      var active = document.activeElement;
+      if (e.shiftKey) {
+        if (active === first || !m.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (active === last || !m.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
   }
 
   // ---------- Query parser ----------
