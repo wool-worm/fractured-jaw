@@ -41,7 +41,8 @@ robots.txt               Crawler rules (allow conventional, deny AI training)
 ai.txt                   AI-training opt-out (Spawning convention)
 src/
   _css/                  Stylesheet modules (variables, base, layout, ..., zen);
-                         concatenated + content-hashed by site-css.11ty.js
+                         concatenated, comment-stripped + content-hashed by
+                         site-css.11ty.js
   _data/                 Global data: site.js, navigation.json, feeds.js,
                          assets.js, announcements.js, webring.js
   _includes/
