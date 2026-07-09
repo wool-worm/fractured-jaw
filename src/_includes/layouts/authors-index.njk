@@ -3,10 +3,10 @@ layout: layouts/base.njk
 ---
 {# Author index page (/authors/). Lists every author record in
    collections.authors with a count derived from collections.authorPosts
-   and a link to the per-author page. Authors are pre-sorted alphabetically
-   by display name (title) in .eleventy.js. Mirrors layouts/series-index
-   structurally, but uses .author-cloud styling for compact tag-style
-   chips. #}
+   and a link to the per-author page. Authors are pre-sorted in .eleventy.js
+   by most recent published post (newest first; no-post authors last,
+   alphabetical tiebreak). Mirrors layouts/series-index structurally, but
+   uses .author-cloud styling for compact tag-style chips. #}
 
 <section class="authors-index">
   <header class="page-header">

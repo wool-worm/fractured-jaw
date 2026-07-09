@@ -69,11 +69,15 @@ const { reportIssue } = require("./build-report");
 const OPEN = 0x5b; // [
 const BANG = 0x21; // !
 
-// Module-level cache: vault path → boolean (file exists). Cleared per build
-// is unnecessary — Eleventy spawns a fresh Node process for each build, and
-// the dev server invalidates between rebuilds via require cache. fs.existsSync
-// is fast enough that this cache is just there to avoid hammering the disk
-// during a single build with many references to the same target.
+// Module-level cache: vault path → boolean (file exists). One-shot builds
+// get a fresh Node process, so staleness can't occur there. KNOWN LIMITATION:
+// in `eleventy --serve`, config-required modules like this one stay loaded
+// across incremental rebuilds, so entries persist — create a file that a
+// wikilink already pointed at (or flip its draft/exclude flag) and the cached
+// result stays stale until the dev server restarts. Deliberate trade for
+// keeping the disk quiet during a build; restart the server if a link
+// refuses to come alive. (Same dynamic applies to targetExcludedCache below
+// and the caches in content.11tydata.js / album-note.js.)
 const existsCache = new Map();
 
 // Pull host-page context off the markdown-it `state.env` Eleventy supplies.

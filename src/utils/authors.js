@@ -124,7 +124,9 @@ function parseAuthorField(raw, contentRoot) {
 // the collections.authors list, return the resolved display records in
 // frontmatter order. Drops entries that didn't resolve (those are already
 // reported by the validator). Each record has:
-//   { slug, displayName, url, image, image_alt }
+//   { slug, displayName, url }
+// (No image fields — if bylines ever grow avatars, add them here AND in
+// the push() below; they are not currently carried through.)
 //
 // The authorsCollection is the array Eleventy passes in for
 // collections.authors — each item is a content file with .url, .data,

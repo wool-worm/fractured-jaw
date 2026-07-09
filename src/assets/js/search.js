@@ -380,11 +380,17 @@
   function getQueryParam(name) {
     var s = window.location.search || "";
     if (!s) return "";
+    // decodeURIComponent throws a URIError on malformed input (a hand-typed
+    // "?q=100%" is enough); fall back to the raw text so the results page
+    // still runs instead of dying silently.
+    function decode(v) {
+      try { return decodeURIComponent(v); } catch (e) { return v; }
+    }
     var pairs = s.replace(/^\?/, "").split("&");
     for (var i = 0; i < pairs.length; i++) {
       var p = pairs[i].split("=");
-      if (decodeURIComponent(p[0]) === name) {
-        return decodeURIComponent((p[1] || "").replace(/\+/g, " "));
+      if (decode(p[0]) === name) {
+        return decode((p[1] || "").replace(/\+/g, " "));
       }
     }
     return "";

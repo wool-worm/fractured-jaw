@@ -1498,7 +1498,6 @@
       //   0.50 .. 0.75  → slowdown (target word at lower rate)
       //   0.75 .. 1.00  → static  (target word replaced with pink-noise burst)
       var doGlitch = glitchRng() <= 0.25;
-      // var doGlitch = glitchRng() <= 1.00; // Force glitching on every repetition for testing/demo purposes.
       var message = buildCompromisedMessage(template, code, section, sectionLetter, authority);
       var parts;
       if (doGlitch) {

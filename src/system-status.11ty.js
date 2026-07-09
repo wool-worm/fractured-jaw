@@ -8,6 +8,7 @@
 // numbers come from this emitter.
 
 const fs = require("fs");
+const slugify = require("./utils/slugify");
 const { parseAuthorField, resolveAuthors } = require("./utils/authors");
 
 const CONTENT_ROOT = "src/content";
@@ -76,11 +77,14 @@ class SystemStatus {
       const section = data.section || "other";
       sectionCounts[section] = (sectionCounts[section] || 0) + 1;
 
-      // Tags — normalize to lowercase, same as the tagList collection.
+      // Tags — normalize by slug, the same key the tagList collection
+      // dedupes on, so the widget's tag_index count always matches the
+      // number of tag pages ("Post Punk" and "post-punk" are one tag).
       const rawTags = data.tags;
       const tagList = Array.isArray(rawTags) ? rawTags : rawTags ? [rawTags] : [];
       for (const tag of tagList) {
-        if (tag) tagSet.add(String(tag).toLowerCase());
+        const slug = slugify(String(tag));
+        if (slug) tagSet.add(slug);
       }
     }
 
