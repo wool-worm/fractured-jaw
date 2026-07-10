@@ -62,6 +62,10 @@ stations:
     album: "[[_data/media/music/lake-haze/vhs-memories-lp/album]]"
     tts_readout: Incoming organic signal detected... sender... Lake Haze... subject... VHS Memories... click below to decrypt...
   - band: GAMMA
+    frequency: 44
+    album: "[[_data/media/music/wingdings/5/album]]"
+    tts_readout: Incoming organic signal detected... sender... incomprehensible... subject... unknown... click below to decrypt...
+  - band: GAMMA
     frequency: 55
     album: "[[_data/media/music/steve-hauschildt/aeropsia/album]]"
     tts_readout: Incoming organic signal detected... sender... Steve Hows child... subject... Air rope sia... click below to decrypt...
