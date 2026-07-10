@@ -1,13 +1,19 @@
 ---
 title: Two Fresh Tracks & Surprise Album Drop
 date_published: 2026-07-08T20:48:41
-date_updated: 2026-07-09T16:49:30
+date_updated: 2026-07-09T22:30:55
 author: "[[authors/wool-worm|wool-worm]]"
-tags: [media, review, electronic, dub, techno, experimental]
+tags:
+  - media
+  - review
+  - electronic
+  - dub
+  - techno
+  - experimental
 series_name:
-description: "Spotted two fresh dub-techno finds while trawling the freqs, plus a bonus album drop that is literally breaking peoples' computers."
-featured: false
-draft: true
+description: Spotted two fresh dub-techno finds while trawling the freqs, plus a bonus album drop that is literally breaking peoples' computers.
+featured: true
+draft: false
 exclude: false
 preview_enabled: true
 graph_enabled: true

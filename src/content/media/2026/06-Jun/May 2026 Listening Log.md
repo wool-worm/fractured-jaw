@@ -3,10 +3,19 @@ title: May 2026 Listening Log
 date_published: 2026-06-01T22:01:27
 date_updated: 2026-06-01T23:31:56
 author: "[[authors/boogra-boy|boogra-boy]]"
-tags: [review, music, ambient, breakbeat, electronic, lo-fi-house, hyperpop, experimental, doom-metal]
+tags:
+  - review
+  - music
+  - ambient
+  - breakbeat
+  - electronic
+  - lo-fi-house
+  - hyperpop
+  - experimental
+  - doom-metal
 series_name: "[[series/boogra-boy's Monthly Mystery Mix|boogra-boy's Monthly Mystery Mix]]"
-description: "Lots of chatter on the hexbands this month, boogra-boy's top picks, just for you"
-featured: true
+description: Lots of chatter on the hexbands this month, boogra-boy's top picks, just for you
+featured: false
 draft: false
 exclude: false
 preview_enabled: true
