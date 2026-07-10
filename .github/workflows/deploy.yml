@@ -281,8 +281,12 @@ jobs:
           DEPLOY_URL: ${{ steps.deployment.outputs.page_url }}
         run: node .github/scripts/post-system.js
 
+      # failure() is required here: without a status-check function, GitHub
+      # implicitly ANDs success() into the expression, and after the deploy
+      # step fails the job is already failing, so the step would always be
+      # skipped exactly when it should fire.
       - name: Post deploy failure to Discord system
-        if: steps.deployment.outcome == 'failure'
+        if: failure() && steps.deployment.outcome == 'failure'
         env:
           DISCORD_WEBHOOK_SYSTEM: ${{ secrets.DISCORD_WEBHOOK_SYSTEM }}
           DEPLOY_STATUS: failed

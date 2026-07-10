@@ -50,6 +50,10 @@
   //   compromised   — termination-loop "this station has been terminated"
   //   haunted       — abandoned-AI monologue from haunted.md (very rare)
   //   fractured_jaw — pinned at FJR_BAND, FJR_INDEX (see below)
+  //
+  // KEEP IN SYNC: src/radio-music.11ty.js duplicates this weight table
+  // (and the hash + FJR coordinate) to validate at build time that
+  // station pointers only occupy carrier_wave coords.
   var SIGNAL_TYPES = [
     { name: "dead_air",      weight: 61 },
     { name: "carrier_wave",  weight: 15 },
@@ -1149,6 +1153,10 @@
           if (!s.station_band || s.station_freq == null) continue;
           musicStationMap[s.station_band + ":" + s.station_freq] = s;
         }
+        // The station map changes what signalAt() reports, so any channel
+        // ordering computed before the fetch settled is now stale. Drop it;
+        // the next ordinalOf() call rebuilds against the final dial.
+        channelOrderCache = {};
         updateReadout();
         draw();
         if (powered) applyAudio();
@@ -1498,7 +1506,6 @@
       //   0.50 .. 0.75  → slowdown (target word at lower rate)
       //   0.75 .. 1.00  → static  (target word replaced with pink-noise burst)
       var doGlitch = glitchRng() <= 0.25;
-      // var doGlitch = glitchRng() <= 1.00; // Force glitching on every repetition for testing/demo purposes.
       var message = buildCompromisedMessage(template, code, section, sectionLetter, authority);
       var parts;
       if (doGlitch) {

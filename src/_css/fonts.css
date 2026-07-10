@@ -57,28 +57,6 @@
   font-display: swap;
 }
 
-/* Sudbury Basin — post/page titles */
-@font-face {
-  font-family: 'Sudbury Basin';
-  src: url('fonts/sudbury/SudburyBasin-Regular.woff2') format('woff2'),
-       url('fonts/sudbury/SudburyBasin-Regular.woff') format('woff'),
-       url('fonts/sudbury/SudburyBasin-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Sudbury Basin 3D — optional variant, same family stack */
-@font-face {
-  font-family: 'Sudbury Basin 3D';
-  src: url('fonts/sudbury/SudburyBasin3D-Regular.woff2') format('woff2'),
-       url('fonts/sudbury/SudburyBasin3D-Regular.woff') format('woff'),
-       url('fonts/sudbury/SudburyBasin3D-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
 /* Brutalism — masthead/logotype only */
 @font-face {
   font-family: 'Brutalism';

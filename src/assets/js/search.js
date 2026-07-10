@@ -94,6 +94,31 @@
         if (m && !m.hidden) closeModal();
       }
     });
+    // Focus trap: while the dialog is open, Tab cycles within it instead
+    // of escaping into the page behind the backdrop (role="dialog" +
+    // aria-modal promise exactly that). Focusables are queried live so
+    // this needs no bookkeeping as the modal's markup evolves.
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Tab") return;
+      var m = getModal();
+      if (!m || m.hidden) return;
+      var focusables = m.querySelectorAll(
+        'button, input, select, textarea, [href], [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusables.length) return;
+      var first = focusables[0];
+      var last = focusables[focusables.length - 1];
+      var active = document.activeElement;
+      if (e.shiftKey) {
+        if (active === first || !m.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (active === last || !m.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
   }
 
   // ---------- Query parser ----------
@@ -380,11 +405,17 @@
   function getQueryParam(name) {
     var s = window.location.search || "";
     if (!s) return "";
+    // decodeURIComponent throws a URIError on malformed input (a hand-typed
+    // "?q=100%" is enough); fall back to the raw text so the results page
+    // still runs instead of dying silently.
+    function decode(v) {
+      try { return decodeURIComponent(v); } catch (e) { return v; }
+    }
     var pairs = s.replace(/^\?/, "").split("&");
     for (var i = 0; i < pairs.length; i++) {
       var p = pairs[i].split("=");
-      if (decodeURIComponent(p[0]) === name) {
-        return decodeURIComponent((p[1] || "").replace(/\+/g, " "));
+      if (decode(p[0]) === name) {
+        return decode((p[1] || "").replace(/\+/g, " "));
       }
     }
     return "";

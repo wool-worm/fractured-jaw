@@ -40,8 +40,9 @@
 }
 
 /* ── Callout boxes ───────────────────────────────────────────────────────── */
-/* Brutalist-style callout blocks for in-article annotation.
-   Usage: <div class="callout callout--note">...</div>
+/* Brutalist-style callout blocks for in-article annotation. Bare .callout
+   IS the note variant (its ::before prints "// note:").
+   Usage: <div class="callout">...</div>
           <div class="callout callout--requires">...</div>
           <div class="callout callout--fracture">...</div>  ← danger/twist
 */

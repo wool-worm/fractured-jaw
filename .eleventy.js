@@ -152,14 +152,37 @@ module.exports = function (eleventyConfig) {
       }
     }
 
+    // Bad ids route through reportIssue (not throw) so a broken embed
+    // joins the aggregated end-of-build error list instead of halting
+    // the render pass on the first offender — same one-pass philosophy
+    // as the wikilink/frontmatter validators. Emitting nothing keeps
+    // the page rendering around the missing player in dev.
     var id = opts.album || opts.track;
     if (!id || !/^\d+$/.test(String(id))) {
-      throw new Error(
-        "bandcamp shortcode: album or track id must be a numeric string (got " +
-        JSON.stringify(id) + ")"
-      );
+      reportIssue({
+        kind: "bandcamp-shortcode",
+        file: (this.page && this.page.inputPath) || "(bandcamp shortcode call)",
+        offending: "id: " + JSON.stringify(id),
+        reason: "album or track id must be a numeric string",
+        isDraft: false,
+        isExcluded: false,
+      });
+      return "";
     }
-    var embed = buildBandcampEmbed(opts);
+    var embed;
+    try {
+      embed = buildBandcampEmbed(opts);
+    } catch (e) {
+      reportIssue({
+        kind: "bandcamp-shortcode",
+        file: (this.page && this.page.inputPath) || "(bandcamp shortcode call)",
+        offending: JSON.stringify(opts.preset || "(default preset)"),
+        reason: e.message,
+        isDraft: false,
+        isExcluded: false,
+      });
+      return "";
+    }
     // Width override: when opts.width is set, constrain the iframe via a
     // max-width inline style (the actual width still scales down on
     // narrower viewports). Without it, the iframe takes the full column.
@@ -243,14 +266,33 @@ module.exports = function (eleventyConfig) {
       }
     }
 
+    // Same aggregated-error treatment as the bandcamp shortcode above.
     var id = opts.album || opts.track;
     if (!id || !/^[A-Za-z0-9]{16,}$/.test(String(id))) {
-      throw new Error(
-        "spotify shortcode: album or track id must be a base62 alphanumeric string (Spotify ids are typically 22 chars; got " +
-        JSON.stringify(id) + ")"
-      );
+      reportIssue({
+        kind: "spotify-shortcode",
+        file: (this.page && this.page.inputPath) || "(spotify shortcode call)",
+        offending: "id: " + JSON.stringify(id),
+        reason: "album or track id must be a base62 alphanumeric string (Spotify ids are typically 22 chars)",
+        isDraft: false,
+        isExcluded: false,
+      });
+      return "";
     }
-    var sEmbed = buildSpotifyEmbed(opts);
+    var sEmbed;
+    try {
+      sEmbed = buildSpotifyEmbed(opts);
+    } catch (e) {
+      reportIssue({
+        kind: "spotify-shortcode",
+        file: (this.page && this.page.inputPath) || "(spotify shortcode call)",
+        offending: JSON.stringify(opts.variant || "(default variant)"),
+        reason: e.message,
+        isDraft: false,
+        isExcluded: false,
+      });
+      return "";
+    }
     var sHeight = opts.height || sEmbed.height;
     var sWidthAttr = opts.width ? ' width="' + opts.width + '"' : ' width="100%"';
     var sStyle = 'border:0;' + (opts.width ? 'max-width:' + opts.width + 'px;' : '');
@@ -374,6 +416,22 @@ module.exports = function (eleventyConfig) {
     return str;
   });
 
+  // Return the LATER of two date values as a UTC ISO string (empty string
+  // when both are missing). Used by head.njk to clamp article:modified_time
+  // and JSON-LD dateModified: the vault plugin maintains date_updated as
+  // file-mtime, which can legitimately precede a forward-dated
+  // date_published — but "modified before published" is nonsense to
+  // consumers, so freshness metadata never reports earlier than publish.
+  // The Atom feed and sitemap apply the same clamp in their own renderers.
+  eleventyConfig.addFilter("newerOf", (a, b) => {
+    const ma = toMillis(a);
+    const mb = toMillis(b);
+    if (!ma && !mb) return "";
+    const winner = ma >= mb ? a : b;
+    const dt = toDateTime(winner);
+    return dt && dt.isValid ? dt.toUTC().toISO() : "";
+  });
+
   // Promote a possibly-relative URL to an absolute one by prefixing site.url.
   // Used in head.njk for og:image (Open Graph rejects relative paths). Passes
   // through any value that already starts with http:// or https://.
@@ -441,6 +499,18 @@ module.exports = function (eleventyConfig) {
     });
   }
 
+  // Top-level pages (/, /about/, section landings, ...). Exists primarily
+  // so pages get the same safety net as everything else: required-field
+  // validation (title-only for pages; see requiredFieldsFor) and URL
+  // collision detection. Without this, two page files whose names slugify
+  // identically would silently overwrite each other on disk.
+  eleventyConfig.addCollection("pages", (api) => {
+    const items = api.getFilteredByGlob("src/content/pages/**/*.md");
+    validateCollection(items, "pages");
+    detectCollisions(items, "pages");
+    return items;
+  });
+
   // Cross-section feed of every published post.
   eleventyConfig.addCollection("all_content", (api) => {
     const items = api.getFilteredByGlob(CONTENT_GLOBS);
@@ -471,8 +541,14 @@ module.exports = function (eleventyConfig) {
 
   // Tag index: every unique tag (case-normalized) with the posts that carry it.
   // Each entry: { tag, displayName, count, posts: [...] }.
+  //
+  // Series parents + author records are included alongside the four content
+  // sections: their pages render tag chips linking to /tags/<slug>/, so any
+  // tag carried ONLY by a parent (e.g. "series") must still produce a tag
+  // page or those chips 404. On the tag page they group under their own
+  // section headings ("authors"/"series", after the canonical four).
   eleventyConfig.addCollection("tagList", (api) => {
-    const all = api.getFilteredByGlob(CONTENT_GLOBS);
+    const all = api.getFilteredByGlob([...CONTENT_GLOBS, SERIES_GLOB, AUTHORS_GLOB]);
     const map = new Map();
     for (const item of all) {
       const raw = item.data.tags;
@@ -532,13 +608,35 @@ module.exports = function (eleventyConfig) {
   // Author records — each file at src/content/authors/<Name>.md is a real,
   // navigable author page (/authors/<slug>/) with full frontmatter (title
   // = display name, description, optional image) and an optional bio body.
-  // Mirrors the `series` collection shape. Sorted alphabetically by slug
-  // so /authors/ renders in a stable order regardless of join date.
+  // Mirrors the `series` collection shape. Sorted by most recent published
+  // post (newest contributor first) so /authors/ leads with whoever posted
+  // most recently; authors with no posts fall to the end, alphabetical
+  // tiebreak for determinism.
   eleventyConfig.addCollection("authors", (api) => {
     const items = api.getFilteredByGlob(AUTHORS_GLOB);
     validateCollection(items, "authors");
     detectCollisions(items, "authors");
+
+    // Most-recent post date per author URL, computed the same way the
+    // authorPosts membership map is (same glob + author-field parsing), so
+    // the sort key matches the "last published date" the page renders from
+    // authorPosts[url][0].
+    const newestByUrl = new Map();
+    for (const post of api.getFilteredByGlob(CONTENT_GLOBS)) {
+      const parsed = parseAuthorField(post.data.author, CONTENT_ROOT);
+      if (parsed.kind === "empty") continue;
+      const ms = toMillis(post.data.date_published);
+      for (const entry of parsed.entries) {
+        if (entry.kind !== "wikilink") continue;
+        const prev = newestByUrl.get(entry.url);
+        if (prev === undefined || ms > prev) newestByUrl.set(entry.url, ms);
+      }
+    }
+
     return [...items].sort((a, b) => {
+      const av = newestByUrl.has(a.url) ? newestByUrl.get(a.url) : -Infinity;
+      const bv = newestByUrl.has(b.url) ? newestByUrl.get(b.url) : -Infinity;
+      if (av !== bv) return bv - av; // newest first
       const an = (a.data && a.data.title) || "";
       const bn = (b.data && b.data.title) || "";
       return String(an).localeCompare(String(bn));
@@ -726,7 +824,24 @@ module.exports = function (eleventyConfig) {
   // plugin (and hand-placement) writes files at
   //   src/content/_attachments/<section>/<slug>/<file>
   // which exactly mirrors the post's published URL path.
-  eleventyConfig.addPassthroughCopy({ "src/content/_attachments": "attachments" });
+  //
+  // _attachments/_data/ is EXCLUDED: it holds the album-cover images the
+  // music-embed wizard manages for vault-side reference. Nothing published
+  // references them (the radio widget plays Bandcamp iframes; review embeds
+  // are iframes too), and they were ~30% of the deployed site by weight.
+  // Subdirs are discovered at config time so new sections need no edit here.
+  // NOTE: if a post's `image:` frontmatter ever points into _attachments/
+  // _data/, the build's exists-check passes (file is on disk) but the
+  // published og:image URL would 404 — keep post covers out of _data.
+  for (const entry of require("fs").readdirSync(
+    pathModule.join(CONTENT_ROOT_ABS, "_attachments"),
+    { withFileTypes: true }
+  )) {
+    if (!entry.isDirectory() || entry.name === "_data") continue;
+    eleventyConfig.addPassthroughCopy({
+      [`src/content/_attachments/${entry.name}`]: `attachments/${entry.name}`,
+    });
+  }
   eleventyConfig.addPassthroughCopy("CNAME");
   // Crawler hints — robots.txt is the conventional signal, ai.txt is the
   // emerging Spawning-style opt-out for AI training crawlers. Both live

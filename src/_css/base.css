@@ -208,6 +208,21 @@ th {
 }
 
 /* ── Lists (global) ─────────────────────────────────────────────────────── */
+/* Chrome lists (nav, cards, tag clouds, widgets) are unmarked by default;
+   each sets its own list-style:none anyway, but the global keeps new chrome
+   honest. PROSE lists get their markers back below — authored markdown
+   bullets/numbers carry meaning and must render (an <ol> without numbers
+   loses its sequence). */
 ul, ol {
   list-style: none;
+}
+
+.post-content ul, .page-content ul, .section-intro ul,
+.home-intro ul, .series-intro ul, .page-intro ul {
+  list-style: disc;
+}
+
+.post-content ol, .page-content ol, .section-intro ol,
+.home-intro ol, .series-intro ol, .page-intro ol {
+  list-style: decimal;
 }

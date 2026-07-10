@@ -12,8 +12,14 @@
 
 const { reportIssue } = require("./build-report");
 
-const REQUIRED = ["title", "date_published"];
+const REQUIRED_DEFAULT = ["title", "date_published"];
+// Top-level pages (/, /about/, section landings, ...) are navigation
+// surfaces, not dated entries — title is the only hard requirement.
+const REQUIRED_FOR_PAGES = ["title"];
 const RECOMMENDED_DEFAULT = ["author", "description"];
+// Pages carry no author byline; description still matters because it
+// drives the meta-description tag (head.njk) for every landing surface.
+const RECOMMENDED_FOR_PAGES = ["description"];
 // Series parents are aggregators, not authored entries. They group posts;
 // the individual posts carry the author bylines. Description still matters
 // because it appears in the series-card on the /series/ landing.
@@ -28,7 +34,13 @@ function recommendedFieldsFor(inputPath) {
   if (!inputPath) return RECOMMENDED_DEFAULT;
   if (inputPath.includes("/series/")) return RECOMMENDED_FOR_SERIES;
   if (inputPath.includes("/authors/")) return RECOMMENDED_FOR_AUTHORS;
+  if (inputPath.includes("/pages/")) return RECOMMENDED_FOR_PAGES;
   return RECOMMENDED_DEFAULT;
+}
+
+function requiredFieldsFor(inputPath) {
+  if (inputPath && inputPath.includes("/pages/")) return REQUIRED_FOR_PAGES;
+  return REQUIRED_DEFAULT;
 }
 
 // Check a single Eleventy collection item. Returns { errors, warnings }.
@@ -37,7 +49,7 @@ function inspect(item) {
   const warnings = [];
   const data = item.data || {};
 
-  for (const field of REQUIRED) {
+  for (const field of requiredFieldsFor(item.inputPath)) {
     if (isMissing(data[field])) {
       errors.push({ field });
     }
@@ -71,6 +83,25 @@ function isMissing(value) {
 // Recommended-field misses still print as warnings.
 function validateCollection(items, sectionName) {
   for (const item of items) {
+    // Shape check: `tags` must be a YAML list (or absent). The tag
+    // collections would tolerate a bare string, but post-card.njk and
+    // post-meta.njk iterate `tags` directly, and Nunjucks iterating a
+    // string walks it character by character — a scalar tag renders as
+    // one tag chip per letter. Same severity model as bare-string
+    // author/series_name: warn in dev, fatal in prod unless the post
+    // is draft/excluded.
+    const rawTags = item.data && item.data.tags;
+    if (rawTags !== undefined && rawTags !== null && rawTags !== "" && !Array.isArray(rawTags)) {
+      reportIssue({
+        kind: "tags-frontmatter",
+        file: item.inputPath,
+        offending: `tags: ${JSON.stringify(rawTags)}`,
+        reason: `must be a YAML list (tags: [one, two]); a bare string would render one tag chip per character (section "${sectionName}")`,
+        isDraft: item.data.draft === true,
+        isExcluded: item.data.exclude === true,
+      });
+    }
+
     const { errors, warnings } = inspect(item);
     for (const err of errors) {
       reportIssue({

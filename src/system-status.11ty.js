@@ -49,7 +49,6 @@ class SystemStatus {
 
     let totalWords = 0;
     const authorCounts = {};
-    const tagSet = new Set();
     const sectionCounts = {};
 
     for (const item of items) {
@@ -75,14 +74,13 @@ class SystemStatus {
       // Section tallies — useful for future widget variations.
       const section = data.section || "other";
       sectionCounts[section] = (sectionCounts[section] || 0) + 1;
-
-      // Tags — normalize to lowercase, same as the tagList collection.
-      const rawTags = data.tags;
-      const tagList = Array.isArray(rawTags) ? rawTags : rawTags ? [rawTags] : [];
-      for (const tag of tagList) {
-        if (tag) tagSet.add(String(tag).toLowerCase());
-      }
     }
+
+    // tag_index = the number of tag pages, by construction: tagList is
+    // the collection the /tags/ pages paginate over (it now also spans
+    // series parents + author records), so counting it directly can
+    // never drift from what the site actually publishes.
+    const tagCount = ((collections && collections.tagList) || []).length;
 
     const authors = Object.entries(authorCounts)
       .map(([name, count]) => ({ name, count }))
@@ -91,7 +89,7 @@ class SystemStatus {
     return JSON.stringify({
       counts: {
         posts: items.length,
-        tags: tagSet.size,
+        tags: tagCount,
         words: totalWords,
       },
       sections: sectionCounts,

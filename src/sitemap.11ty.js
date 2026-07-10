@@ -30,14 +30,44 @@ class Sitemap {
       // Honor explicit opt-out.
       if (item.data && item.data.sitemap_enabled === false) continue;
 
-      const lastmod = toIso(
-        (item.data && (item.data.date_updated || item.data.date_published)) ||
-          item.date
+      // lastmod: the LATER of updated/published — the vault plugin's
+      // date_updated is file-mtime and can precede a forward-dated
+      // date_published; a lastmod older than the publish date reads as
+      // nonsense to crawlers. ISO date strings compare safely as strings.
+      const updated = toIso(item.data && item.data.date_updated);
+      const published = toIso(
+        (item.data && item.data.date_published) || item.date
       );
+      const lastmod =
+        updated && published
+          ? (updated > published ? updated : published)
+          : updated || published;
 
       urls.push({
         loc: site.url.replace(/\/$/, "") + item.url,
         lastmod,
+      });
+    }
+
+    // Per-tag pages. They're pagination output from src/tag.njk, which is
+    // eleventyExcludeFromCollections (so it stays out of the content
+    // collections) — meaning they never appear in `collections.all` above
+    // and have to be added from tagList explicitly. lastmod is the newest
+    // date across the tag's member posts, since that's when the tag page's
+    // content last changed.
+    const tagList = (collections && collections.tagList) || [];
+    for (const entry of tagList) {
+      let newest = null;
+      for (const post of entry.posts) {
+        const d = toIso(
+          (post.data && (post.data.date_updated || post.data.date_published)) ||
+            post.date
+        );
+        if (d && (!newest || d > newest)) newest = d;
+      }
+      urls.push({
+        loc: site.url.replace(/\/$/, "") + `/tags/${entry.tag}/`,
+        lastmod: newest,
       });
     }
 

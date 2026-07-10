@@ -32,7 +32,7 @@ No JS framework, no bundler, no CSS preprocessor, no analytics, no comments, no 
 ## Project layout
 
 ```
-.eleventy.js             Eleventy config (collections, filters, watch targets)
+.eleventy.js             Eleventy config (collections, filters, shortcodes, watch targets)
 package.json             Scripts: start, build, build:dev, clean
 .eleventyignore          Paths Eleventy must not read
 .gitignore               Paths git must not track
@@ -40,13 +40,18 @@ CNAME                    Custom-domain marker for GitHub Pages
 robots.txt               Crawler rules (allow conventional, deny AI training)
 ai.txt                   AI-training opt-out (Spawning convention)
 src/
-  _data/                 Global data: site.js, navigation.json, feeds.js
+  _css/                  Stylesheet modules (variables, base, layout, ..., zen);
+                         concatenated, comment-stripped + content-hashed by
+                         site-css.11ty.js
+  _data/                 Global data: site.js, navigation.json, feeds.js,
+                         assets.js, announcements.js, webring.js
   _includes/
     layouts/             Page-type templates (post, essay, fragment, ...)
     partials/            Header, footer, head, widgets, post-card, ...
   assets/
-    css/                 Stylesheets (modular; site.css imports the rest)
-    js/                  Vanilla JS (widgets, search, wikilink-preview, ...)
+    css/fonts/           Self-hosted webfonts (passthrough-copied)
+    js/                  Vanilla JS source (widgets, search, wikilink-preview, ...);
+                         emitted content-hashed by assets-js.11ty.js
     images/              Skull logo, favicon, default OG image
   content/               Obsidian vault
     blog/                Long-form posts
@@ -56,19 +61,28 @@ src/
     pages/               Top-level pages (/, /about/, section landings, /webring/, ...)
     series/              Series parents (group posts across sections)
     authors/             Author files (display name, bio body, per-author feed)
-    _attachments/        Images, routed by the Obsidian attachment-scrubber plugin
-    _data/               Radio voice-channel + webring source markdown (tracked, but excluded from Eleventy's content pipeline)
+    _attachments/        Images, routed by the Obsidian Image Wizard plugin
+    _announcements/      Announcement notes (systems-widget log + Discord webhook;
+                         tracked, pipeline-excluded)
+    _data/               Radio voice-channel, webring + album-note source markdown
+                         (tracked, pipeline-excluded)
     _local/              Author scratch + documentation (gitignored)
     .obsidian/           Vault config (gitignored; syncs via Obsidian Sync)
-  utils/                 permalink, slugify, frontmatter, wikilinks, series, authors, atom-feed
+  utils/                 permalink, slugify, frontmatter, wikilinks, series, authors,
+                         atom-feed, album-note, asset-manifest, build-report
+  site-css.11ty.js       Emits the CSS bundle at /assets/css/site.<hash>.css
+  assets-js.11ty.js      Emits each client script at /assets/js/<name>.<hash>.js
   preview-index.11ty.js  Generates /preview-index.json (wikilink hover previews)
   graph-data.11ty.js     Generates /graph-data.json (graph widget + backlinks)
   search-index.11ty.js   Generates /search-index.json (in-page search)
-  sitemap.11ty.js        Generates /sitemap.xml
+  sitemap.11ty.js        Generates /sitemap.xml (pages, posts, tag pages)
   system-status.11ty.js  Generates /system-status.json (systems widget data)
+  newsletter-feed.11ty.js     Generates /newsletter.json (Buttondown allowlist)
+  announcements-feed.11ty.js  Generates /announcements.json (webhook diff source)
   haunted.11ty.js        Generates /haunted.json (haunted radio channels)
   radio-cipher.11ty.js   Generates /radio-cipher.json
   radio-compromised.11ty.js   Generates /radio-compromised.json
+  radio-music.11ty.js    Generates /radio-music.json (Bandcamp stations)
   fractured-jaw-radio.11ty.js Generates /fractured-jaw-radio.json
   feed.11ty.js           Atom feed emitter (master + per-section + series-aggregate)
   feed-series.11ty.js    Per-series Atom feeds
@@ -77,6 +91,7 @@ src/
   404.njk                /404.html page (GitHub Pages 404 surface)
   tag.njk                Per-tag pages
 .github/workflows/       GitHub Pages deploy workflow
+.github/scripts/         Deploy-time automation (Discord webhooks, Buttondown drafts)
 _site/                   Build output (gitignored)
 ```
 
@@ -102,7 +117,7 @@ Frontmatter (all sections):
 | `date_published`  | Required. ISO 8601. Emitted as UTC to keep build-machine timezone out of rendered output. |
 | `date_updated`    | Maintained by an Obsidian plugin.                           |
 | `author`          | Wikilink to `[[authors/<Name>\|<Name>]]`. Array for co-authored posts. Strict-validated. |
-| `tags`            | List of tags. Lowercased + slug-normalized for URLs.        |
+| `tags`            | List of tags (must be a YAML list — bare strings are rejected). Slug-normalized for URLs. |
 | `description`     | <50 words. Drives social-card description + previews.       |
 | `featured`        | Boolean. `true` puts the post on the homepage featured row. |
 | `draft`           | Boolean. Visible in dev only.                               |
@@ -110,9 +125,14 @@ Frontmatter (all sections):
 | `preview_enabled` | Boolean (default true). False = omit from wikilink hover.   |
 | `graph_enabled`   | Boolean (default true). False = omit from graph data.       |
 | `image`           | Wikilink to `_attachments/<section>/<slug>/<file>` (required form). Caption after the pipe drives the alt text on cards + og:image. Bare URLs and bare strings are rejected by the strict validator. |
+| `image_focus`     | CSS object-position keywords (e.g. `center top`) setting the cover crop's focal point. Validated at build. |
 | `reading_time`    | Auto-computed by an Obsidian plugin.                        |
 | `series_name`     | Wikilink to `[[series/<Name>|...]]` (optional).             |
 | `rating`          | Media section only. Free-form scale.                        |
+| `newsletter_enabled` | Boolean (default true). False = never drafted into the Buttondown email. |
+| `sitemap_enabled` | Boolean (default true). False = omit from sitemap.xml.      |
+| `card_type`       | Twitter card override (`summary` / `summary_large_image`).  |
+| `page_type`       | Graph-widget layout override (`top` / `section` / `content` / `tag`). Usually computed from the section. |
 
 ## Branching + deploy
 
@@ -130,12 +150,14 @@ PRs into either branch run a build check without deploying; merging a PR into `m
 - Tags, per-tag pages, tag index
 - Authors as a first-class section (each author has a real file with bio body, per-author Atom feed, and wikilink-only `author:` frontmatter)
 - Series (first-class section; parent files have full frontmatter, posts opt in via `series_name:`)
-- Graph widget (in-page local graph) + dedicated `/network_nodes/` full graph
+- Graph widget (in-page local graph) + dedicated `/network_nodes/` full graph; physics self-suspends once the layout settles
 - Atom feeds: master, per-section (blog, essays, fragments, media), series-aggregate, per-series, per-author
 - DIY in-page search (build-emitted index, client-side ranking; no remote service)
-- Pirate-radio scanner widget (six signal types + pinned FJR channel; haunted stations)
-- Systems-status panel widget (real-data stats + encryption state machine)
-- Responsive staircase (1400 / 1200 / 1100 / 1000 / 720) with JS-driven widget fold
+- Pirate-radio scanner widget: static, carrier waves, drone signals, numbers stations, ciphers, compromised broadcasts, haunted AI monologues, Bandcamp music stations, and the pinned FJR voice channel
+- Systems-status panel widget (real-data stats + encryption state machine) with an announcements log fed by vault notes
+- Zen mode ("flatline"): calm palette, motion stripped, radio + systems widgets hidden; per-tab session persistence
+- Email newsletter via Buttondown (subscribe page with optional metadata fields; one digest draft per deploy, manual send) + Discord webhooks for new posts, announcements, and deploy status
+- Column-yields-space responsive layout: widgets auto-fold at 1280px, unified mobile switchover (hamburger, widget hide, intro fold) at 820px
 - Inline image attachments via Obsidian `![[_attachments/...]]` syntax with EXIF stripping done vault-side
 - Brutalist styling: void / brass / blood / sodium palette, layered masthead glitch, scanline, sawtooth section dividers
 - Brutalist 404 page at `/404.html`

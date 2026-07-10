@@ -38,7 +38,9 @@ const SOURCE_PATH = path.join(
 
 module.exports = function () {
   if (!fs.existsSync(SOURCE_PATH)) {
-    return { neighbors: [], notes: "" };
+    // Same shape as the populated return below so templates never see an
+    // undefined `rings`.
+    return { neighbors: [], rings: [], notes: "" };
   }
   const raw = fs.readFileSync(SOURCE_PATH, "utf8");
   const parsed = matter(raw);

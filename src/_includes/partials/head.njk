@@ -72,8 +72,11 @@
 {% if _isArticle and date_published %}
 <meta property="article:published_time" content="{{ date_published | isoDate }}">
 {% endif %}
+{# modified_time is clamped to never precede published_time — the vault
+   plugin tracks date_updated as file-mtime, which can sit earlier than a
+   forward-dated date_published. #}
 {% if _isArticle and date_updated %}
-<meta property="article:modified_time" content="{{ date_updated | isoDate }}">
+<meta property="article:modified_time" content="{{ date_updated | newerOf(date_published) }}">
 {% endif %}
 
 {# Twitter card #}
@@ -105,4 +108,31 @@
 {% endif %}
 {% if section == "authors" and page.url != "/authors/" %}
 <link rel="alternate" type="application/atom+xml" href="{{ page.url }}feed.xml" title="{{ site.title }} — {{ title }}">
+{% endif %}
+
+{# JSON-LD Article schema — structured metadata for search engines
+   (richer SERP rendering: headline, dates, author). Inert data, no
+   requests, no runtime code; built entirely from the values this file
+   already computed (_description, _ogImage, _headAuthors). Gated to the
+   four CONTENT sections only — series parents and author records also
+   pass the broader _isArticle og:type gate but are navigation records,
+   and "@type: Article, headline: wool-worm" is wrong structured data.
+   dateModified is clamped to never precede datePublished (see the
+   newerOf filter). `dump` JSON-encodes each value (quotes, newlines);
+   `safe` stops autoescape from HTML-escaping quotes inside the script. #}
+{% if section in ["blog", "essays", "fragments", "media"] and date_published %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ (title or site.title) | dump | safe }},
+  "description": {{ _description | dump | safe }},
+  "mainEntityOfPage": {{ (site.url + page.url) | dump | safe }},
+  "datePublished": {{ (date_published | isoDate) | dump | safe }},
+  "dateModified": {{ ((date_updated or date_published) | newerOf(date_published)) | dump | safe }},
+  "image": {{ _ogImage | dump | safe }},
+  "author": [{% for a in _headAuthors %}{ "@type": "Person", "name": {{ a.displayName | dump | safe }}, "url": {{ (site.url + a.url) | dump | safe }} }{% if not loop.last %}, {% endif %}{% endfor %}],
+  "publisher": { "@type": "Organization", "name": {{ site.title | dump | safe }}, "logo": { "@type": "ImageObject", "url": {{ (site.defaultImage | absoluteUrl(site.url)) | dump | safe }} } }
+}
+</script>
 {% endif %}

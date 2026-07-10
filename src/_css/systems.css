@@ -1,16 +1,15 @@
 /* ── Systems-status widget (floating, every page) ────────────────────────
    Pinned left-center for visual balance against the graph widget
-   (top-right) and the radio widget (bottom-right). Same width as the
-   graph widget (220px), 20% taller (288px). Vertical centering via
-   top:50% + translateY(-50%). When folded, slides left so only the
-   fold button strip remains visible at the screen edge. */
+   (top-right) and the radio widget (bottom-right). 250px wide,
+   min-height 320px. Vertical centering via top + translateY(-50%).
+   When folded, slides left so only the fold button strip remains
+   visible at the screen edge. */
 
 .systems-widget {
   position: fixed;
   /* Vertical anchor. The announcements log roughly doubled the panel
-     height; 55% biases it slightly below center so the taller panel sits
-     clear of the masthead while keeping its bottom on-screen. Tuning
-     knob: nudge this %  up/down to taste. */
+     height; 49% keeps the taller panel clear of the masthead while
+     keeping its bottom on-screen. Tuning knob: nudge up/down to taste. */
   top: 49%;
   left: 1rem;
   transform: translateY(-50%);
@@ -455,15 +454,15 @@ body.is-encryption-failure .systems-failure-banner {
   font-size: 0.7rem;
 }
 
-/* Auto-fold in the medium-wide zone (1001–1455px) is driven by JS
-   (matchMedia) in systems-widget.js — see syncFoldedState(). The JS
-   toggles .is-folded so the fold button's state (« vs ») stays in sync
-   with the visual. Click-to-peek works in the auto-fold zone too.
-   1455 (up from 1400) accounts for the 250px widget width. */
+/* Auto-fold in the medium zone (821–1279px, the unified handoff all three
+   widgets share) is driven by JS (matchMedia) in systems-widget.js — see
+   syncFoldedState(). The JS toggles .is-folded so the fold button's state
+   (« vs ») stays in sync with the visual. Click-to-peek works in the
+   auto-fold zone too. */
 
 /* ── Hide at/below 820px ────────────────────────────────────────────────── */
-/* All three widgets fold-to-hidden together at 820px (the nav hamburger still
-   takes over lower, at 760px). */
+/* All three widgets fold-to-hidden together at 820px — the same breakpoint
+   the nav hamburger and intro-fold use (the unified mobile switchover). */
 
 @media (max-width: 820px) {
   .systems-widget {

@@ -99,8 +99,13 @@ function renderEntry(item, siteUrl, defaultAuthor, authorsByUrl) {
   const title = data.title || "(untitled)";
   const published = toIsoDate(data.date_published) || toIsoDate(item.date);
   // <updated> is required by the spec; fall back to published when no
-  // explicit date_updated.
-  const updated = toIsoDate(data.date_updated) || published;
+  // explicit date_updated. Clamped so it never precedes <published> —
+  // the vault plugin tracks date_updated as file-mtime, which can sit
+  // earlier than a forward-dated date_published, and "updated before
+  // published" confuses feed readers. (UTC ISO strings compare safely
+  // as strings.)
+  let updated = toIsoDate(data.date_updated) || published;
+  if (published && updated && updated < published) updated = published;
 
   const authors = resolveEntryAuthors(data, defaultAuthor, authorsByUrl);
 

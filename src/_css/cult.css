@@ -172,13 +172,10 @@ body.is-encryption-failure .site-station-id::after {
   font-weight: bold;
 }
 
-/* ── 4. SVG turbulence filters ──────────────────────────────────────────── */
-/* Only section titles (listing pages) get distortion — not reading pages */
-.section-title {
-  filter: url(#turbulence-mild);
-}
-
-/* No turbulence filter on masthead — displacement makes it too fuzzy */
+/* ── 4. Title treatment ─────────────────────────────────────────────────── */
+/* (An SVG turbulence filter on section titles lived here once, but its
+   <filter> defs never shipped in the markup, so browsers ignored it —
+   removed 2026-07 rather than resurrected.) */
 
 /* Reading pages: no animation or distortion on post/page titles */
 .page-title,
@@ -265,9 +262,9 @@ body.is-encryption-failure .site-station-id::after {
    into the sprite via duplicated frames in Piskel (5 idle + 3+2+2 break
    + 5 post-break), so this CSS just steps through them at a constant
    rate. To retune the animation, edit the sprite and re-export — no
-   CSS changes needed. To change the loop tempo, adjust 4s below.
-   If the frame count ever changes, update steps(N) AND the keyframe
-   target (-(N×64)px) to match. */
+   CSS changes needed. To change the loop tempo, adjust the 6s duration
+   below. If the frame count ever changes, update steps(N) AND the
+   keyframe target (-(N×64)px) to match. */
 .skull-logo {
   /* --skull-size drives box dims, sprite background-size, AND the
      skull-frames keyframe endpoint (calc(var(--skull-size) * -17)).
@@ -673,7 +670,7 @@ hr {
 }
 
 /* Skull sprite — step through 17 frames horizontally. Each step holds
-   for 1/17 of the animation duration (~235ms at 4s total). */
+   for 1/17 of the animation duration (~353ms at the 6s total). */
 @keyframes skull-frames {
   to { background-position: calc(var(--skull-size, 64px) * -17) 0; }
 }
@@ -748,15 +745,6 @@ hr {
   51%        { opacity: 0; }
   52%        { opacity: 1; }
   75%        { color: var(--blood-bright); }
-}
-
-/* Post/page title corruption */
-@keyframes title-corrupt {
-  0%, 91%, 100% { transform: none; }
-  92%  { transform: translateX(-4px) skewX(-3deg); text-shadow: 0.6rem 0 0 var(--ichor), -0.6rem 0 0 var(--brass); }
-  93%  { transform: translateX(3px); }
-  94%  { transform: translateX(-1px) skewX(1deg); }
-  95%  { transform: none; }
 }
 
 /* Tag border scan — verdigris ↔ ichor */

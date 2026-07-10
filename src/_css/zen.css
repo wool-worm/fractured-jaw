@@ -249,8 +249,10 @@ html.zen {
 
 /* ── 2. Motion: stop everything ─────────────────────────────────────────────
    Mirrors the prefers-reduced-motion block, scoped to zen. JS-driven canvas
-   motion (the graph widget's force simulation) is unaffected and keeps
-   drifting on purpose. */
+   motion (the graph widget's force simulation) is deliberately untouched:
+   the graph stays alive in zen. Since the physics loop self-suspends once
+   the layout settles, that means a short settle animation, not perpetual
+   drift. */
 html.zen *,
 html.zen *::before,
 html.zen *::after {
@@ -323,9 +325,8 @@ html.zen .home-sections::before {
 }
 
 /* ── 4. Flatten shadows + filters the token remap can't reach ───────────────
-   The literal rgba(139,0,0,...) drop shadows and the SVG turbulence /
-   skull drop-shadow filters don't reference --blood, so neutralise them
-   explicitly. */
+   The literal rgba(139,0,0,...) drop shadows and the skull drop-shadow
+   filter don't reference --blood, so neutralise them explicitly. */
 html.zen h1, html.zen h2, html.zen h3, html.zen h4, html.zen h5, html.zen h6,
 html.zen .page-title, html.zen .section-title, html.zen .post-title,
 html.zen .post-card-title a {
@@ -348,10 +349,6 @@ html.zen .wikilink-preview {
 
 html.zen .search-modal-panel {
   box-shadow: none;
-}
-
-html.zen .section-title {
-  filter: none;
 }
 
 /* ── 5. Masthead + skull: calm, readable, static ────────────────────────────

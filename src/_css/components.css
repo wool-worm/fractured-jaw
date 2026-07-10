@@ -275,11 +275,13 @@
 }
 
 /* ── Foldable intros (mobile only) ──────────────────────────────────────── */
-/* intro-fold.js adds .intro-foldable when the viewport is <=760px AND the
-   intro's natural height exceeds the 150px threshold; it also inserts the
+/* intro-fold.js adds .intro-foldable when the viewport is <=820px AND the
+   intro's natural height exceeds the 100px threshold; it also inserts the
    .intro-fold-toggle button. Above the breakpoint the class is removed
-   and the button hidden, so desktop layout is unchanged. */
-@media (max-width: 760px) {
+   and the button hidden, so desktop layout is unchanged. 820px is the
+   unified mobile switchover (hamburger + widget-hide + intro-fold) and
+   must match BREAKPOINT_MAX in intro-fold.js. */
+@media (max-width: 820px) {
   .intro-foldable {
     position: relative;
     max-height: 100px;
@@ -832,12 +834,6 @@
   font-size: 1.125rem;
   line-height: 1.8;
 }
-
-/* Section-specific accent colours on post cards */
-.post-blog     .post-card { border-left-color: #0a0; }
-.post-essay    .post-card { border-left-color: #06c; }
-.post-fragment .post-card { border-left-color: #c0c; }
-.post-media    .post-card { border-left-color: #c80; }
 
 /* ── Accessibility helper ───────────────────────────────────────────────── */
 .visually-hidden {

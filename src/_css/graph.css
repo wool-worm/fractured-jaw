@@ -330,7 +330,8 @@
    Click-to-peek works in the auto-fold zone too. */
 
 /* Hide widget at/below 820px — all three widgets fold-to-hidden together
-   here (the nav hamburger still kicks in lower, at 760px). */
+   here, the same breakpoint as the nav hamburger + intro-fold (the
+   unified mobile switchover). */
 @media (max-width: 820px) {
   .graph-widget {
     display: none;

@@ -30,6 +30,16 @@ function stripFrontmatter(raw) {
   return m ? m[1] : raw;
 }
 
+// Blank out fenced code blocks and inline code spans before scanning.
+// markdown-it never linkifies wikilinks inside code, so a [[...]] shown
+// as a syntax example would otherwise produce a graph edge the rendered
+// page doesn't actually have.
+function stripCode(body) {
+  return body
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`[^`\n]*`/g, " ");
+}
+
 class GraphData {
   data() {
     return {
@@ -65,7 +75,19 @@ class GraphData {
     // plugin uses. Edges to unknown targets (typos, dead links, or pages
     // excluded via graph_enabled:false) are dropped silently here; the
     // wikilink plugin still warns at build for genuine dead links.
+    //
+    // Edges are deduped (a post linking the same target three times is
+    // still one edge — repeats would triple the spring pull in the force
+    // layout and bloat the JSON). The same set also catches a body link
+    // duplicating a frontmatter-synthesized author/series edge below.
     const linkEdges = [];
+    const seenEdges = new Set();
+    function addLinkEdge(source, target) {
+      const key = source + " " + target;
+      if (seenEdges.has(key)) return;
+      seenEdges.add(key);
+      linkEdges.push({ source, target });
+    }
     for (const item of items) {
       if (!item.url) continue;
       // Skip outgoing edges from excluded pages — orphan source IDs
@@ -73,7 +95,7 @@ class GraphData {
       if (item.data.graph_enabled === false) continue;
 
       const raw = fs.readFileSync(item.inputPath, "utf8");
-      const body = stripFrontmatter(raw);
+      const body = stripCode(stripFrontmatter(raw));
 
       WIKILINK_RE.lastIndex = 0; // regex is module-scoped; reset between items
       let m;
@@ -82,7 +104,7 @@ class GraphData {
         const targetUrl = vaultPathToUrl(vaultPath.trim());
         if (!targetUrl || targetUrl === item.url) continue;
         if (!knownUrls.has(targetUrl)) continue;
-        linkEdges.push({ source: item.url, target: targetUrl });
+        addLinkEdge(item.url, targetUrl);
       }
     }
 
@@ -107,7 +129,7 @@ class GraphData {
       for (const entry of parsed.entries) {
         if (entry.kind !== "wikilink") continue;
         if (!knownUrls.has(entry.url)) continue;
-        linkEdges.push({ source: item.url, target: entry.url });
+        addLinkEdge(item.url, entry.url);
       }
     }
 
@@ -130,7 +152,7 @@ class GraphData {
       const parsed = parseSeriesField(item.data.series_name, CONTENT_ROOT);
       if (parsed.kind !== "wikilink") continue;
       if (!knownUrls.has(parsed.url)) continue;
-      linkEdges.push({ source: item.url, target: parsed.url });
+      addLinkEdge(item.url, parsed.url);
     }
 
     // Tag nodes + post→tag edges. Tags are a separate node type so the

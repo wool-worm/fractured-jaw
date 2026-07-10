@@ -1,13 +1,13 @@
 /* Mobile nav toggle.
    Wires the hamburger button (.site-nav-toggle) to the nav dropdown
    (.site-nav) by flipping data-open + aria-expanded. The button is
-   visually hidden above 760px via CSS, so this script no-ops at desktop
+   visually hidden above 820px via CSS, so this script no-ops at desktop
    widths (the listeners are attached but never fire — the button is
    display:none). Closes the panel on:
      - Esc keypress
      - Click on any link inside the panel
      - Click outside the header (overlay-dismiss)
-     - Viewport widening past 760px (so the panel doesn't stay "open"
+     - Viewport widening past 820px (so the panel doesn't stay "open"
        invisibly when the user resizes back up to desktop)
 */
 (function () {

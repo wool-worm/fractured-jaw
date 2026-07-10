@@ -19,6 +19,14 @@ yarn-error.log*
 Thumbs.db
 desktop.ini
 
+# Cygwin/MSYS crash dumps (Git Bash grep occasionally aborts and drops
+# these at the cwd)
+*.stackdump
+
+# Music Embed Wizard writes a .bak safety copy next to radio-music.md
+# before every station write; backups must never ride a content commit
+src/content/_data/*.bak
+
 # Editor scratch
 .vscode/
 .idea/

@@ -270,7 +270,7 @@ module.exports = {
     // Resolve the frontmatter `image:` field once, before any template
     // reads it. Strict-form: must be a wikilink (`[[_attachments/...|alt]]`)
     // pointing at a real file on disk. Bare strings (URLs, paths) warn in
-    // dev and error in prod via [src/utils/wikilink-report.js]. Caption
+    // dev and error in prod via src/utils/build-report.js. Caption
     // after the pipe is exposed as `image_alt` for templates that want
     // alt text without re-parsing.
     image: (data) => resolveFrontmatterImage(data).url,
