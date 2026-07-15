@@ -3,7 +3,7 @@
 module.exports = {
   title: "Fractured Jaw",
   description:
-    "A zine and blog. Writing, music, politics. Anonymous, intermittent, hand-built.",
+    "A zine and blog. Writing, music, politics. Anonymous, intermittent, static.",
   // Short brand tagline appended to the homepage <title> (after "Fractured
   // Jaw :: ") so it isn't a too-short bare brand name. Keep it punchy; the
   // full <title> should land roughly 50-60 chars. Empty = bare site.title.
