@@ -1,17 +1,11 @@
 ---
 title: Two Fresh Tracks & Surprise Album Drop
 date_published: 2026-07-08T20:48:41
-date_updated: 2026-07-09T22:30:55
+date_updated: 2026-07-11T13:29:33
 author: "[[authors/wool-worm|wool-worm]]"
-tags:
-  - media
-  - review
-  - electronic
-  - dub
-  - techno
-  - experimental
+tags: [media, review, electronic, dub, techno, experimental]
 series_name:
-description: Spotted two fresh dub-techno finds while trawling the freqs, plus a bonus album drop that is literally breaking peoples' computers.
+description: "Spotted two fresh dub-techno finds while trawling the freqs, plus a bonus album drop that is literally breaking peoples' computers."
 featured: true
 draft: false
 exclude: false
@@ -37,7 +31,7 @@ Since I became aware of Müller’s music with the 2018 release of *Compro,* I�
 
 Hitting play on this track, your feet are instantly pulled from under you by the hazy rip-tide of pulsing bass. As the subtle textures surrounding that rhythmic impulse slowly come into focus, a reverb drenched synth hits like a heat element powering on. Chords begin to punch through from the background with their heavy delay echoing throughout; there goes a lone sound system thumping out a dub track down the empty road. Solenoid ticks and phased pads pan as the track continues to layer.
 
-And like any good Skee Mask track, as the complexity seems to be building to its peak, there is a subtle pullback. Great compositions always leave room to breathe, to recover a bit, before charging on. In a genre sometimes known for its relentlessness, there is a great sensitivity in exercising restraint. With some of the claustrophobic layers peeled back, a central synth voice is given room to explore its surroundings. Entirely inhuman, but not entirely artificial, the deep rumbling basso barks out from the background before being smothered again. Like a biologic agent growing across a substrate, the mycorrhizal tendrils of the synth pads spiral their way back into to mix before a frigid phased out hat rhythm hits the writhing mass like a overdriven halogen bulb.
+And like any good Skee Mask track, as the complexity seems to be building to its peak, there is a subtle pullback. Great compositions always leave room to breathe, to recover a bit, before charging on. In a genre sometimes known for its relentlessness, there is a great sensitivity in exercising restraint. With some of the claustrophobic layers peeled back, a central synth voice is given room to explore its surroundings. Entirely inhuman, but not entirely artificial, the deep rumbling basso barks out from the background before being smothered again. Like a biologic agent growing across a substrate, the mycorrhizal tendrils of the synth pads spiral their way back into the mix before a frigid phased out hat rhythm hits the writhing mass like a overdriven halogen bulb.
 
 Now all the pieces are there and the bio-machine has come to life, but even in this heavy groove, the callback to Burial is clear. The drenched cityscape, the hissing air returns, even the lonesome metallic shriek at 4:34–trains braking in the railyard. Its the same city, the same alienation, but this time we’re all dancing to it.
 

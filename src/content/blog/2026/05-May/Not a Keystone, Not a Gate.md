@@ -12,7 +12,7 @@ tags:
   - on-writing
 series_name:
 description: The inaugural post for Fractured Jaw
-featured: true
+featured: false
 draft: false
 exclude: false
 preview_enabled: true
