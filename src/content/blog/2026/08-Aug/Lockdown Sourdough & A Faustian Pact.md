@@ -16,7 +16,7 @@ image: "[[_attachments/blog/lockdown-sourdough-a-faustian-pact/cover.jpg|CCTV ca
 image_focus: center center
 reading_time: 14–18 min
 ---
-# “The Rant”
+### “The Rant”
 
 Anyone that hangs around me long enough will doubtless hear “the rant.” The rant knows no limits—social niceties, cultural conventions, and sidelong eyerolls cannot stop it. The rant has known many settings, late night phone calls and long car rides are a favorite, but for the most part it is indiscriminate and opportunistic. To be fair to myself, everyone has a rant of some kind. I’m sure you can think of one you’ve idly rehearsed in the shower, or perhaps you’ve made it as far as subjecting your relatives to it at a family barbecue, not that I would know.
 
@@ -24,7 +24,7 @@ My rant is about technologies of attention: what they are, what they do to our p
 
 One aspect of the rant that has intrigued me over the last few years is the transformation in how it is received. In the early iterations, it was a truly niche topic in my social circles and only garnered conversations with likeminded folks, people working in tech, or those who had made infosec and privacy into a hobby of sorts. Tellingly, as we have slid further into the post-COVID technological landscape, there has been an unmistakable tone shift. A topic that once felt unrelatable, even alienating at times, has gone somewhat mainstream.
 
-# Cottage-core and its consequences
+### Cottage-core and its consequences
 
 I certainly cannot take any credit here, despite it being a special interest of mine, enormous social forces have been at work. At the height of the pandemic, the cottage-core aesthetic captured the imaginations of many a locked down, screen-bound, freshly minted remote worker. It seemed like overnight, everyone was baking their own bread, churning their own butter, or taking up some kind of needlework project. There was a palpable craving in the zeitgeist at the time for any kind of embodied experience. Its not surprising, and only a touch ironic, that this occurred during (and due to) the greatest expansion of social media use since the late aughties boom.
 
@@ -32,7 +32,7 @@ As we gradually reentered the world, cottage-core received a bit of an overdue r
 
 While I personally didn’t follow the cottage-core scene very closely, I certainly identified with the social discontent it was speaking to. In a world of ceaseless zoom calls, outdoor “pod” hangouts, and hours spent rotting on Instagram, any depiction of an alternative was intoxicating. Its enormous popularity was testament to the presence of what it appealed to. It didn’t so much speak for itself in the end, as much as for the epiphenomenon that it harnessed. And maybe I’m giving the influencers too much credit here, perhaps they didn’t have us all so fooled—maybe it was a somewhere in between fiction and deception, in that weird space of kayfabe where we all nodded our heads in affirmation, but privately wanted more than the illusion could bear.
 
-# A bit more on attention
+### A bit more on attention
 
 People that know me in real life, and now I suppose anyone that stumbles on this blog post, also knows that I am a practicing Buddhist, and practicing attention tends to come with the territory. Of course like any practice, there are high tides and low tides, and while I will never claim to be any better or worse at it than anyone else, there is one thing my experience has made clear: attention changes the world. This wisdom is expressed continuously by the teachers of the dharma, reframed by a number of western thinkers such as Weil and presently McGilchrist, and distilled by poets like Mary Oliver and W.S. Merwin. It is also perhaps the most immediately accessible truth available to anyone; after everything else has been stripped away, we still have the ability to choose what we attend to. This is sadly so fundamental that it often goes ignored rather than exercised. Many (including myself) take it as a matter of course that attention is a thing, at least mostly, out of our control. Yes, you can wrestle it towards a task for a limited time, but it all too quickly flies away to some unknown destination. This is all the more true in our terminally distracted world. What many people don’t know, or have forgotten, or don’t have the space to realize is that attention is both a (*the*) way of being in the world and something that grows stronger with practice. It is perhaps *the only* skill that grants access to the greater phenomenological world.
 
@@ -46,7 +46,7 @@ That was a bit of a detour to say that there are many more people than just Boom
 
 I also sense that people have begun to feel a bit Pavlovian lately. It is impossible to interact with modern apps without noticing the automaticity they have trained. I, for my part, had the exact swipe sequence needed to reach Instagram memorized; I probably could have done it with my eyes shut. Even the sequencing of content feels predictable. There is the lure, some interesting short video that leaves just enough to the imagination to warrant a click, then the rabbit hole of increasingly obscure and niche content, finally climaxing in the inevitable hate-watch videos. This plays out over and over again, and often we are left with a “why did I just do that” ringing in our heads. This little gap is where the light gets in. It is the recognition that it really isn’t part of our nature to be this way and it isn’t in our interests to do so. Hiding somewhere in that space between scrolling and the lock button is the recognition that attention is something you train, and if you don’t do it, someone else will do it for you.
 
-# “The experiment”
+### “The experiment”
 
 Where is all of this going? Well I certainly didn’t plan to write a diatribe about cottage-core and iPhones. But I also try to write from the heart with minimal forethought, so I suppose that is where my mind is right now. I originally set out to write about “the rant” and “the experiment” but uncovered a few things along the way. In hindsight, those topics trace part of the chord between those two endpoints, and if they are relatable enough, maybe they can draw that line for you too.
 
