@@ -15,7 +15,7 @@ tags:
   - phonk
 series_name: "[[series/boogra-boy's Monthly Mystery Mix|boogra-boy's Monthly Mystery Mix]]"
 description: Phonk, house, techno, galore. This June boogra-boy bring the beats and nothing but.
-featured: true
+featured: false
 draft: false
 exclude: false
 preview_enabled: true
