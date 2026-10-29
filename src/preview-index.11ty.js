@@ -14,7 +14,9 @@
 // these against the transform plugin's calls on shared sources.
 
 const path = require("path");
-const Image = require("@11ty/eleventy-img");
+// eleventy-img v7 is ESM-only; require() returns the module namespace, so
+// .default is the callable Image() (with .generateHTML attached).
+const Image = require("@11ty/eleventy-img").default;
 
 const IMG_OPTIONS = {
   widths: [400, 800, 1200, 1600],
