@@ -29,7 +29,7 @@
 //
 // Idempotency mirrors the Discord dispatch: "new" is computed by the feed
 // diff against the live site, and once deployed a post is in the live feed, so
-// the next deploy won't re-detect it. No npm dependency (Node 20 global fetch).
+// the next deploy won't re-detect it. No npm dependency (Node's built-in fetch).
 
 const fs = require("fs");
 
