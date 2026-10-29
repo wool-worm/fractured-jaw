@@ -1,9 +1,14 @@
 ---
-title: Lockdown Sourdough & A Faustian Pact
+title: Lockdown Sourdough
 date_published: 2026-08-03T19:43:02
 date_updated: 2026-08-14T23:58:47
 author: "[[authors/wool-worm|wool-worm]]"
-tags: [blog, technology, digital-minimalism, data-privacy, attention]
+tags:
+  - blog
+  - technology
+  - digital-minimalism
+  - data-privacy
+  - attention
 series_name:
 description: "In which I answer the big questions like: why did I try to make my own butter during lockdown, if GPS and flashlights are useful technologies, and how we allowed the iPod to ever go out of fashion."
 featured: true
@@ -12,7 +17,7 @@ exclude: false
 preview_enabled: true
 graph_enabled: true
 newsletter_enabled: true
-image: "[[_attachments/blog/lockdown-sourdough-a-faustian-pact/cover.jpg|CCTV camera in a cage]]"
+image: "[[_attachments/blog/lockdown-sourdough/cover.jpg|CCTV camera in a cage]]"
 image_focus: center center
 reading_time: 14–18 min
 ---
@@ -20,7 +25,7 @@ reading_time: 14–18 min
 
 Anyone that hangs around me long enough will doubtless hear “the rant.” The rant knows no limits—social niceties, cultural conventions, and sidelong eyerolls cannot stop it. The rant has known many settings, late night phone calls and long car rides are a favorite, but for the most part it is indiscriminate and opportunistic. To be fair to myself, everyone has a rant of some kind. I’m sure you can think of one you’ve idly rehearsed in the shower, or perhaps you’ve made it as far as subjecting your relatives to it at a family barbecue, not that I would know.
 
-My rant is about technologies of attention: what they are, what they do to our perception of and interactions with the world, and the system that is forming as we, at an increasingly rapid rate, fuse with them. I know, it all sounds very dramatic, and believe me, it really is. Simone Weil, keenly picking up the threads laid down by millennia of thought, concludes that “attention is the rarest and purest form of generosity.” So why do we give it away with so little care?
+My rant is about technologies of attention: what they are, what they do to our perception of and interactions with the world, and the system that is forming as we, at an increasingly rapid rate, fuse with them. I know, it all sounds very dramatic, and believe me, it really is. Simone Weil, succinctly grazing the core of our spiritual reality, concludes that “attention is the rarest and purest form of generosity.” So why do we give it away with so little care?
 
 One aspect of the rant that has intrigued me over the last few years is the transformation in how it is received. In the early iterations, it was a truly niche topic in my social circles and only garnered conversations with likeminded folks, people working in tech, or those who had made infosec and privacy into a hobby of sorts. Tellingly, as we have slid further into the post-COVID technological landscape, there has been an unmistakable tone shift. A topic that once felt unrelatable, even alienating at times, has gone somewhat mainstream.
 
@@ -52,7 +57,7 @@ Where is all of this going? Well I certainly didn’t plan to write a diatribe a
 
 “The experiment” is something I’ve been talking about for a long time, but somehow putting off for even longer. Its a reaction to but also a moderation of the role technology plays in my life. As this post makes pretty clear, I was a pretty heavy phone user. At times it felt like carrying around a pack of cigarettes in my pocket while trying to quit smoking. I had spent a lot of time acknowledging this (see: “the rant”) but very little time doing anything about it. In that intervening time, I have seen my attention degrade precipitously and the Pavlovian feeling creeping in. There was some effect too of realizing that, sometime soon, I’ll have spent more of my life than not with a smartphone. I spent more and more time wondering what I was truly gaining from this arrangement and I began to wonder what a new contract with my technology might look like. For the record, I am not a dogmatic “phone-bad” person. There are many wonderful qualities of these devices that I would not want to lose: GPS, a camera, a flashlight (I think this was the first app developed for the iPhone), a calculator. Many more functions on top of these too are massively enabling. Then what sort of Faustian pact I had made with the rest of the device?
 
-Stafford Beer famously coined the delightful acronym “POSIWID,” the purpose of a system is what it does. What did my personal technological world *do*? Well some of it, the calculator, the camera, the GPS, was *connective*. These were tools that allowed me to interface with the real world more effectively. I know I have gone on [[essays/2026/05-May/False Idol, Dream Virus|rants about “ease” and “smoothness”]] in the past but you’ll have to bear with me, I’m still figuring all this out. A lot of ease and smoothness is quite helpful, doubly so for those with disabilities or the elderly; it would have served to have taken a less totalizing stance on that topic before. But I think the distinction might not entirely live in the ease or smoothness of a technology, but in its *enclosure*. Unlike technologies of connection that are built to be instrumental, technologies of attention are typically built to be ends in and of themselves. What they *do* is trap and confine, any connection they foster is largely incidental to their purpose, or at most a convenient excuse for their existence. As I wrote in my previous piece, they identify a societal need, propose themselves as the solution, and then undermine any alternatives, they are a parasitic architecture of the mind. Interestingly, this is also Cory Doctorow’s “enshittification” at work at an mental and emotional scale. We have offloaded our attention to a system that promised ease, were given enclosure, and now we have to pay to get it back.
+Stafford Beer famously coined the delightful acronym “POSIWID,” the purpose of a system is what it does. What did my personal technological world *do*? Well some of it, the calculator, the camera, the GPS, was *connective*. These were tools that allowed me to interface with the real world more effectively. I know I have gone on [[essays/2026/05-May/False Idol, Dream Virus|rants about “ease” and “smoothness”]] in the past but you’ll have to bear with me, I’m still figuring all this out. A lot of ease and smoothness is quite helpful, doubly so for those with disabilities or the elderly; it would have served to have taken a less totalizing stance on that topic before. But I think the distinction might not entirely live in the ease or smoothness of a technology, but in its *enclosure*. Unlike technologies of connection that are built to be instrumental, technologies of attention are typically built to be ends in and of themselves. What they *do* is trap and confine, any connection they foster is largely incidental to their purpose, or at most a convenient excuse for their existence. As I wrote in my previous piece, they identify a societal need, propose themselves as the solution, and then undermine any alternatives, they are a parasitic architecture of the mind. Interestingly, this is also Cory Doctorow’s “enshittification” at work on a mental and emotional scale. We have offloaded our attention to a system that promised ease, were given enclosure, and now we have to pay to get it back.
 
 It started with a full inventory of my digital life. Everything I do on a device logged and considered. Did this activity feel mostly connective or mostly enclosing? What were the things I truly needed to do on the timeframe of minutes, hours, days, weeks? It turns out that many of the things I felt required the utmost urgency needed nothing of the sort. A good example is email. There are very few emails that are so time sensitive as to require a response in less than 24 hours. I would argue that unless you are in the medical or legal professions, or in an active combat zone, very few things are that life-or-death at all. Anything that could be handled in greater than 24 hours, more than 90% of the time, would be pushed off to my computer—it didn’t need to be in my pocket, so it would stay on my desk. Since I already had the patient open for surgery, I reconsidered my relationship with streaming media as well. Was I okay with suddenly losing access to music or movies that I had paid for? Was I okay with the patterns of consumption that those apps cultivated? My full assessment was in, I had arrived at a plan for technological de-evolution.
 

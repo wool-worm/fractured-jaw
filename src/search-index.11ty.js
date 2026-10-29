@@ -16,7 +16,9 @@
 // processed once per build.
 
 const path = require("path");
-const Image = require("@11ty/eleventy-img");
+// eleventy-img v7 is ESM-only; require() returns the module namespace, so
+// .default is the callable Image() (with .generateHTML attached).
+const Image = require("@11ty/eleventy-img").default;
 const slugify = require("./utils/slugify");
 const { parseAuthorField, resolveAuthors } = require("./utils/authors");
 
